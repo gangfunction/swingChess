@@ -11,7 +11,7 @@ import java.util.List;
 public class Pawn {
     public List<Position> calculatePawnMoves(ChessPiece piece, ChessBoard chessBoard) {
         List<Position> validMoves = new ArrayList<>();
-        int direction = piece.getColor() == Player.Color.WHITE ? 1 : -1;
+        int direction = piece.getColor() == Player.Color.WHITE ? -1 : 1;
         int startX = piece.getPosition().getX();
         int startY = piece.getPosition().getY();
 
@@ -21,7 +21,10 @@ public class Pawn {
             validMoves.add(oneStepForward);
 
             // 첫 이동인 경우, 두 칸 이동 가능
-            if ((piece.getColor() == Player.Color.WHITE && startY == 1) || (piece.getColor() == Player.Color.BLACK && startY == 6)) {
+            System.out.println("piece.getColor(): " + piece.getColor());
+            System.out.println("startY: " + startY);
+            if ((piece.getColor() == Player.Color.WHITE && startY == 6) || (piece.getColor() == Player.Color.BLACK && startY == 1)) {
+                System.out.println("startY: " + startY);
                 Position twoStepsForward = new Position(startX, startY + 2 * direction);
                 if (chessBoard.isPositionEmpty(twoStepsForward)) {
                     validMoves.add(twoStepsForward);

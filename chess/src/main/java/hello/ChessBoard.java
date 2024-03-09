@@ -38,6 +38,9 @@ public class ChessBoard {
         }
     }
 
+
+
+
     private void handleSquareClick(int x, int y) {
         //일단 클릭한 위치에 말이 있는지 확인
         Optional<ChessPiece> pieceOptional = findPieceAtPosition(x, y);
