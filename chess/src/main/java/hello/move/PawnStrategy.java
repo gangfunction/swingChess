@@ -8,12 +8,17 @@ import hello.Position;
 import java.util.ArrayList;
 import java.util.List;
 
-public class Pawn {
-    public List<Position> calculatePawnMoves(ChessPiece piece, ChessBoard chessBoard) {
+public class PawnStrategy implements MoveStrategy {
+
+    @Override
+    public List<Position> calculateMoves( ChessBoard chessBoard, ChessPiece piece) {
         List<Position> validMoves = new ArrayList<>();
-        int direction = piece.getColor() == Player.Color.WHITE ? -1 : 1;
-        int startX = piece.getPosition().getX();
-        int startY = piece.getPosition().getY();
+        Position position = piece.getPosition();
+        Player.Color color = piece.getColor();
+
+        int direction = color == Player.Color.WHITE ? -1 : 1;
+        int startX = position.getX();
+        int startY = position.getY();
 
         // 직선 이동 검사
         Position oneStepForward = new Position(startX, startY + direction);
@@ -21,9 +26,9 @@ public class Pawn {
             validMoves.add(oneStepForward);
 
             // 첫 이동인 경우, 두 칸 이동 가능
-            System.out.println("piece.getColor(): " + piece.getColor());
+            System.out.println("piece.getColor(): " + color);
             System.out.println("startY: " + startY);
-            if ((piece.getColor() == Player.Color.WHITE && startY == 6) || (piece.getColor() == Player.Color.BLACK && startY == 1)) {
+            if ((color == Player.Color.WHITE && startY == 6) || (color == Player.Color.BLACK && startY == 1)) {
                 System.out.println("startY: " + startY);
                 Position twoStepsForward = new Position(startX, startY + 2 * direction);
                 if (chessBoard.isPositionEmpty(twoStepsForward)) {
@@ -38,7 +43,7 @@ public class Pawn {
                 new Position(startX + 1, startY + direction)
         };
         for (Position attackPos : attackPositions) {
-            if (chessBoard.isPositionOccupiedByOpponent(attackPos, piece.getColor())){
+            if (chessBoard.isPositionOccupiedByOpponent(attackPos, color)){
                 validMoves.add(attackPos);
             }
         }

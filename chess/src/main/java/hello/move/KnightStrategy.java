@@ -2,14 +2,19 @@ package hello.move;
 
 import hello.ChessBoard;
 import hello.ChessPiece;
+import hello.Player;
 import hello.Position;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class Knight {
-    public List<Position> calculateKnightMoves(ChessPiece piece, ChessBoard chessBoard) {
+public class KnightStrategy implements MoveStrategy {
+
+    @Override
+    public List<Position> calculateMoves(ChessBoard chessBoard, ChessPiece piece) {
         List<Position> validMoves = new ArrayList<>();
+        Position position = piece.getPosition();
+        Player.Color color = piece.getColor();
         int[][] directions = {
                 {-2, -1}, {-2, 1},
                 {-1, -2}, {-1, 2},
@@ -18,8 +23,8 @@ public class Knight {
         };
 
         for (int[] dir : directions) {
-            int newX = piece.getPosition().getX() + dir[0];
-            int newY = piece.getPosition().getY() + dir[1];
+            int newX = position.getX() + dir[0];
+            int newY = position.getY() + dir[1];
 
             // 이동하려는 위치가 체스판 내부에 있는지 확인
             if (newX >= 0 && newX < 8 && newY >= 0 && newY < 8) {

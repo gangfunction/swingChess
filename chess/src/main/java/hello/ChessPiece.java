@@ -1,10 +1,28 @@
 package hello;
 
 
+import hello.move.MoveStrategy;
+
+import java.util.List;
+
 public class ChessPiece {
     private Type type;
     private Position position;
     private Player.Color color;
+
+    public ChessPiece(MoveStrategy moveStrategy) {
+        this.moveStrategy = moveStrategy;
+    }
+
+    private MoveStrategy moveStrategy;
+
+    public void setMoveStrategy(MoveStrategy moveStrategy) {
+        this.moveStrategy = moveStrategy;
+    }
+    public List<Position> calculateMoves(ChessBoard chessBoard, ChessPiece piece) {
+        return moveStrategy.calculateMoves(chessBoard, piece);
+    }
+
 
     // 체스말의 종류를 나타내는 열거형
     public enum Type {
