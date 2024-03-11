@@ -1,7 +1,7 @@
 package hello.move;
 
-import hello.ChessBoard;
-import hello.ChessPiece;
+import hello.gameobject.ChessBoard;
+import hello.gameobject.ChessPiece;
 import hello.Position;
 
 import java.util.ArrayList;
@@ -26,13 +26,13 @@ public class RookStrategy implements MoveStrategy {
                 currentY += direction[1];
                 Position newPosition = new Position(currentX, currentY);
 
-                if (!chessBoard.isValidPosition(newPosition)) {
+                if (!chessBoard.getDistanceManager().isValidPosition(newPosition, chessBoard)) {
                     break; // 보드 범위를 벗어난 경우
                 }
 
-                if (chessBoard.isPositionEmpty(newPosition) || chessBoard.isPositionOccupiedByOpponent(newPosition, piece.getColor())) {
+                if (chessBoard.getDistanceManager().isPositionEmpty(newPosition, chessBoard) || chessBoard.getDistanceManager().isPositionOccupiedByOpponent(newPosition, piece.getColor(), chessBoard)) {
                     validMoves.add(newPosition); // 빈 칸이거나 상대 말이 있는 경우
-                    if (chessBoard.isPositionOccupiedByOpponent(newPosition, piece.getColor())) {
+                    if (chessBoard.getDistanceManager().isPositionOccupiedByOpponent(newPosition, piece.getColor(), chessBoard)) {
                         break; // 상대 말을 잡을 수 있는 위치에 도달한 경우
                     }
                 } else {

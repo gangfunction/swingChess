@@ -1,7 +1,7 @@
 package hello.move;
 
-import hello.ChessBoard;
-import hello.ChessPiece;
+import hello.gameobject.ChessBoard;
+import hello.gameobject.ChessPiece;
 import hello.Position;
 
 import java.util.ArrayList;
@@ -28,14 +28,14 @@ public class QueenStrategy implements MoveStrategy {
 
                 Position newPosition = new Position(x, y);
 
-                if (!chessBoard.isValidPosition(newPosition)) {
+                if (!chessBoard.getDistanceManager().isValidPosition(newPosition, chessBoard)) {
                     break;
                 }
 
-                if (chessBoard.isPositionEmpty(newPosition)) {
+                if (chessBoard.getDistanceManager().isPositionEmpty(newPosition, chessBoard)) {
                     validMoves.add(newPosition);
                 } else {
-                    if (chessBoard.isPositionOccupiedByOpponent(newPosition, piece.getColor())) {
+                    if (chessBoard.getDistanceManager().isPositionOccupiedByOpponent(newPosition, piece.getColor(), chessBoard)) {
                         validMoves.add(newPosition);
                     }
                     break;

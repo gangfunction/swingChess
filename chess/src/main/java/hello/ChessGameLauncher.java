@@ -1,6 +1,9 @@
 package hello;
 
+import hello.ui.ButtonConfigurer;
+
 import javax.swing.*;
+import java.awt.event.ActionListener;
 import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
 
@@ -17,59 +20,33 @@ public class ChessGameLauncher {
         dialog.add(panel);
         panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
 
-        // 버튼을 ButtonConfigurer를 사용하여 구성
-        newGame(owner, panel, dialog);
+        // 버튼 추가 로직
+        addButtonsToPanel(panel, dialog);
 
-        JButton loadGameButton = ButtonConfigurer.configureButton("게임 불러오기", e -> {
-            System.out.println("게임 불러오기!");
-            // 게임 불러오기 로직
-        });
-        panel.add(loadGameButton);
-
-        JButton exitButton = ButtonConfigurer.configureButton("게임 종료", e -> System.exit(0));
-        panel.add(exitButton);
-        owner.addComponentListener(new ComponentAdapter() {
-            @Override
-            public void componentMoved(ComponentEvent e) {
-                dialog.setLocationRelativeTo(owner);
-            }
-        });
-
-        // 프레임 가운데 정렬 및 표시
+        // 다이얼로그 위치 설정과 표시
         dialog.setLocationRelativeTo(owner);
         dialog.setVisible(true);
     }
 
-    private static void newGame(JFrame owner, JPanel panel, JDialog dialog) {
-        ChessBoard chessBoard = new ChessBoard(); // 체스보드를 새로 생성하거나 초기화
-        GameState gameState = new GameState(); // 게임 상태를 새로 생성하거나 초기화
-        JButton newGameButton = ButtonConfigurer.configureButton("새 게임", e -> {
-            try{
-                dialog.setVisible(false);
-                chessBoard.resetBoard();
-                gameState.resetGame(); // 게임 상태를 새 게임 상태로 리셋
-                boolean loadSuccess = true;
-                if(!loadSuccess){
-                    throw new Exception("게임 로딩 실패");
-                }
-
-            }catch (Exception ex){
-                JOptionPane.showMessageDialog(dialog, "게임 로딩 실패. 3초 후 게임을 종료합니다.");
-                try {
-                    Thread.sleep(3000);
-                } catch (InterruptedException ie) {
-                    Thread.currentThread().interrupt();
-                }
-                System.exit(0);
-            }
+    private static void addButtonsToPanel(JPanel panel, JDialog dialog) {
+        panel.add(createButton("새 게임", e -> {
             System.out.println("새 게임 시작!");
+            dialog.dispose();
+            // TODO: 새 게임 시작 로직
+        }));
 
-            owner.setContentPane(chessBoard.getBoardPanel()); // 메인 프레임의 컨텐트 팬을 새 체스보드로 설정
-            owner.revalidate(); // 메인 프레임의 UI를 새롭게 그립니다.
-            owner.repaint();
-        });
-        panel.add(newGameButton);
+        panel.add(createButton("게임 불러오기", e -> {
+            System.out.println("게임 불러오기!");
+            // TODO: 게임 불러오기 로직
+        }));
+
+        panel.add(createButton("게임 종료", e -> System.exit(0)));
     }
+
+    private static JButton createButton(String text, ActionListener actionListener) {
+        return ButtonConfigurer.configureButton(text, actionListener);
+    }
+
 
 
 }

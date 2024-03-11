@@ -1,9 +1,9 @@
 package hello.move;
 
-import hello.ChessBoard;
-import hello.ChessPiece;
-import hello.Player;
-import hello.Position;
+import hello.*;
+import hello.core.Player;
+import hello.gameobject.ChessBoard;
+import hello.gameobject.ChessPiece;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -25,13 +25,14 @@ public class BishopStrategy implements MoveStrategy {
                 y += direction[1];
                 Position nextPosition = new Position(x, y);
 
-                if (!chessBoard.isValidPosition(nextPosition)) {
+                if (!chessBoard.getDistanceManager().isValidPosition(nextPosition, chessBoard)) {
                     break;
                 }
 
-                if (chessBoard.isPositionEmpty(nextPosition) || chessBoard.isPositionOccupiedByOpponent(nextPosition, color)) {
+                if (chessBoard.getDistanceManager().isPositionEmpty(nextPosition, chessBoard) ||
+                        chessBoard.getDistanceManager().isPositionOccupiedByOpponent(nextPosition, color, chessBoard)) {
                     validMoves.add(nextPosition);
-                    if (chessBoard.isPositionOccupiedByOpponent(nextPosition, color)) {
+                    if (chessBoard.getDistanceManager().isPositionOccupiedByOpponent(nextPosition, color, chessBoard)) {
                         break;
                     }
                 } else {

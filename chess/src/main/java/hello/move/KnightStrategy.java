@@ -1,9 +1,9 @@
 package hello.move;
 
-import hello.ChessBoard;
-import hello.ChessPiece;
-import hello.Player;
-import hello.Position;
+import hello.*;
+import hello.core.Player;
+import hello.gameobject.ChessBoard;
+import hello.gameobject.ChessPiece;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -31,7 +31,7 @@ public class KnightStrategy implements MoveStrategy {
                 Position newPosition = new Position(newX, newY);
 
                 // 이동하려는 위치에 자신의 말이 없는지 확인
-                if (chessBoard.isPositionEmpty(newPosition)) {
+                if (chessBoard.getDistanceManager().isPositionEmpty(newPosition, chessBoard)) {
                     validMoves.add(newPosition);
                 }
             }
