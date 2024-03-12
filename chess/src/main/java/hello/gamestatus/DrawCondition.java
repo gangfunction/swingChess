@@ -1,13 +1,8 @@
 package hello.gamestatus;
 
-import hello.gameobject.ChessBoard;
 
 public class DrawCondition {
-    private ChessBoard chessBoard;
 
-    public DrawCondition(ChessBoard chessBoard) {
-        this.chessBoard = chessBoard;
-    }
 
     public boolean isStalemate() {
         // 여기에 스테일메이트 판정 로직 구현

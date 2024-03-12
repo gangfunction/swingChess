@@ -1,8 +1,8 @@
-package hello.move;
+package hello.strategy;
 
 import hello.*;
 import hello.core.Player;
-import hello.gameobject.ChessBoard;
+import hello.gameobject.ChessGameState;
 import hello.gameobject.ChessPiece;
 
 import java.util.ArrayList;
@@ -10,8 +10,13 @@ import java.util.List;
 
 public class KnightStrategy implements MoveStrategy {
 
+
+    public KnightStrategy() {
+
+    }
+
     @Override
-    public List<Position> calculateMoves(ChessBoard chessBoard, ChessPiece piece) {
+    public List<Position> calculateMoves(ChessGameState chessBoard, ChessPiece piece, GameUtils utils) {
         List<Position> validMoves = new ArrayList<>();
         Position position = piece.getPosition();
         Player.Color color = piece.getColor();
@@ -31,7 +36,7 @@ public class KnightStrategy implements MoveStrategy {
                 Position newPosition = new Position(newX, newY);
 
                 // 이동하려는 위치에 자신의 말이 없는지 확인
-                if (chessBoard.getDistanceManager().isPositionEmpty(newPosition, chessBoard)) {
+                if (utils.isPositionEmpty(newPosition, chessBoard)) {
                     validMoves.add(newPosition);
                 }
             }

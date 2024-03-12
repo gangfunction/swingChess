@@ -21,6 +21,9 @@ public class Position {
         Position position = (Position) obj;
         return x == position.x && y == position.y;
     }
+    public int toBoardIndex(){
+        return(this.y*8 + this.x);
+    }
 
     @Override
     public int hashCode() {

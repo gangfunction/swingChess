@@ -29,16 +29,18 @@ public class GameLog implements Observer {
         dialog.setVisible(true);
     }
     @Override
-    public void update() {
-        String logEntry = game.getGameState();
-        textArea.append(logEntry + "\n");
-        textArea.setCaretPosition(textArea.getDocument().getLength());
+    public void update(String gameState) {
+        appendLogEntry(gameState);
     }
 
     @Override
     public void logAction(String message) {
+        appendLogEntry(message);
+    }
+    private void appendLogEntry(String message) {
         textArea.append(message + "\n");
-        // 로그의 가장 아래로 스크롤
         textArea.setCaretPosition(textArea.getDocument().getLength());
     }
+
+
 }

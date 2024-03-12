@@ -1,16 +1,14 @@
 package hello.core;
 
-import hello.GameLog;
-
 import java.util.ArrayList;
 import java.util.List;
 
-public class ChessGame {
-    private List<Player> players = new ArrayList<>();
+public class ChessGameTurn {
+    private final List<Player> players = new ArrayList<>();
     private int currentPlayerIndex = 0; // 현재 차례인 플레이어의 인덱스
     private boolean gameEnded; // 게임 종료 여부
 
-    public ChessGame() {
+    public ChessGameTurn() {
         players.add(new Player(Player.Color.WHITE));
         players.add(new Player(Player.Color.BLACK));
         gameEnded = false;

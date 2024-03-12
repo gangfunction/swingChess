@@ -11,21 +11,30 @@ import java.io.IOException;
 import java.net.URL;
 
 public class IconLoader {
+    private static final int ICON_WIDTH = 50;
+    private static final int ICON_HEIGHT = 50;
+
+
     public static Icon loadIcon(ChessPiece.Type type, Player.Color color) {
         String iconName = getIconName(type, color);
         URL iconURL = IconLoader.class.getResource(iconName);
         if (iconURL != null) {
-            try {
-                BufferedImage image = ImageIO.read(iconURL);
-                if (image != null) {
-                    Image resizedImage = image.getScaledInstance(50, 50, Image.SCALE_SMOOTH);
-                    return new ImageIcon(resizedImage);
-                }
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
+            return createIconFromURL(iconURL);
         } else {
             System.err.println("Icon not found: " + iconName);
+            return null;
+        }
+    }
+
+    private static Icon createIconFromURL(URL iconURL) {
+        try {
+            BufferedImage image = ImageIO.read(iconURL);
+            if (image != null) {
+                Image resizedImage = image.getScaledInstance(ICON_WIDTH, ICON_HEIGHT, Image.SCALE_SMOOTH);
+                return new ImageIcon(resizedImage);
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
         }
         return null;
     }

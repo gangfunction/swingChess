@@ -1,16 +1,22 @@
-package hello.move;
+package hello.strategy;
 
-import hello.*;
+import hello.GameUtils;
+import hello.Position;
 import hello.core.Player;
-import hello.gameobject.ChessBoard;
+import hello.gameobject.ChessGameState;
 import hello.gameobject.ChessPiece;
 
 import java.util.ArrayList;
 import java.util.List;
 
 public class BishopStrategy implements MoveStrategy {
+
+    public BishopStrategy() {
+
+    }
+
     @Override
-    public List<Position> calculateMoves(ChessBoard chessBoard, ChessPiece piece) {
+    public List<Position> calculateMoves(ChessGameState chessGameState, ChessPiece piece, GameUtils utils) {
         List<Position> validMoves = new ArrayList<>();
         Position position = piece.getPosition();
         Player.Color color = piece.getColor();
@@ -25,14 +31,14 @@ public class BishopStrategy implements MoveStrategy {
                 y += direction[1];
                 Position nextPosition = new Position(x, y);
 
-                if (!chessBoard.getDistanceManager().isValidPosition(nextPosition, chessBoard)) {
+                if (!utils.isValidPosition(nextPosition)) {
                     break;
                 }
 
-                if (chessBoard.getDistanceManager().isPositionEmpty(nextPosition, chessBoard) ||
-                        chessBoard.getDistanceManager().isPositionOccupiedByOpponent(nextPosition, color, chessBoard)) {
+                if (utils.isPositionEmpty(nextPosition, chessGameState) ||
+                        utils.isPositionOccupiedByOpponent(nextPosition, color, chessGameState)) {
                     validMoves.add(nextPosition);
-                    if (chessBoard.getDistanceManager().isPositionOccupiedByOpponent(nextPosition, color, chessBoard)) {
+                    if (utils.isPositionOccupiedByOpponent(nextPosition, color, chessGameState)) {
                         break;
                     }
                 } else {

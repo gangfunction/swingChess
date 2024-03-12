@@ -4,8 +4,8 @@ import hello.ui.ButtonConfigurer;
 
 import javax.swing.*;
 import java.awt.event.ActionListener;
-import java.awt.event.ComponentAdapter;
-import java.awt.event.ComponentEvent;
+import java.util.ArrayList;
+import java.util.List;
 
 public class ChessGameLauncher {
 
@@ -21,32 +21,32 @@ public class ChessGameLauncher {
         panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
 
         // 버튼 추가 로직
-        addButtonsToPanel(panel, dialog);
+        List<ButtonConfig> buttons = new ArrayList<>();
+        buttons.add(new ButtonConfig("새 게임", e -> startNewGame(dialog)));
+        buttons.add(new ButtonConfig("게임 불러오기", e -> loadGame(dialog)));
+        buttons.add(new ButtonConfig("게임 종료", e -> System.exit(0)));
 
+        addButtonsToPanel(panel, buttons);
         // 다이얼로그 위치 설정과 표시
         dialog.setLocationRelativeTo(owner);
         dialog.setVisible(true);
     }
-
-    private static void addButtonsToPanel(JPanel panel, JDialog dialog) {
-        panel.add(createButton("새 게임", e -> {
-            System.out.println("새 게임 시작!");
-            dialog.dispose();
-            // TODO: 새 게임 시작 로직
-        }));
-
-        panel.add(createButton("게임 불러오기", e -> {
-            System.out.println("게임 불러오기!");
-            // TODO: 게임 불러오기 로직
-        }));
-
-        panel.add(createButton("게임 종료", e -> System.exit(0)));
+    private static void addButtonsToPanel(JPanel panel,  List<ButtonConfig> buttons) {
+        buttons.forEach(buttonConfig -> panel.add(ButtonConfigurer.configureButton(buttonConfig.text(), buttonConfig.actionListener())));
     }
 
-    private static JButton createButton(String text, ActionListener actionListener) {
-        return ButtonConfigurer.configureButton(text, actionListener);
+    private static void loadGame(JDialog dialog){
+        System.out.println("게임 불러오기!");
+        dialog.dispose();
     }
 
+    private static void startNewGame(JDialog dialog) {
+        System.out.println("새 게임 시작!");
+        dialog.dispose();
+        // TODO: 새 게임 시작 로직
+    }
 
+    public record ButtonConfig(String text, ActionListener actionListener) {
+    }
 
 }

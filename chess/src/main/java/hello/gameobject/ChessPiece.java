@@ -3,18 +3,14 @@ package hello.gameobject;
 
 import hello.Position;
 import hello.core.Player;
-import hello.move.MoveStrategy;
 
 public class ChessPiece {
     private Type type;
     private Position position;
     private Player.Color color;
 
-    public ChessPiece(MoveStrategy moveStrategy) {
-        this.moveStrategy = moveStrategy;
+    public ChessPiece() {
     }
-
-    private MoveStrategy moveStrategy;
 
 
     // 체스말의 종류를 나타내는 열거형

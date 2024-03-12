@@ -1,23 +1,23 @@
 package hello.gamestatus;
 
 import hello.core.Player;
-import hello.gameobject.ChessBoard;
+import hello.gameobject.ChessGameState;
 import hello.gameobject.ChessPiece;
 
 import java.util.List;
 
 public class CheckStatus {
-    private final ChessBoard chessBoard;
+    private final VictoryCondition victoryCondition;
 
-    public CheckStatus(ChessBoard chessBoard) {
-        this.chessBoard = chessBoard;
+    public CheckStatus(VictoryCondition victoryCondition) {
+        this.victoryCondition = victoryCondition;
     }
 
-    public static boolean isInCheck(ChessPiece king, List<ChessPiece> chessPieces, ChessBoard chessBoard) {
+    public  boolean isInCheck(ChessPiece king, List<ChessPiece> chessPieces, ChessGameState chessGameState) {
         for (ChessPiece piece : chessPieces) {
             // 현재 위치의 체스말이 상대방의 말이고, 그 말이 왕의 위치로 이동할 수 있는지 확인
             if (piece != null && piece.getColor() != king.getColor() &&
-                    VictoryCondition.isValidMove(piece, king.getPosition().getX(), king.getPosition().getY(), chessBoard)) {
+                    victoryCondition.isValidMove(piece, king.getPosition().getX(), king.getPosition().getY(), chessGameState)) {
                 return true; // 상대방의 말이 왕을 공격할 수 있는 경우
             }
         }

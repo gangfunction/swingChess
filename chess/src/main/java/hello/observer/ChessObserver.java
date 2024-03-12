@@ -1,6 +1,6 @@
 package hello.observer;
 
-import hello.core.ChessGame;
+import hello.core.ChessGameTurn;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -8,19 +8,21 @@ import java.util.List;
 public class ChessObserver implements Subject{
     private List<Observer> observers;
     private String gameState;
-    private ChessGame game;
+    private ChessGameTurn game;
 
     public ChessObserver() {
         observers = new ArrayList<>();
     }
-    public ChessObserver(ChessGame game) {
+    public ChessObserver(ChessGameTurn game) {
         this();
         this.game = game;
     }
 
     public void setGameState(String gameState) {
-        this.gameState = gameState;
-        notifyObservers();
+        if(this.gameState == null || !this.gameState.equals(gameState)){
+            this.gameState = gameState;
+            notifyObservers();
+        }
     }
 
     @Override
@@ -36,7 +38,7 @@ public class ChessObserver implements Subject{
     @Override
     public void notifyObservers() {
         for (Observer observer : observers) {
-            observer.update();
+            observer.update(gameState);
         }
     }
 

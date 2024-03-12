@@ -1,6 +1,7 @@
-package hello.move;
+package hello.strategy;
 
-import hello.gameobject.ChessBoard;
+import hello.GameUtils;
+import hello.gameobject.ChessGameState;
 import hello.gameobject.ChessPiece;
 import hello.Position;
 
@@ -8,8 +9,12 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class QueenStrategy implements MoveStrategy {
+    public QueenStrategy() {
+
+    }
+
     @Override
-    public List<Position> calculateMoves(ChessBoard chessBoard, ChessPiece piece) {
+    public List<Position> calculateMoves(ChessGameState chessBoard, ChessPiece piece, GameUtils gameUtils) {
         List<Position> validMoves = new ArrayList<>();
         int[][] directions = {
                 {1, 0}, {-1, 0}, // 상하
@@ -28,14 +33,14 @@ public class QueenStrategy implements MoveStrategy {
 
                 Position newPosition = new Position(x, y);
 
-                if (!chessBoard.getDistanceManager().isValidPosition(newPosition, chessBoard)) {
+                if (!gameUtils.isValidPosition(newPosition)) {
                     break;
                 }
 
-                if (chessBoard.getDistanceManager().isPositionEmpty(newPosition, chessBoard)) {
+                if (gameUtils.isPositionEmpty(newPosition, chessBoard)) {
                     validMoves.add(newPosition);
                 } else {
-                    if (chessBoard.getDistanceManager().isPositionOccupiedByOpponent(newPosition, piece.getColor(), chessBoard)) {
+                    if (gameUtils.isPositionOccupiedByOpponent(newPosition, piece.getColor(), chessBoard)) {
                         validMoves.add(newPosition);
                     }
                     break;
