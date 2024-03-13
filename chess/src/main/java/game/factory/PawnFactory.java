@@ -4,7 +4,12 @@ import game.object.ChessPiece;
 import game.core.Player;
 import game.Position;
 
-public class PawnFactory implements ChessPieceFactory{
+public class PawnFactory extends AbstractChessPieceFactory{
+    @Override
+    protected ChessPiece.Type getType() {
+        return ChessPiece.Type.PAWN;
+    }
+
     private static PawnFactory instance;
 
     public PawnFactory() {}
@@ -14,9 +19,5 @@ public class PawnFactory implements ChessPieceFactory{
             instance = new PawnFactory();
         }
         return instance;
-    }
-    @Override
-    public ChessPiece createChessPiece(Position position, Player.Color color) {
-        return new ChessPiece(ChessPiece.Type.PAWN, position, color);
     }
 }

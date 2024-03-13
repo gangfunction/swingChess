@@ -6,13 +6,9 @@ public class CommandInvoker {
     private Stack<Command> undoStack = new Stack<>();
     private Stack<Command> redoStack = new Stack<>();
 
-    private Command command;
 
-    public void setCommand(Command command) {
-        this.command = command;
-    }
 
-    public void executeCommand() {
+    public void executeCommand(Command command) {
         command.execute();
         undoStack.push(command);
         redoStack.clear();

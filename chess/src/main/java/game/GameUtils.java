@@ -7,13 +7,14 @@ import game.object.ChessPiece;
 import java.util.Optional;
 
 public class GameUtils {
+    private static final int BOARD_SIZE = 8;
     public GameUtils() {
     }
 
     public boolean isValidPosition(Position position) {
         int x = position.getX();
         int y = position.getY();
-        return x >= 0 && x < 8 && y >= 0 && y < 8;
+        return x >= 0 && x < BOARD_SIZE && y >= 0 && y < BOARD_SIZE;
     }
 
     public boolean isPositionEmpty(Position position, ChessGameState chessGameState) {
@@ -23,7 +24,7 @@ public class GameUtils {
 
     public boolean isPositionOccupiedByOpponent(Position position, Player.Color currentPlayerColor, ChessGameState chessGameState) {
         return chessGameState.getChessPieces().stream()
-                .anyMatch(piece -> piece.getPosition().equals(position) && piece.getColor() != currentPlayerColor);
+                .anyMatch(piece -> piece.getPosition().equals(position) && !piece.getColor().equals(currentPlayerColor));
     }
 
 

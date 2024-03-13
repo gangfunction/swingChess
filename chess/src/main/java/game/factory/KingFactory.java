@@ -4,7 +4,7 @@ import game.object.ChessPiece;
 import game.core.Player;
 import game.Position;
 
-public class KingFactory implements ChessPieceFactory{
+public class KingFactory extends AbstractChessPieceFactory {
     private static KingFactory instance;
 
     public KingFactory() {
@@ -16,8 +16,10 @@ public class KingFactory implements ChessPieceFactory{
         }
         return instance;
     }
+
     @Override
-    public ChessPiece createChessPiece(Position position, Player.Color color) {
-        return new ChessPiece(ChessPiece.Type.KING, position, color);
+    protected ChessPiece.Type getType() {
+        return ChessPiece.Type.KING;
     }
+
 }

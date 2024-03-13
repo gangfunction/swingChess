@@ -6,27 +6,33 @@ import game.observer.Observer;
 import javax.swing.*;
 import java.awt.*;
 
+
 public class GameLog implements Observer {
-    private final ChessObserver game;
     private final JTextArea textArea;
-    private final JDialog dialog;
+
     public GameLog(ChessObserver game) {
-        this.game = game;
         game.addObserver(this);
-        // 다이얼로그 설정
-        dialog = new JDialog((Frame) null, "Game Log", false);
-        dialog.setSize(400, 600);
-        dialog.setLayout(new BorderLayout());
 
         // 텍스트 영역 설정
         textArea = new JTextArea();
         textArea.setEditable(false);
-        JScrollPane scrollPane = new JScrollPane(textArea);
-        dialog.add(scrollPane, BorderLayout.CENTER);
 
-        // 다이얼로그 표시
-        dialog.setLocationRelativeTo(null);
+
+        // 다이얼로그 설정
+        JDialog dialog = createDialog();
+        dialog.add(createScrollPane(textArea),BorderLayout.CENTER);
+        dialog.pack();
         dialog.setVisible(true);
+    }
+    private JDialog createDialog(){
+        JDialog dialog = new JDialog((Frame) null, "Game Log", false);
+        dialog.setSize(400, 600);
+        dialog.setLayout(new BorderLayout());
+        dialog.setLocationRelativeTo(null);
+        return dialog;
+    }
+    private JScrollPane createScrollPane(JTextArea textArea){
+        return new JScrollPane(textArea);
     }
     @Override
     public void update(String gameState) {
@@ -38,8 +44,10 @@ public class GameLog implements Observer {
         appendLogEntry(message);
     }
     private void appendLogEntry(String message) {
-        textArea.append(message + "\n");
-        textArea.setCaretPosition(textArea.getDocument().getLength());
+        SwingUtilities.invokeLater(()->{
+            textArea.append(message + "\n");
+            textArea.setCaretPosition(textArea.getDocument().getLength());
+        });
     }
 
 

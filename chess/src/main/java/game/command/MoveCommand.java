@@ -10,11 +10,7 @@ public class MoveCommand implements Command {
     private final Position startPosition;
     private final Position endPosition;
     private final ChessPiece capturedPiece;
-
     private final ChessGameState chessGameState;
-
-
-
     private final GameUtils gameUtils;
 
 

@@ -12,39 +12,35 @@ public class RookStrategy implements MoveStrategy {
 
     public RookStrategy() {
     }
-
-    @Override
-    public List<Position> calculateMoves(ChessGameState chessBoard, ChessPiece piece, GameUtils gameUtils) {
+    static final MoveCalculator straightMoveCalculator = (chessGameState, chessPiece, gameUtils) -> {
         List<Position> validMoves = new ArrayList<>();
-        int x = piece.getPosition().getX();
-        int y = piece.getPosition().getY();
-
-        // 상하좌우 방향으로 이동 가능한 위치 계산
-        int[][] directions = {{1, 0}, {-1, 0}, {0, 1}, {0, -1}};
+        Position position = chessPiece.getPosition();
+        int[][] directions = {{1, 0}, {-1, 0}, {0, 1}, {0, -1}}; // 상, 하, 좌, 우 이동
 
         for (int[] direction : directions) {
-            int currentX = x;
-            int currentY = y;
-            while (true) {
-                currentX += direction[0];
-                currentY += direction[1];
-                Position newPosition = new Position(currentX, currentY);
+            int x = position.getX();
+            int y = position.getY();
 
-                if (!gameUtils.isValidPosition(newPosition)) {
-                    break; // 보드 범위를 벗어난 경우
-                }
-
-                if (gameUtils.isPositionEmpty(newPosition, chessBoard) || gameUtils.isPositionOccupiedByOpponent(newPosition, piece.getColor(), chessBoard)) {
-                    validMoves.add(newPosition); // 빈 칸이거나 상대 말이 있는 경우
-                    if (gameUtils.isPositionOccupiedByOpponent(newPosition, piece.getColor(), chessBoard)) {
-                        break; // 상대 말을 잡을 수 있는 위치에 도달한 경우
+            Position nextPosition = new Position(x + direction[0], y + direction[1]);
+            while (gameUtils.isValidPosition(nextPosition)) {
+                if (gameUtils.isPositionEmpty(nextPosition, chessGameState) ||
+                        gameUtils.isPositionOccupiedByOpponent(nextPosition, chessPiece.getColor(), chessGameState)) {
+                    validMoves.add(nextPosition);
+                    if (gameUtils.isPositionOccupiedByOpponent(nextPosition, chessPiece.getColor(), chessGameState)) {
+                        break; // 상대 말을 만나면 더 이상 진행하지 않음
                     }
                 } else {
-                    break; // 자신의 말이 있는 위치에 도달한 경우
+                    break; // 자기 말을 만나거나 유효하지 않은 위치일 경우 중단
                 }
+                // 다음 위치를 위해 새로운 Position 객체 생성
+                nextPosition = new Position(nextPosition.getX() + direction[0], nextPosition.getY() + direction[1]);
             }
         }
 
         return validMoves;
+    };
+    @Override
+    public List<Position> calculateMoves(ChessGameState chessGameState, ChessPiece chessPiece, GameUtils gameUtils) {
+        return straightMoveCalculator.calculate(chessGameState, chessPiece, gameUtils);
     }
 }

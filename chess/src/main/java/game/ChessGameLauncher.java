@@ -27,12 +27,13 @@ public class ChessGameLauncher {
         buttons.add(new ButtonConfig("게임 종료", e -> System.exit(0)));
 
         addButtonsToPanel(panel, buttons);
-        // 다이얼로그 위치 설정과 표시
         dialog.setLocationRelativeTo(owner);
         dialog.setVisible(true);
     }
     private static void addButtonsToPanel(JPanel panel,  List<ButtonConfig> buttons) {
-        buttons.forEach(buttonConfig -> panel.add(ButtonConfigurer.configureButton(buttonConfig.text(), buttonConfig.actionListener())));
+        buttons.forEach(buttonConfig -> {
+            panel.add(ButtonConfigurer.configureButton(buttonConfig.text(), buttonConfig.actionListener()));
+        });
     }
 
     private static void loadGame(JDialog dialog){

@@ -15,11 +15,9 @@ public class BishopStrategy implements MoveStrategy {
 
     }
 
-    @Override
-    public List<Position> calculateMoves(ChessGameState chessGameState, ChessPiece piece, GameUtils utils) {
+    static final MoveCalculator diagonalMoveCalculator = (chessGameState, chessPiece, gameUtils) -> {
         List<Position> validMoves = new ArrayList<>();
-        Position position = piece.getPosition();
-        Player.Color color = piece.getColor();
+        Position position = chessPiece.getPosition();
         int[][] directions = {{1, 1}, {1, -1}, {-1, 1}, {-1, -1}};
 
         for (int[] direction : directions) {
@@ -31,14 +29,14 @@ public class BishopStrategy implements MoveStrategy {
                 y += direction[1];
                 Position nextPosition = new Position(x, y);
 
-                if (!utils.isValidPosition(nextPosition)) {
+                if (!gameUtils.isValidPosition(nextPosition)) {
                     break;
                 }
 
-                if (utils.isPositionEmpty(nextPosition, chessGameState) ||
-                        utils.isPositionOccupiedByOpponent(nextPosition, color, chessGameState)) {
+                if (gameUtils.isPositionEmpty(nextPosition, chessGameState) ||
+                        gameUtils.isPositionOccupiedByOpponent(nextPosition, chessPiece.getColor(), chessGameState)) {
                     validMoves.add(nextPosition);
-                    if (utils.isPositionOccupiedByOpponent(nextPosition, color, chessGameState)) {
+                    if (gameUtils.isPositionOccupiedByOpponent(nextPosition, chessPiece.getColor(), chessGameState)) {
                         break;
                     }
                 } else {
@@ -46,7 +44,11 @@ public class BishopStrategy implements MoveStrategy {
                 }
             }
         }
-
         return validMoves;
+    };
+
+    @Override
+    public List<Position> calculateMoves(ChessGameState chessGameState, ChessPiece piece, GameUtils utils) {
+        return diagonalMoveCalculator.calculate(chessGameState, piece, utils);
     }
 }

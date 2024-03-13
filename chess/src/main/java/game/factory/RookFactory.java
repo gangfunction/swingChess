@@ -4,7 +4,7 @@ import game.object.ChessPiece;
 import game.core.Player;
 import game.Position;
 
-public class RookFactory implements ChessPieceFactory{
+public class RookFactory extends AbstractChessPieceFactory{
     private static RookFactory instance;
 
     public RookFactory() {
@@ -16,8 +16,10 @@ public class RookFactory implements ChessPieceFactory{
         }
         return instance;
     }
+
     @Override
-    public ChessPiece createChessPiece(Position position, Player.Color color) {
-        return new ChessPiece(ChessPiece.Type.ROOK, position, color);
+    protected ChessPiece.Type getType() {
+        return ChessPiece.Type.ROOK;
     }
+
 }

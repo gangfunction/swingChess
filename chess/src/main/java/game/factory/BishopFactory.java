@@ -4,7 +4,7 @@ import game.object.ChessPiece;
 import game.core.Player;
 import game.Position;
 
-public class BishopFactory implements ChessPieceFactory{
+public class BishopFactory extends AbstractChessPieceFactory {
     private static BishopFactory instance;
 
     public BishopFactory() {
@@ -17,8 +17,10 @@ public class BishopFactory implements ChessPieceFactory{
         return instance;
     }
 
+
     @Override
-    public ChessPiece createChessPiece(Position position, Player.Color color) {
-        return new ChessPiece(ChessPiece.Type.BISHOP, position, color);
+    protected ChessPiece.Type getType() {
+        return ChessPiece.Type.BISHOP;
     }
 }
+

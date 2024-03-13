@@ -67,7 +67,6 @@ public class ChessGameLogic {
         Command moveCommand = new MoveCommand(selectedPiece, selectedPiece.getPosition(), clickedPosition,
                 chessGameState, gameUtils);
 
-        commandInvoker.setCommand(moveCommand);
         Optional<ChessPiece> opponentPiece = gameUtils.
                 findPieceAtPosition(clickedPosition.getX(), clickedPosition.getY(), chessGameState);
         opponentPiece.ifPresent(p -> {
@@ -77,7 +76,7 @@ public class ChessGameLogic {
 
         chessBoardUI.onPieceMoved(selectedPiece.getPosition(), clickedPosition, selectedPiece);
 
-        commandInvoker.executeCommand();
+        commandInvoker.executeCommand(moveCommand);
 
         chessBoardUI.clearHighlights(chessBoardUI);
 

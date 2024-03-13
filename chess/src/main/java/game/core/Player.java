@@ -4,7 +4,7 @@ import game.GameLog;
 
 public class Player {
     private String name; // 플레이어의 이름
-    private Color color; // 플레이어가 가진 체스말의 색상
+    private final Color color; // 플레이어가 가진 체스말의 색상
 
     public Player(Color color) {
         this.color = color;

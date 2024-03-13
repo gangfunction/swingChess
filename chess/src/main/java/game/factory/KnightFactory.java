@@ -1,10 +1,8 @@
 package game.factory;
 
 import game.object.ChessPiece;
-import game.core.Player;
-import game.Position;
 
-public class KnightFactory implements ChessPieceFactory {
+public class KnightFactory extends AbstractChessPieceFactory{
     private static KnightFactory instance;
 
     public KnightFactory() {
@@ -18,7 +16,8 @@ public class KnightFactory implements ChessPieceFactory {
     }
 
     @Override
-    public ChessPiece createChessPiece(Position position, Player.Color color) {
-        return new ChessPiece(ChessPiece.Type.KNIGHT, position, color);
+    protected ChessPiece.Type getType() {
+        return ChessPiece.Type.KNIGHT;
     }
+
 }
