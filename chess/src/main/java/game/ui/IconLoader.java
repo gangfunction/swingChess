@@ -1,7 +1,7 @@
 package game.ui;
 
-import game.object.ChessPiece;
-import game.core.Player;
+import game.core.Color;
+import game.factory.Type;
 
 import javax.imageio.ImageIO;
 import javax.swing.*;
@@ -15,7 +15,7 @@ public class IconLoader {
     private static final int ICON_HEIGHT = 50;
 
 
-    public static Icon loadIcon(ChessPiece.Type type, Player.Color color) {
+    public static Icon loadIcon(Type type, Color color) {
         String iconName = getIconName(type, color);
         URL iconURL = IconLoader.class.getResource(iconName);
         if (iconURL != null) {
@@ -39,9 +39,9 @@ public class IconLoader {
         return null;
     }
 
-    private static String getIconName(ChessPiece.Type type, Player.Color color) {
+    private static String getIconName(Type type, Color color) {
         System.out.println("type: " + type + ", color: " + color);
-        String colorPrefix = (color == Player.Color.WHITE) ? "white" : "black";
+        String colorPrefix = (color == Color.WHITE) ? "white" : "black";
 
         return "/icons/" + colorPrefix + "/" + type.toString().toLowerCase() + ".png";
 

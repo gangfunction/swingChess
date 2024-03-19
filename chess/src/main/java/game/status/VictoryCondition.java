@@ -2,10 +2,9 @@ package game.status;
 
 import game.GameUtils;
 import game.Position;
-import game.core.Player;
-import game.object.ChessBoardUI;
+import game.object.ChessGameLogic;
 import game.object.ChessGameState;
-import game.object.ChessPiece;
+import game.factory.ChessPiece;
 import game.strategy.KingStrategy;
 
 import java.util.HashSet;
@@ -16,13 +15,13 @@ public class VictoryCondition {
 
     private final ChessGameState chessGameState;
     private final GameUtils gameUtils;
+    private final ChessGameLogic chessGameLogic;
 
-    private final CheckStatus checkStatus;
 
-    public VictoryCondition(ChessGameState chessGameState, GameUtils gameUtils, CheckStatus checkStatus) {
+    public VictoryCondition(ChessGameState chessGameState, GameUtils gameUtils, ChessGameLogic chessGameLogic) {
         this.chessGameState = chessGameState;
         this.gameUtils = gameUtils;
-        this.checkStatus = checkStatus;
+        this.chessGameLogic = chessGameLogic;
     }
 
     public  boolean canKingEscape(ChessPiece king, List<ChessPiece> chessPieces) {
@@ -35,8 +34,8 @@ public class VictoryCondition {
         final int boardSize = 8;
 
         for (int[] direction : directions) {
-            int newX = king.getPosition().getX() + direction[0];
-            int newY = king.getPosition().getY() + direction[1];
+            int newX = king.getPosition().x() + direction[0];
+            int newY = king.getPosition().y() + direction[1];
 
             // 해당 위치가 보드 내에 있는지 확인
             if (newX >= 0 && newX < boardSize && newY >= 0 && newY < boardSize) {
@@ -51,7 +50,9 @@ public class VictoryCondition {
                     chessPieces.add(new ChessPiece(king.getType(), new Position(newX, newY), king.getColor()));
 
                     // 이동 후 왕이 체크 상태인지 확인
-                    boolean isInCheckAfterMove = checkStatus.isInCheck(king, chessPieces, chessGameState);
+                    boolean isInCheckAfterMove = chessPieces.stream()
+                            .filter(piece -> piece != null && piece.getColor() != king.getColor())
+                            .anyMatch(piece -> chessGameLogic.calculateMovesForPiece(piece).contains(king.getPosition()));
 
                     // 이동을 원래대로 되돌림
                     king.setPosition(originalPosition);
@@ -69,23 +70,7 @@ public class VictoryCondition {
     }
 
 
-    public boolean isCheckmate(Player.Color currentPlayerColor, List<ChessPiece> chessPieces, ChessBoardUI chessBoardUI) {
-        // 1단계: 현재 플레이어의 왕의 위치 찾기
-        ChessPiece king = CheckStatus.findKing(currentPlayerColor, chessPieces);
-        if (king == null) {
-            return false; // 왕이 없는 경우는 체크메이트가 아님
-        }
-
-        // 2단계: 왕이 현재 체크 상태인지 확인
-        if (!checkStatus.isInCheck(king, chessPieces, chessGameState)) {
-            return false; // 왕이 체크 상태가 아니면 체크메이트가 아님
-        }
-
-        // 3단계: 왕이 체크 상태에서 벗어날 수 있는지 확인
-        return !canKingEscape(king, chessPieces);
-    }
-
-     boolean isValidMove(ChessPiece king, int newX, int newY, ChessGameState chessGameState) {
+    boolean isValidMove(ChessPiece king, int newX, int newY, ChessGameState chessGameState) {
         {
             Set<Position> validMoves = new HashSet<>(new KingStrategy().calculateMoves(chessGameState, king, gameUtils));
 

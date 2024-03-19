@@ -1,37 +1,11 @@
 package game;
 
-import java.util.Objects;
-
-public class Position {
-    private int x;
-    private int y;
-
-    public Position(int x, int y) {
-        this.x = x;
-        this.y = y;
+public record Position(int x, int y) {
+    public int toBoardIndex() {
+        return (this.y * 8 + this.x);
     }
 
-    public int getX() {
-        return x;
+    public Position add(int i, int i1) {
+        return new Position(this.x + i, this.y + i1);
     }
-    @Override
-    public boolean equals(Object obj) {
-        if (this == obj) return true;
-        if (obj == null || getClass() != obj.getClass()) return false;
-        Position position = (Position) obj;
-        return x == position.x && y == position.y;
-    }
-    public int toBoardIndex(){
-        return(this.y*8 + this.x);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(x, y);
-    }
-
-    public int getY() {
-        return y;
-    }
-
 }

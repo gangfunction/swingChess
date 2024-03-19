@@ -1,5 +1,6 @@
 package game;
 
+import game.factory.ChessPiece;
 import game.observer.ChessObserver;
 import game.observer.Observer;
 

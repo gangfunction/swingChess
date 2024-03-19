@@ -1,18 +1,22 @@
 package game.object;
 
+import game.GameUtils;
 import game.Position;
-import game.core.Player;
+import game.core.Color;
+import game.factory.ChessPiece;
+import game.factory.Type;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
+//TODO: 캐슬링 상태 업데이트
 public class ChessGameState {
 
     private final List<ChessPiece> chessPieces = new ArrayList<>();
     private ChessPiece selectedPiece = null;
     private ChessPiece lastMovedPiece = null; // 마지막으로 이동한 폰
     public boolean lastMoveWasDoubleStep = false; // 마지막 이동이 두 칸이었는지 여부
-    private Player lastPlayer;
 
     public ChessGameState() {
     }
@@ -41,7 +45,7 @@ public class ChessGameState {
     // 필요에 따라 추가 메서드 구현
     public void updateLastMovedPawn(ChessPiece pawn, Position from, Position to) {
         // 폰의 이동 거리 계산
-        int distanceMoved = Math.abs(from.getY() - to.getY());
+        int distanceMoved = Math.abs(from.y() - to.y());
 
         // 이동한 거리가 2칸인 경우만 업데이트
         if (distanceMoved == 2) {
@@ -53,37 +57,14 @@ public class ChessGameState {
             this.lastMoveWasDoubleStep = false;
         }
     }
-    public void updateLastMoveInfo(ChessPiece piece, Position from, Position to, Player currntPlayer){
-        this.lastMovedPiece = piece;
-        this.lastMoveWasDoubleStep = Math.abs(from.getY() - to.getY()) == 2;
-        this.lastPlayer = currntPlayer;
-    }
-//    public boolean isEnPassantPossible(Position attackingPawnPos, Position targetPawnPos) {
-//        // 마지막 이동한 폰이 앙파썽 대상 폰인지 확인
-//        System.out.println("앙파썽 대상인가요?");
-//        if (lastMoveWasDoubleStep && lastMovedPiece != null && lastPlayer != currentPlayer) {
-//            System.out.println("앙파썽 대상입니다.");
-//            return lastMovedPiece.getPosition().equals(targetPawnPos) &&
-//                    // 앙파썽을 시도하는 폰의 위치가 마지막으로 이동한 폰의 옆 칸인지 확인
-//                    Math.abs(lastMovedPiece.getPosition().getX() - attackingPawnPos.getX()) == 1;
-//        }
-//        return false;
-//    }
-    public boolean isEnPassantPossible(Position attackingPawnPos, Player currentPlayer) {
-        if (lastMoveWasDoubleStep && lastMovedPiece != null && lastPlayer != currentPlayer) {
-            // 앙파썽 대상 폰이 바로 이전 턴에 이동했는지 확인
-            return true;
-        }
-        return false;
-    }
 
-    public ChessPiece getChessPieceAt(Position targetPosition) {
+    public Optional<ChessPiece> getChessPieceAt(Position targetPosition) {
         for (ChessPiece piece : chessPieces) {
             if (piece.getPosition().equals(targetPosition)) {
-                return piece;
+                return Optional.of(piece);
             }
         }
-        return null;
+        return Optional.empty();
     }
     public ChessPiece getLastMovedPiece(){
         return this.lastMovedPiece;
@@ -95,5 +76,47 @@ public class ChessGameState {
     public void removeChessPiece(ChessPiece targetPawn) {
         chessPieces.remove(targetPawn);
     }
+    public boolean isRookUnmovedForCastling(Color color, Position kingPosition) {
+        // 캐슬링이 가능한 룩의 위치를 확인
+        Position rookPosition = kingPosition.x() == 2 ?
+                new Position(0, kingPosition.y()) : // 퀸 사이드 캐슬링
+                new Position(7, kingPosition.y());  // 킹 사이드 캐슬링
 
+        Optional<ChessPiece> rook = getChessPieceAt(rookPosition);
+        if(rook.isPresent() && rook.get().getType() == Type.ROOK && rook.get().getColor() == color){
+            return !rook.get().isMoved();
+        }
+        return false; // 해당 위치에 룩이 없거나 이미 이동했으면 false 반환
+    }
+
+    public void movePiece(ChessPiece piece, Position moveTo) {
+        getChessPieceAt(moveTo).ifPresent(this::removeChessPiece);
+        piece.setPosition(moveTo);
+        piece.setMoved(true);
+    }
+
+
+    private int moveWithoutPawnOrCaptureCount = 0;
+    public void updateMoveWithoutPawnOrCaptureCount(boolean isPawnMove, boolean isCapture) {
+        if (isPawnMove || isCapture) {
+            moveWithoutPawnOrCaptureCount = 0;
+        } else {
+            moveWithoutPawnOrCaptureCount++;
+        }
+    }
+
+    public int getMoveWithoutPawnOrCaptureCount() {
+        return moveWithoutPawnOrCaptureCount;
+    }
+
+    boolean isAvailableMoveTarget(Position position, ChessGameLogic chessGameLogic) {
+        ChessPiece selectedPiece = getSelectedPiece();
+        System.out.println("selectedPiece:" + selectedPiece.getPosition().x() + " " + selectedPiece.getPosition().y());
+        List<Position> validMoves = chessGameLogic.calculateMovesForPiece(selectedPiece);
+        for (Position p : validMoves) {
+            System.out.println("validMoves:" + p.x() + " " + p.y());
+        }
+
+        return validMoves.contains(position) && !chessGameLogic.isFriendlyPieceAtPosition(position, selectedPiece);
+    }
 }

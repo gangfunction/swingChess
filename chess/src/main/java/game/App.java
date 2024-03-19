@@ -40,10 +40,12 @@ public class App {
         ChessGameTurn chessGameTurn = new ChessGameTurn();
         ChessObserver observer = new ChessObserver();
         GameLog gameLog = new GameLog(observer);
-        ChessGameLogic chessGameLogic = new ChessGameLogic(chessGameTurn, commandInvoker, chessGameState, gameLog);
-        ChessBoardUI chessBoardUI = new ChessBoardUI(chessGameState, chessGameLogic);
+        ChessGameLogic chessGameLogic = new ChessGameLogic(chessGameTurn, commandInvoker, chessGameState,gameLog);
+
+        ChessBoardUI chessBoardUI = new ChessBoardUI(chessGameState);
         chessGameLogic.setChessBoardUI(chessBoardUI);
         chessGameLogic.setGameEventListener(chessBoardUI);
+        chessBoardUI.setGameLogicActions(chessGameLogic);
         return chessBoardUI;
     }
 

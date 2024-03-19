@@ -3,7 +3,7 @@ package game.strategy;
 import game.GameUtils;
 import game.Position;
 import game.object.ChessGameState;
-import game.object.ChessPiece;
+import game.factory.ChessPiece;
 
 import java.util.List;
 

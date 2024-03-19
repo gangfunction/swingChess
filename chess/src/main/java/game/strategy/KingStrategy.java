@@ -2,7 +2,7 @@ package game.strategy;
 
 import game.GameUtils;
 import game.object.ChessGameState;
-import game.object.ChessPiece;
+import game.factory.ChessPiece;
 import game.Position;
 
 import java.util.ArrayList;
@@ -16,8 +16,8 @@ public class KingStrategy implements MoveStrategy {
     @Override
     public List<Position> calculateMoves(ChessGameState chessBoard, ChessPiece piece, GameUtils utils) {
         List<Position> validMoves = new ArrayList<>();
-        int x = piece.getPosition().getX();
-        int y = piece.getPosition().getY();
+        int x = piece.getPosition().x();
+        int y = piece.getPosition().y();
 
         // 왕이 이동할 수 있는 모든 방향의 변화량
         int[][] directions = {

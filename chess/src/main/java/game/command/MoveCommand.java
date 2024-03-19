@@ -3,7 +3,8 @@ package game.command;
 import game.GameUtils;
 import game.Position;
 import game.object.ChessGameState;
-import game.object.ChessPiece;
+import game.factory.ChessPiece;
+import game.factory.Type;
 
 public class MoveCommand implements Command {
     private final ChessPiece piece;
@@ -24,7 +25,7 @@ public class MoveCommand implements Command {
         this.capturedPiece = findPieceAtEndPosition();
     }
     private ChessPiece findPieceAtEndPosition() {
-        return gameUtils.findPieceAtPosition(endPosition.getX(), endPosition.getY(), chessGameState).orElse(null);
+        return gameUtils.findPieceAtPosition(endPosition.x(), endPosition.y(), chessGameState).orElse(null);
     }
 
     @Override
@@ -32,7 +33,7 @@ public class MoveCommand implements Command {
         piece.setPosition(endPosition);
         chessGameState.setSelectedPiece(null);
 
-        if (piece.getType() == ChessPiece.Type.PAWN && Math.abs(startPosition.getY() - endPosition.getY()) == 2) {
+        if (piece.getType() == Type.PAWN && Math.abs(startPosition.y() - endPosition.y()) == 2) {
             chessGameState.updateLastMovedPawn(piece, startPosition, endPosition);
         }
     }

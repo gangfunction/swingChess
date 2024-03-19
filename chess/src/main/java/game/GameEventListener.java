@@ -1,9 +1,12 @@
 package game;
 
-import game.object.ChessPiece;
+import game.factory.ChessPiece;
+
+import java.util.List;
 
 public interface GameEventListener {
-    void onPieceMoved(Position oldPosition, Position newPosition, ChessPiece piece);
+    void onPieceMoved( Position newPosition, ChessPiece piece);
     void onPieceSelected(ChessPiece piece);
-    void onInvalidMoveAttempted();
+    void onInvalidMoveAttempted(String reason);
+    void onMovesCalculated(List<Position> moves);
 }

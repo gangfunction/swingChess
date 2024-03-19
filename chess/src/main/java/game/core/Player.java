@@ -1,7 +1,5 @@
 package game.core;
 
-import game.GameLog;
-
 public class Player {
     private String name; // 플레이어의 이름
     private final Color color; // 플레이어가 가진 체스말의 색상
@@ -11,12 +9,7 @@ public class Player {
     }
 
 
-    // 플레이어의 색상을 정의하는 열거형
-    public enum Color {
-        WHITE, BLACK
-    }
-
-    public Player(String name, Color color, GameLog gameLog) {
+    public Player(String name, Color color) {
         this.name = name;
         this.color = color;
     }
