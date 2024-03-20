@@ -4,6 +4,7 @@ import game.GameUtils;
 import game.Position;
 import game.object.ChessGameState;
 import game.factory.ChessPiece;
+import game.object.GameStatusListener;
 import game.strategy.MoveCalculator;
 
 import java.util.ArrayList;
@@ -11,7 +12,7 @@ import java.util.List;
 
 public class StraightMoveCalculator implements MoveCalculator {
     @Override
-    public List<Position> calculate(ChessGameState chessGameState, ChessPiece chessPiece, GameUtils gameUtils) {
+    public List<Position> calculate(GameStatusListener chessGameState, ChessPiece chessPiece, GameUtils gameUtils) {
         List<Position> validMoves = new ArrayList<>();
         Position position = chessPiece.getPosition();
         int[][] directions = {{1, 0}, {-1, 0}, {0, 1}, {0, -1}}; // 상, 하, 좌, 우 이동
@@ -30,7 +31,7 @@ public class StraightMoveCalculator implements MoveCalculator {
         return validMoves;
     }
 
-    public static boolean calculateValidMoves(ChessGameState chessGameState, ChessPiece chessPiece, GameUtils gameUtils, List<Position> validMoves, int nextX, int nextY) {
+    public static boolean calculateValidMoves(GameStatusListener chessGameState, ChessPiece chessPiece, GameUtils gameUtils, List<Position> validMoves, int nextX, int nextY) {
         Position nextPosition = new Position(nextX, nextY);
 
         if (!gameUtils.isValidPosition(nextPosition)) return true;

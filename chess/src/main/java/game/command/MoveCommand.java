@@ -5,18 +5,19 @@ import game.Position;
 import game.object.ChessGameState;
 import game.factory.ChessPiece;
 import game.factory.Type;
+import game.object.GameStatusListener;
 
 public class MoveCommand implements Command {
     private final ChessPiece piece;
     private final Position startPosition;
     private final Position endPosition;
     private final ChessPiece capturedPiece;
-    private final ChessGameState chessGameState;
+    private final GameStatusListener chessGameState;
     private final GameUtils gameUtils;
 
 
 
-    public MoveCommand(ChessPiece piece, Position startPosition, Position endPosition, ChessGameState chessGameState, GameUtils gameUtils) {
+    public MoveCommand(ChessPiece piece, Position startPosition, Position endPosition, GameStatusListener chessGameState, GameUtils gameUtils) {
         this.piece = piece;
         this.startPosition = startPosition;
         this.endPosition = endPosition;
@@ -25,7 +26,7 @@ public class MoveCommand implements Command {
         this.capturedPiece = findPieceAtEndPosition();
     }
     private ChessPiece findPieceAtEndPosition() {
-        return gameUtils.findPieceAtPosition(endPosition.x(), endPosition.y(), chessGameState).orElse(null);
+        return gameUtils.findPieceAtPosition(chessGameState, endPosition).orElse(null);
     }
 
     @Override

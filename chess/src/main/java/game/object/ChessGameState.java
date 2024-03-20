@@ -1,6 +1,5 @@
 package game.object;
 
-import game.GameUtils;
 import game.Position;
 import game.core.Color;
 import game.factory.ChessPiece;
@@ -11,38 +10,44 @@ import java.util.List;
 import java.util.Optional;
 
 //TODO: 캐슬링 상태 업데이트
-public class ChessGameState {
+public class ChessGameState implements GameStatusListener {
 
     private final List<ChessPiece> chessPieces = new ArrayList<>();
     private ChessPiece selectedPiece = null;
     private ChessPiece lastMovedPiece = null; // 마지막으로 이동한 폰
-    public boolean lastMoveWasDoubleStep = false; // 마지막 이동이 두 칸이었는지 여부
+    private boolean lastMoveWasDoubleStep = false; // 마지막 이동이 두 칸이었는지 여부
 
     public ChessGameState() {
     }
 
+    @Override
     public void addChessPiece(ChessPiece chessPiece) {
         chessPieces.add(chessPiece);
     }
 
+    @Override
     public List<ChessPiece> getChessPieces() {
-        return chessPieces;
+        return new ArrayList<>(chessPieces);
     }
 
+    @Override
     public void clearChessPieces() {
         chessPieces.clear();
     }
 
 
+    @Override
     public ChessPiece getSelectedPiece() {
         return selectedPiece;
     }
 
+    @Override
     public void setSelectedPiece(ChessPiece piece){
         this.selectedPiece = piece;
     }
 
     // 필요에 따라 추가 메서드 구현
+    @Override
     public void updateLastMovedPawn(ChessPiece pawn, Position from, Position to) {
         // 폰의 이동 거리 계산
         int distanceMoved = Math.abs(from.y() - to.y());
@@ -58,6 +63,7 @@ public class ChessGameState {
         }
     }
 
+    @Override
     public Optional<ChessPiece> getChessPieceAt(Position targetPosition) {
         for (ChessPiece piece : chessPieces) {
             if (piece.getPosition().equals(targetPosition)) {
@@ -66,16 +72,20 @@ public class ChessGameState {
         }
         return Optional.empty();
     }
+    @Override
     public ChessPiece getLastMovedPiece(){
         return this.lastMovedPiece;
     }
+    @Override
     public boolean getLastMoveWasDoubleStep(){
         return this.lastMoveWasDoubleStep;
     }
 
+    @Override
     public void removeChessPiece(ChessPiece targetPawn) {
         chessPieces.remove(targetPawn);
     }
+    @Override
     public boolean isRookUnmovedForCastling(Color color, Position kingPosition) {
         // 캐슬링이 가능한 룩의 위치를 확인
         Position rookPosition = kingPosition.x() == 2 ?
@@ -89,14 +99,9 @@ public class ChessGameState {
         return false; // 해당 위치에 룩이 없거나 이미 이동했으면 false 반환
     }
 
-    public void movePiece(ChessPiece piece, Position moveTo) {
-        getChessPieceAt(moveTo).ifPresent(this::removeChessPiece);
-        piece.setPosition(moveTo);
-        piece.setMoved(true);
-    }
-
 
     private int moveWithoutPawnOrCaptureCount = 0;
+    @Override
     public void updateMoveWithoutPawnOrCaptureCount(boolean isPawnMove, boolean isCapture) {
         if (isPawnMove || isCapture) {
             moveWithoutPawnOrCaptureCount = 0;
@@ -105,11 +110,13 @@ public class ChessGameState {
         }
     }
 
+    @Override
     public int getMoveWithoutPawnOrCaptureCount() {
         return moveWithoutPawnOrCaptureCount;
     }
 
-    boolean isAvailableMoveTarget(Position position, ChessGameLogic chessGameLogic) {
+    @Override
+    public boolean isAvailableMoveTarget(Position position, ChessGameLogic chessGameLogic) {
         ChessPiece selectedPiece = getSelectedPiece();
         System.out.println("selectedPiece:" + selectedPiece.getPosition().x() + " " + selectedPiece.getPosition().y());
         List<Position> validMoves = chessGameLogic.calculateMovesForPiece(selectedPiece);

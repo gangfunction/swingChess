@@ -2,6 +2,7 @@ package game;
 
 import game.command.CommandInvoker;
 import game.core.ChessGameTurn;
+import game.object.CastlingLogic;
 import game.object.ChessBoardUI;
 import game.object.ChessGameLogic;
 import game.object.ChessGameState;
@@ -20,8 +21,6 @@ public class App {
             primaryFrame.setSize(600, 600);
 
             ChessBoardUI chessBoardUI = getChessBoardUI();
-
-
             primaryFrame.setContentPane(chessBoardUI.getBoardPanel());
             primaryFrame.setVisible(true);
             Dimension dim = Toolkit.getDefaultToolkit().getScreenSize();
@@ -40,12 +39,12 @@ public class App {
         ChessGameTurn chessGameTurn = new ChessGameTurn();
         ChessObserver observer = new ChessObserver();
         GameLog gameLog = new GameLog(observer);
-        ChessGameLogic chessGameLogic = new ChessGameLogic(chessGameTurn, commandInvoker, chessGameState,gameLog);
-
+        ChessGameLogic chessGameLogic = new ChessGameLogic(chessGameTurn, commandInvoker, gameLog);
         ChessBoardUI chessBoardUI = new ChessBoardUI(chessGameState);
-        chessGameLogic.setChessBoardUI(chessBoardUI);
-        chessGameLogic.setGameEventListener(chessBoardUI);
+        chessGameLogic.setGameEventListener(chessBoardUI,chessGameState);
         chessBoardUI.setGameLogicActions(chessGameLogic);
+        CastlingLogic castlingLogic = new CastlingLogic();
+        castlingLogic.setCastlingLogic(chessGameLogic,chessGameState,chessBoardUI);
         return chessBoardUI;
     }
 

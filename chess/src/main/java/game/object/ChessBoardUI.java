@@ -1,6 +1,6 @@
 package game.object;
 
-import game.GameEventListener;
+import game.GameUtils;
 import game.Position;
 import game.factory.*;
 import game.ui.IconLoader;
@@ -21,6 +21,7 @@ public class ChessBoardUI implements GameEventListener {
     private GameLogicActions gameLogicActions;
     private static final Color LIGHT_SQUARE_COLOR = Color.WHITE;
     private static final Color DARK_SQUARE_COLOR = Color.GRAY;
+
     public void setGameLogicActions(GameLogicActions gameLogicActions) {
         this.gameLogicActions = gameLogicActions;
     }
@@ -31,18 +32,18 @@ public class ChessBoardUI implements GameEventListener {
         initializeBoard();
         placeChessPieces();
     }
-
     public void highlightMoves(List<Position> moves) {
         clearHighlights();
         moves.forEach(this::highlightSingleMove);
     }
+
     public void highlightSingleMove(Position position) {
         JPanel square = getPanelAtPosition(position);
         square.setBackground(Color.YELLOW);
     }
 
-
     private static final Set<Position> highlightedPositions = new HashSet<>();
+
 
     public static Set<Position> getHighlightedPositions() {
         return highlightedPositions;
@@ -51,7 +52,7 @@ public class ChessBoardUI implements GameEventListener {
     public void highlightPossibleMoves(ChessPiece piece) {
         clearHighlights();
         getHighlightedPositions().clear();
-        List<Position> moves = gameLogicActions.calculateMovesForPiece(piece); // 이동 가능한 위치 계산
+        List<Position> moves = piece.calculateMoves(chessGameState,new GameUtils()) ;// 이동 가능한 위치 계산
         highlightMoves(moves);
         highlightedPositions.addAll(moves); // 하이라이트된 위치 목록에 추가합니다.
     }
@@ -121,32 +122,29 @@ public class ChessBoardUI implements GameEventListener {
         panel.setBackground(backgroundColor);
     }
 
-
     private void placeChessPieces() {
-        placePawns();
-        placeSpecialPieces(game.core.Color.WHITE, 7);
-        placeSpecialPieces(game.core.Color.BLACK, 0);
-    }
-    private void placePawns(){
-        ChessPieceFactoryImpl factory = ChessPieceFactoryImpl.INSTANCE;
-        IntStream.range(0, BOARD_SIZE).forEach(i -> placePieceOnboard(factory.createChessPiece(Type.PAWN, new Position(i, 6), game.core.Color.WHITE)));
-        IntStream.range(0, BOARD_SIZE).forEach(i -> placePieceOnboard(factory.createChessPiece(Type.PAWN, new Position(i, 1), game.core.Color.BLACK)));
-    }
+        ChessPieceFactoryImpl factImpl = ChessPieceFactoryImpl.INSTANCE;
+        IntStream.range(0, BOARD_SIZE).forEach(i -> placePieceOnboard(factImpl.createChessPiece(Type.PAWN, new Position(i, 6), game.core.Color.WHITE)));
+        IntStream.range(0, BOARD_SIZE).forEach(i -> placePieceOnboard(factImpl.createChessPiece(Type.PAWN, new Position(i, 1), game.core.Color.BLACK)));
 
-    private void placeSpecialPieces(game.core.Color color, int y) {
-        ChessPieceFactoryImpl factory = ChessPieceFactoryImpl.INSTANCE;
         Type[] pieceTypes = {Type.ROOK, Type.KNIGHT, Type.BISHOP, Type.QUEEN, Type.KING, Type.BISHOP, Type.KNIGHT, Type.ROOK};
 
         for (int i = 0; i < BOARD_SIZE; i++) {
-            placePieceOnboard(factory.createChessPiece(pieceTypes[i], new Position(i, y), color));
+            placePieceOnboard(factImpl.createChessPiece(pieceTypes[i], new Position(i, 7), game.core.Color.WHITE));
         }
+        for (int i = 0; i < BOARD_SIZE; i++) {
+            placePieceOnboard(factImpl.createChessPiece(pieceTypes[i], new Position(i, 0), game.core.Color.BLACK));
+        }
+
     }
+
+
 
 
     // 추가 UI 메서드 구현
     public void placePieceOnboard(ChessPiece chessPiece) {
         try {
-            chessGameState.getChessPieces().add(chessPiece); // 내부 리스트에 체스말 추가
+            chessGameState.addChessPiece(chessPiece); // 내부 리스트에 체스말 추가
             Icon icon = IconLoader.loadIcon(chessPiece.getType(), chessPiece.getColor());
             JLabel pieceLabel = new JLabel(icon, SwingConstants.CENTER);
             JPanel panel = getPanelAtPosition(chessPiece.getPosition());

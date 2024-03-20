@@ -4,6 +4,7 @@ import game.GameUtils;
 import game.object.ChessGameState;
 import game.factory.ChessPiece;
 import game.Position;
+import game.object.GameStatusListener;
 import game.strategy.calculator.DiagonalMoveCalculator;
 import game.strategy.calculator.StraightMoveCalculator;
 
@@ -19,7 +20,7 @@ public class QueenStrategy implements MoveStrategy {
     private final MoveCalculator diagonalMoveCalculator = new DiagonalMoveCalculator();
     private final MoveCalculator straightMoveCalculator = new StraightMoveCalculator();
     @Override
-    public List<Position> calculateMoves(ChessGameState chessGameState, ChessPiece chessPiece, GameUtils utils) {
+    public List<Position> calculateMoves(GameStatusListener chessGameState, ChessPiece chessPiece, GameUtils utils) {
 
         List<Position> diagonalMoves = diagonalMoveCalculator.calculate(chessGameState, chessPiece, utils);
         // 수직/수평 이동 계산

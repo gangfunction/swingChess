@@ -66,11 +66,15 @@ public class DrawCondition {
             for (Position move : possibleMoves) {
                 // 임시로 이동을 수행해봅니다.
                 Position originalPosition = piece.getPosition();
-                chessGameState.movePiece(piece, move);
+                chessGameState.getChessPieceAt(move).ifPresent(chessGameState::removeChessPiece);
+                piece.setPosition(move);
+                piece.setMoved(true);
                 // 체크 상태인지 확인합니다.
                 boolean isInCheck = chessGameLogic.isKingInCheck(currentPlayerColor);
                 // 원래 상태로 되돌립니다.
-                chessGameState.movePiece(piece, originalPosition);
+                chessGameState.getChessPieceAt(originalPosition).ifPresent(chessGameState::removeChessPiece);
+                piece.setPosition(originalPosition);
+                piece.setMoved(true);
                 if (!isInCheck) {
                     return false;
                 }

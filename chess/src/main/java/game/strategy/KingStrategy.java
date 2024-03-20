@@ -4,6 +4,7 @@ import game.GameUtils;
 import game.object.ChessGameState;
 import game.factory.ChessPiece;
 import game.Position;
+import game.object.GameStatusListener;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -14,7 +15,7 @@ public class KingStrategy implements MoveStrategy {
     }
 
     @Override
-    public List<Position> calculateMoves(ChessGameState chessBoard, ChessPiece piece, GameUtils utils) {
+    public List<Position> calculateMoves(GameStatusListener chessBoard, ChessPiece piece, GameUtils utils) {
         List<Position> validMoves = new ArrayList<>();
         int x = piece.getPosition().x();
         int y = piece.getPosition().y();

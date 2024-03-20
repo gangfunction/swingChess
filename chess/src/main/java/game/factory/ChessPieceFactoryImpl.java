@@ -9,6 +9,9 @@ public enum ChessPieceFactoryImpl implements ChessPieceFactory{
     INSTANCE;
     private static final Logger LOGGER = Logger.getLogger(ChessPieceFactoryImpl.class.getName());
 
+    ChessPieceFactoryImpl() {
+    }
+
     @Override
     public ChessPiece createChessPiece(Type type, Position position, Color color) {
         LOGGER.fine("Creating " + color + " " + type + " at " + position);

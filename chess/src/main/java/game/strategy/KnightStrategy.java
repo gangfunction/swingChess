@@ -3,6 +3,7 @@ package game.strategy;
 import game.*;
 import game.object.ChessGameState;
 import game.factory.ChessPiece;
+import game.object.GameStatusListener;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -15,7 +16,7 @@ public class KnightStrategy implements MoveStrategy {
     }
 
     @Override
-    public List<Position> calculateMoves(ChessGameState chessBoard, ChessPiece piece, GameUtils utils) {
+    public List<Position> calculateMoves(GameStatusListener chessBoard, ChessPiece piece, GameUtils utils) {
         List<Position> validMoves = new ArrayList<>();
         Position position = piece.getPosition();
         int[][] directions = {

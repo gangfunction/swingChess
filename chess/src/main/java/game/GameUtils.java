@@ -3,6 +3,7 @@ package game;
 import game.core.Color;
 import game.object.ChessGameState;
 import game.factory.ChessPiece;
+import game.object.GameStatusListener;
 
 import java.util.Optional;
 
@@ -17,20 +18,20 @@ public class GameUtils {
         return x >= 0 && x < BOARD_SIZE && y >= 0 && y < BOARD_SIZE;
     }
 
-    public boolean isPositionEmpty(Position position, ChessGameState chessGameState) {
+    public boolean isPositionEmpty(Position position, GameStatusListener chessGameState) {
         return chessGameState.getChessPieces().stream()
                 .noneMatch(piece -> piece.getPosition().equals(position));
     }
 
-    public boolean isPositionOccupiedByOpponent(Position position, Color currentPlayerColor, ChessGameState chessGameState) {
+    public boolean isPositionOccupiedByOpponent(Position position, Color currentPlayerColor, GameStatusListener chessGameState) {
         return chessGameState.getChessPieces().stream()
                 .anyMatch(piece -> piece.getPosition().equals(position) && !piece.getColor().equals(currentPlayerColor));
     }
 
 
-    public Optional<ChessPiece> findPieceAtPosition(int x, int y, ChessGameState chessGameState) {
+    public Optional<ChessPiece> findPieceAtPosition(GameStatusListener chessGameState, Position position) {
         return chessGameState.getChessPieces().stream()
-                .filter(piece -> piece.getPosition().x() == x && piece.getPosition().y() == y)
+                .filter(piece -> piece.getPosition().x() == position.x() && piece.getPosition().y() == position.y())
                 .findFirst();
     }
 
