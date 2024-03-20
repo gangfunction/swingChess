@@ -8,6 +8,7 @@ import game.object.GameStatusListener;
 import game.strategy.calculator.DiagonalMoveCalculator;
 import game.strategy.calculator.StraightMoveCalculator;
 
+import javax.tools.DiagnosticCollector;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -17,14 +18,12 @@ public class QueenStrategy implements MoveStrategy {
 
     }
 
-    private final MoveCalculator diagonalMoveCalculator = new DiagonalMoveCalculator();
-    private final MoveCalculator straightMoveCalculator = new StraightMoveCalculator();
     @Override
     public List<Position> calculateMoves(GameStatusListener chessGameState, ChessPiece chessPiece, GameUtils utils) {
 
-        List<Position> diagonalMoves = diagonalMoveCalculator.calculate(chessGameState, chessPiece, utils);
+        List<Position> diagonalMoves =  new DiagonalMoveCalculator().calculate(chessGameState, chessPiece, utils);
         // 수직/수평 이동 계산
-        List<Position> straightMoves = straightMoveCalculator.calculate(chessGameState, chessPiece, utils);
+        List<Position> straightMoves = new StraightMoveCalculator().calculate(chessGameState, chessPiece, utils);
 
         // 대각선 이동과 수직/수평 이동 결과를 합칩니다.
         return Stream.concat(diagonalMoves.stream(), straightMoves.stream())

@@ -1,13 +1,27 @@
 package game.core;
 
+import game.observer.Observer;
+
 import java.util.ArrayList;
 import java.util.List;
 
 public class ChessGameTurn implements TurnManager{
     private List<Player> players = new ArrayList<>();
+    private List<Observer> observers = new ArrayList<>();
     private static final int NUMBER_OF_PLAYERS = 2; // 플레이어 수
     private int currentPlayerIndex; // 현재 차례인 플레이어의 인덱스
     private boolean gameEnded; // 게임 종료 여부
+    public void addObserver(Observer observer) {
+        observers.add(observer);
+    }
+    public void removeObserver(Observer observer) {
+        observers.remove(observer);
+    }
+    public void notifyObservers(String message) {
+        for (Observer observer : observers) {
+            observer.update(message);
+        }
+    }
 
     public ChessGameTurn() {
         this.players=initializePlayers();
@@ -24,7 +38,10 @@ public class ChessGameTurn implements TurnManager{
     // 다음 플레이어의 차례로 넘어가는 메서드
     @Override
     public void nextTurn() {
+
         currentPlayerIndex = (currentPlayerIndex + 1) % NUMBER_OF_PLAYERS; // 리스트의 다음 인덱스로 이동. 플레이어 수를 초과하는 경우 0으로 되돌림
+        Player player = getCurrentPlayer();
+        notifyObservers(player.getName() + "님의 차례입니다.");
     }
     @Override
     public void resetGame() {

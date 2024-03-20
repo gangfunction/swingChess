@@ -15,10 +15,9 @@ public class BishopStrategy implements MoveStrategy {
 
     }
 
-    private final MoveCalculator diagonalMoveCalculator = new DiagonalMoveCalculator();
 
     @Override
     public List<Position> calculateMoves(GameStatusListener chessGameState, ChessPiece piece, GameUtils utils) {
-        return diagonalMoveCalculator.calculate(chessGameState, piece, utils);
+        return new DiagonalMoveCalculator().calculate(chessGameState, piece, utils);
     }
 }

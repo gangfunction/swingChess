@@ -26,12 +26,10 @@ public class ChessGameLogic  implements GameLogicActions {
         this.gameStatusListener = gameStatusListener;
     }
 
-    private final GameLog gameLog;
 
-    public ChessGameLogic(ChessGameTurn chessGameTurn, CommandInvoker commandInvoker, GameLog gameLog) {
+    public ChessGameLogic(ChessGameTurn chessGameTurn, CommandInvoker commandInvoker) {
         this.chessGameTurn = chessGameTurn;
         this.commandInvoker = commandInvoker;
-        this.gameLog = gameLog;
     }
 
     private final GameUtils gameUtils = new GameUtils();
