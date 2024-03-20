@@ -1,6 +1,5 @@
 package game.object;
 
-import game.GameLog;
 import game.GameUtils;
 import game.Position;
 import game.command.Command;
@@ -16,10 +15,13 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-//TODO: 캐슬링 조건 검사및 수행로직 구현
 public class ChessGameLogic  implements GameLogicActions {
     private GameEventListener gameEventListener;
     private GameStatusListener gameStatusListener;
+
+    private final CastlingLogic castlingLogic;
+    boolean afterCastling = false;
+    boolean queenCastleSide = false;
 
     public void setGameEventListener(GameEventListener gameEventListener,GameStatusListener gameStatusListener) {
         this.gameEventListener = gameEventListener;
@@ -27,9 +29,10 @@ public class ChessGameLogic  implements GameLogicActions {
     }
 
 
-    public ChessGameLogic(ChessGameTurn chessGameTurn, CommandInvoker commandInvoker) {
+    public ChessGameLogic(ChessGameTurn chessGameTurn, CommandInvoker commandInvoker, CastlingLogic castlingLogic) {
         this.chessGameTurn = chessGameTurn;
         this.commandInvoker = commandInvoker;
+        this.castlingLogic = castlingLogic;
     }
 
     private final GameUtils gameUtils = new GameUtils();
@@ -50,10 +53,11 @@ public class ChessGameLogic  implements GameLogicActions {
     }
 
     private void handlePieceSelection(ChessPiece piece, Position clickedPosition) {
+
         if (isSelectable(piece)) {
             gameStatusListener.setSelectedPiece(piece);
             gameEventListener.highlightPossibleMoves(piece);
-//            castlingJudgeLogic(piece, clickedPosition);
+            castlingLogic.castlingJudgeLogic(piece, clickedPosition);
         } else {
             notifyInvalidMoveAttempted("Invalid move:  Piece not selectable.");
         }
@@ -79,13 +83,37 @@ public class ChessGameLogic  implements GameLogicActions {
 
     private void handlePieceMove(Position clickedPosition) {
         ChessPiece selectedPiece = gameStatusListener.getSelectedPiece();
+        System.out.println(gameStatusListener.isAvailableMoveTarget(clickedPosition, this));
+        if(selectedPiece == null){
+            notifyInvalidMoveAttempted("Invalid move: No piece selected.");
+            return;
+        }
+        if(selectedPiece.getType() == Type.KING && isPositionUnderThreat(clickedPosition, selectedPiece.getColor())){
+            notifyInvalidMoveAttempted("Invalid move: King cannot move to a threatened position.");
+            return;
+        }
         if (gameStatusListener.isAvailableMoveTarget(clickedPosition, this)) {
             executeMove(selectedPiece, clickedPosition);
+            selectedPiece.setMoved(true);
             chessGameTurn.nextTurn();
             gameStatusListener.setSelectedPiece(null);
         } else {
             notifyInvalidMoveAttempted("Invalid move: Target position not available.");
         }
+    }
+
+    private boolean isPositionUnderThreat(Position clickedPosition, Color color) {
+        List<ChessPiece> opponentPieces = gameStatusListener.getChessPieces().stream()
+                .filter(piece -> piece.getColor() != color)
+                .toList();
+
+        for (ChessPiece piece : opponentPieces) {
+            List<Position> validMoves = calculateMovesForPiece(piece);
+            if (validMoves.contains(clickedPosition)) {
+                return true; // 주어진 위치가 상대방의 말에 의해 위협받고 있음
+            }
+        }
+        return false; // 주어진 위치가 안전함
     }
 
     public boolean isKingInCheck(Color color) {
@@ -104,6 +132,10 @@ public class ChessGameLogic  implements GameLogicActions {
     }
 
 
+
+
+
+
     private void notifyInvalidMoveAttempted(String reason) {
         if (gameEventListener != null) {
             gameEventListener.onInvalidMoveAttempted(reason);
@@ -120,15 +152,41 @@ public class ChessGameLogic  implements GameLogicActions {
         gameEventListener.onPieceMoved(clickedPosition, selectedPiece);
         commandInvoker.executeCommand(moveCommand);
         gameEventListener.clearHighlights();
+        if(afterCastling){
+            if(!queenCastleSide){
+                gameEventListener.onPieceMoved(new Position(3, selectedPiece.getPosition().y()), gameStatusListener.getChessPieceAt(new Position(0, selectedPiece.getPosition().y())).get());
+                new MoveCommand(gameStatusListener.getChessPieceAt(new Position(0, selectedPiece.getPosition().y())).get(), new Position(0, selectedPiece.getPosition().y()), new Position(3, selectedPiece.getPosition().y()), gameStatusListener, gameUtils).execute();
+                setAfterCastling(false);
+            }
+            else{
+                gameEventListener.onPieceMoved(new Position(5, selectedPiece.getPosition().y()), gameStatusListener.getChessPieceAt(new Position(7, selectedPiece.getPosition().y())).get());
+                new MoveCommand(gameStatusListener.getChessPieceAt(new Position(7, selectedPiece.getPosition().y())).get(), new Position(7, selectedPiece.getPosition().y()), new Position(5, selectedPiece.getPosition().y()), gameStatusListener, gameUtils).execute();
+                setAfterCastling(false);
+            }
+
+        }
+        gameStatusListener.setSelectedPiece(null);
 
         handleEnPassant(selectedPiece, clickedPosition);
         updateGameStateAfterMove(selectedPiece, clickedPosition);
     }
 
-    private void updateGameStateAfterMove(ChessPiece selectedPiece, Position clickedPosition) {
+
+    public void updateGameStateAfterMove(ChessPiece selectedPiece, Position clickedPosition) {
         boolean isPawnMove = selectedPiece.getType() == Type.PAWN;
         boolean isCapture = gameStatusListener.getChessPieceAt(clickedPosition).isPresent();
         gameStatusListener.updateMoveWithoutPawnOrCaptureCount(isPawnMove, isCapture);
+    }
+
+    @Override
+    public void setAfterCastling(boolean afterCastling) {
+        this.afterCastling = afterCastling;
+    }
+
+    @Override
+    public void setQueenCastleSide(boolean b) {
+        this.queenCastleSide = b;
+
     }
 
     private void handleEnPassant(ChessPiece selectedPiece, Position clickedPosition) {

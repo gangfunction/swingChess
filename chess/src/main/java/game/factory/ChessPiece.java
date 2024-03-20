@@ -4,7 +4,6 @@ package game.factory;
 import game.GameUtils;
 import game.Position;
 import game.core.Color;
-import game.object.ChessGameState;
 import game.object.GameStatusListener;
 import game.strategy.*;
 
@@ -19,7 +18,7 @@ public class ChessPiece {
     private boolean moved = false;
 
     public boolean isMoved() {
-        return !moved;
+        return moved;
     }
 
     private MoveStrategy moveStrategy;

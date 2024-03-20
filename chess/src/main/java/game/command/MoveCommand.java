@@ -32,7 +32,6 @@ public class MoveCommand implements Command {
     @Override
     public void execute() {
         piece.setPosition(endPosition);
-        chessGameState.setSelectedPiece(null);
 
         if (piece.getType() == Type.PAWN && Math.abs(startPosition.y() - endPosition.y()) == 2) {
             chessGameState.updateLastMovedPawn(piece, startPosition, endPosition);

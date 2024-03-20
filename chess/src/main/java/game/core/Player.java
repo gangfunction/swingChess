@@ -15,7 +15,6 @@ public class Player {
         this.color = color;
     }
 
-    // 이름을 가져오는 메서드
     public String getName() {
         return name;
     }
@@ -26,12 +25,10 @@ public class Player {
         this.name = name;
     }
 
-    // 플레이어의 체스말 색상을 가져오는 메서드
     public Color getColor() {
         return color;
     }
 
-    // 플레이어 정보를 문자열로 반환하는 메서드
     @Override
     public String toString() {
         return "Player{" +

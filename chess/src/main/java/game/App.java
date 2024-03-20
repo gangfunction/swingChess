@@ -2,10 +2,13 @@ package game;
 
 import game.command.CommandInvoker;
 import game.core.ChessGameTurn;
+import game.object.CastlingLogic;
 import game.object.ChessBoardUI;
 import game.object.ChessGameLogic;
 import game.object.ChessGameState;
 import game.observer.ChessObserver;
+import game.status.DrawCondition;
+import game.status.VictoryCondition;
 
 import javax.swing.*;
 import java.awt.*;
@@ -18,16 +21,26 @@ public class App {
 
             ChessGameState chessGameState = new ChessGameState();
             CommandInvoker commandInvoker = new CommandInvoker();
-            ChessGameTurn chessGameTurn = new ChessGameTurn();
-            ChessGameLogic chessGameLogic = new ChessGameLogic(chessGameTurn, commandInvoker);
-            ChessBoardUI chessBoardUI = new ChessBoardUI(chessGameState);
+            DrawCondition drawCondition = new DrawCondition();
+            GameUtils gameUtils = new GameUtils();
+            VictoryCondition victoryCondition = new VictoryCondition();
+            ChessGameTurn chessGameTurn = new ChessGameTurn(drawCondition,victoryCondition);
 
+            ChessBoardUI chessBoardUI = new ChessBoardUI(chessGameState);
+            CastlingLogic castlingLogic = new CastlingLogic(chessBoardUI,commandInvoker,gameUtils);
+            ChessGameLogic chessGameLogic = new ChessGameLogic(chessGameTurn, commandInvoker, castlingLogic);
+            castlingLogic.setCastlingLogic(chessGameState, chessGameLogic);
             chessGameLogic.setGameEventListener(chessBoardUI, chessGameState);
             chessBoardUI.setGameLogicActions(chessGameLogic);
+            chessGameTurn.setChessGameState(chessGameState);
+            chessGameState.setGameLogicActions(chessGameLogic);
+            victoryCondition.setVictoryCondition(chessGameState, gameUtils, chessGameTurn);
+            drawCondition.setDrawCondition(chessGameState, chessGameLogic, chessGameTurn);
 
             ChessGameLauncher.createAndShowGUI(primaryFrame);
 
             primaryFrame.setContentPane(chessBoardUI.getBoardPanel());
+
             centerFrameOnScreen(primaryFrame);
             primaryFrame.setVisible(true);
             JFrame logFrame = createLogFrame(primaryFrame, chessGameTurn);

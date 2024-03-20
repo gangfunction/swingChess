@@ -9,13 +9,18 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-//TODO: 캐슬링 상태 업데이트
 public class ChessGameState implements GameStatusListener {
 
     private final List<ChessPiece> chessPieces = new ArrayList<>();
     private ChessPiece selectedPiece = null;
     private ChessPiece lastMovedPiece = null; // 마지막으로 이동한 폰
     private boolean lastMoveWasDoubleStep = false; // 마지막 이동이 두 칸이었는지 여부
+    private boolean canCastle = false;
+    private GameLogicActions gameLogicActions;
+    public void setGameLogicActions(GameLogicActions gameLogicActions){
+        this.gameLogicActions = gameLogicActions;
+    }
+
 
     public ChessGameState() {
     }
@@ -120,10 +125,37 @@ public class ChessGameState implements GameStatusListener {
         ChessPiece selectedPiece = getSelectedPiece();
         System.out.println("selectedPiece:" + selectedPiece.getPosition().x() + " " + selectedPiece.getPosition().y());
         List<Position> validMoves = chessGameLogic.calculateMovesForPiece(selectedPiece);
-        for (Position p : validMoves) {
-            System.out.println("validMoves:" + p.x() + " " + p.y());
+        if(canCastle){
+            validMoves.add(new Position(2, selectedPiece.getPosition().y()));
+            validMoves.add(new Position(6, selectedPiece.getPosition().y()));
+            gameLogicActions.setAfterCastling(true);
         }
 
         return validMoves.contains(position) && !chessGameLogic.isFriendlyPieceAtPosition(position, selectedPiece);
+    }
+
+    @Override
+    public ChessPiece getKing(Color color) {
+        for (ChessPiece piece : chessPieces) {
+            if (piece.getType() == Type.KING && piece.getColor() == color) {
+                return piece;
+            }
+        }
+        return null;
+    }
+
+    @Override
+    public Position getEnPassantTarget() {
+        return null;
+    }
+
+    @Override
+    public char[] getCastlingRights() {
+        return new char[0];
+    }
+
+    @Override
+    public void setCanCastle(boolean b) {
+        this.canCastle = true;
     }
 }

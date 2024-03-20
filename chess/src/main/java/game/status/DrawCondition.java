@@ -2,25 +2,36 @@ package game.status;
 
 
 import game.Position;
-import game.core.ChessGameTurn;
 import game.core.Color;
-import game.object.ChessGameLogic;
-import game.object.ChessGameState;
+import game.core.GameTurnListener;
 import game.factory.ChessPiece;
 import game.factory.Type;
+import game.object.GameLogicActions;
+import game.object.GameStatusListener;
 
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 public class DrawCondition {
-    private final ChessGameState chessGameState;
-    private final ChessGameLogic chessGameLogic;
-    private final ChessGameTurn chessGameTurn;
+    private GameStatusListener chessGameState;
+    private GameLogicActions chessGameLogic;
+    private GameTurnListener chessGameTurn;
+
+    public DrawCondition() {
+
+    }
+
+    public void setDrawCondition(GameStatusListener chessGameState, GameLogicActions chessGameLogic, GameTurnListener chessGameTurn) {
+        this.chessGameState = chessGameState;
+        this.chessGameLogic = chessGameLogic;
+        this.chessGameTurn = chessGameTurn;
+    }
+
 
     private final Map<String, Integer> gameStateOccurrences = new HashMap<>();
     public boolean isThreefoldRepetition() {
-        String currentState = serializeGameState();
+        String currentState = chessGameTurn.serializeGameState();
 
         // 현재 상태의 발생 횟수 업데이트
         gameStateOccurrences.put(currentState, gameStateOccurrences.getOrDefault(currentState, 0) + 1);
@@ -29,31 +40,6 @@ public class DrawCondition {
         return gameStateOccurrences.get(currentState) >= 3;
     }
 
-    private String serializeGameState() {
-        StringBuilder builder = new StringBuilder();
-        // 체스판 상태 직렬화
-        chessGameState.getChessPieces().forEach(piece ->
-                builder.append(piece.getType())
-                        .append(piece.getColor())
-                        .append(piece.getPosition().x())
-                        .append(piece.getPosition().y()).append(";"));
-
-        // 턴 정보 직렬화 (현재 플레이어 색상)
-        builder.append("Turn:").append(chessGameTurn.getCurrentPlayerColor()).append(";");
-
-        // 캐슬링 권한, 앙파상 가능성 직렬화 필요 시 추가
-
-        // 게임 종료 상태 포함
-        builder.append("GameEnded:").append(chessGameTurn.isGameEnded() ? "Yes" : "No").append(";");
-
-        return builder.toString();
-    }
-
-    public DrawCondition(ChessGameState chessGameState, ChessGameLogic chessGameLogic, ChessGameTurn chessGameTurn) {
-        this.chessGameState = chessGameState;
-        this.chessGameLogic = chessGameLogic;
-        this.chessGameTurn = chessGameTurn;
-    }
 
     public boolean isStalemate(Color currentPlayerColor) {
         List<ChessPiece> currentPlayerPieces = chessGameState.getChessPieces().stream()

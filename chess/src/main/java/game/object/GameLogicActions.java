@@ -13,4 +13,10 @@ public interface GameLogicActions {
     List<Position> getPositions(ChessPiece piece, Position clickedPosition);
 
     boolean isKingInCheck(Color color);
+
+    void updateGameStateAfterMove(ChessPiece king, Position kingTargetPosition);
+
+    void setAfterCastling(boolean b);
+
+    void setQueenCastleSide(boolean b);
 }
