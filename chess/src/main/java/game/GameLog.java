@@ -1,6 +1,5 @@
 package game;
 
-import game.factory.ChessPiece;
 import game.observer.ChessObserver;
 import game.observer.Observer;
 
@@ -11,8 +10,7 @@ import java.awt.*;
 public class GameLog implements Observer {
     private final JTextArea textArea;
 
-    public GameLog(ChessObserver game) {
-        game.addObserver(this);
+    public GameLog(ChessObserver observer) {
 
         // 텍스트 영역 설정
         textArea = new JTextArea();

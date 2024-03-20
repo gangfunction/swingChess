@@ -83,7 +83,7 @@ public class ChessGameLogic  implements GameLogicActions {
         ChessPiece selectedPiece = gameStatusListener.getSelectedPiece();
         if (gameStatusListener.isAvailableMoveTarget(clickedPosition, this)) {
             executeMove(selectedPiece, clickedPosition);
-            chessGameTurn.nextPlayer();
+            chessGameTurn.nextTurn();
             gameStatusListener.setSelectedPiece(null);
         } else {
             notifyInvalidMoveAttempted("Invalid move: Target position not available.");

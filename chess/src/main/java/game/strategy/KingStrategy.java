@@ -32,10 +32,7 @@ public class KingStrategy implements MoveStrategy {
             int newY = y + direction[1];
             Position newPosition = new Position(newX, newY);
 
-            // 새 위치가 유효한 위치인지 및 적의 말이 있는지 또는 비어 있는지 확인
-            if (utils.isValidPosition(newPosition) &&
-                    (utils.isPositionEmpty(newPosition, chessBoard) ||
-                            utils.isPositionOccupiedByOpponent(newPosition, piece.getColor(), chessBoard))) {
+            if(isValidMove(newPosition, piece, chessBoard, utils)){
                 validMoves.add(newPosition);
             }
         }

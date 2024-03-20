@@ -35,7 +35,7 @@ public class KnightStrategy implements MoveStrategy {
                 Position newPosition = new Position(newX, newY);
 
                 // 이동하려는 위치에 자신의 말이 없는지 확인
-                if (utils.isPositionEmpty(newPosition, chessBoard)) {
+                if(isValidMove(newPosition, piece, chessBoard, utils)){
                     validMoves.add(newPosition);
                 }
             }

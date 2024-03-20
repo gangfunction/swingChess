@@ -15,25 +15,26 @@ import java.awt.*;
 public class App {
     public static void main(String[] args) {
         SwingUtilities.invokeLater(() -> {
+            JFrame primaryFrame = createPrimaryFrame();
 
-            JFrame primaryFrame = new JFrame("App");
-            primaryFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-            primaryFrame.setSize(600, 600);
+            ChessBoardUI chessBoardUI = initializeChessComponents(primaryFrame);
 
-            ChessBoardUI chessBoardUI = getChessBoardUI();
-            primaryFrame.setContentPane(chessBoardUI.getBoardPanel());
-            primaryFrame.setVisible(true);
-            Dimension dim = Toolkit.getDefaultToolkit().getScreenSize();
-            primaryFrame.setLocation(dim.width / 2 - primaryFrame.getSize().width / 2, dim.height / 2 - primaryFrame.getSize().height / 2);
             ChessGameLauncher.createAndShowGUI(primaryFrame);
 
-
+            primaryFrame.setContentPane(chessBoardUI.getBoardPanel());
+            centerFrameOnScreen(primaryFrame);
+            primaryFrame.setVisible(true);
         });
-
-
     }
 
-    private static ChessBoardUI getChessBoardUI() {
+    private static JFrame createPrimaryFrame() {
+        JFrame primaryFrame = new JFrame("Chess Game");
+        primaryFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        primaryFrame.setSize(600, 600);
+        return primaryFrame;
+    }
+
+    private static ChessBoardUI initializeChessComponents(JFrame primaryFrame) {
         ChessGameState chessGameState = new ChessGameState();
         CommandInvoker commandInvoker = new CommandInvoker();
         ChessGameTurn chessGameTurn = new ChessGameTurn();
@@ -41,12 +42,15 @@ public class App {
         GameLog gameLog = new GameLog(observer);
         ChessGameLogic chessGameLogic = new ChessGameLogic(chessGameTurn, commandInvoker, gameLog);
         ChessBoardUI chessBoardUI = new ChessBoardUI(chessGameState);
-        chessGameLogic.setGameEventListener(chessBoardUI,chessGameState);
+
+        chessGameLogic.setGameEventListener(chessBoardUI, chessGameState);
         chessBoardUI.setGameLogicActions(chessGameLogic);
-        CastlingLogic castlingLogic = new CastlingLogic();
-        castlingLogic.setCastlingLogic(chessGameLogic,chessGameState,chessBoardUI);
+
         return chessBoardUI;
     }
 
-
+    private static void centerFrameOnScreen(JFrame frame) {
+        Dimension dim = Toolkit.getDefaultToolkit().getScreenSize();
+        frame.setLocation(dim.width / 2 - frame.getSize().width / 2, dim.height / 2 - frame.getSize().height / 2);
+    }
 }

@@ -2,9 +2,9 @@
 <project version="4">
   <component name="CompilerConfiguration">
     <bytecodeTargetLevel>
-      <module name="chess" target="21" />
-      <module name="chess.main" target="21" />
-      <module name="chess.test" target="21" />
+      <module name="chess" target="17" />
+      <module name="chess.main" target="17" />
+      <module name="chess.test" target="17" />
     </bytecodeTargetLevel>
   </component>
 </project>
