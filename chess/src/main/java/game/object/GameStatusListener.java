@@ -43,4 +43,8 @@ public interface GameStatusListener {
     char[] getCastlingRights();
 
     void setCanCastle(boolean b);
+
+    void placePieceAt(ChessPiece newPiece, Position promotionPosition);
+
+    void onPawnPromotion(ChessPiece pawn, ChessPiece newPiece);
 }

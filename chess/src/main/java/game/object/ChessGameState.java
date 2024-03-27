@@ -5,6 +5,7 @@ import game.core.Color;
 import game.factory.ChessPiece;
 import game.factory.Type;
 
+import javax.swing.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -17,8 +18,10 @@ public class ChessGameState implements GameStatusListener {
     private boolean lastMoveWasDoubleStep = false; // 마지막 이동이 두 칸이었는지 여부
     private boolean canCastle = false;
     private GameLogicActions gameLogicActions;
-    public void setGameLogicActions(GameLogicActions gameLogicActions){
+    private GameEventListener gameEventListener;
+    public void setGameLogicActions(GameLogicActions gameLogicActions, GameEventListener gameEventListener){
         this.gameLogicActions = gameLogicActions;
+        this.gameEventListener = gameEventListener;
     }
 
 
@@ -158,4 +161,21 @@ public class ChessGameState implements GameStatusListener {
     public void setCanCastle(boolean b) {
         this.canCastle = true;
     }
+
+    @Override
+    public void placePieceAt(ChessPiece newPiece, Position promotionPosition) {
+        newPiece.setPosition(promotionPosition);
+    }
+
+    @Override
+    public void onPawnPromotion(ChessPiece pawn, ChessPiece newPiece) {
+        placePieceAt(newPiece, pawn.getPosition());
+        System.out.println(newPiece.getType() + " " + newPiece.getColor() + " " + newPiece.getPosition().x() + " " + newPiece.getPosition().y());
+        removeChessPiece(pawn);
+        gameEventListener.onPieceMoved(newPiece.getPosition(), newPiece);
+        addChessPiece(newPiece);
+
+
+    }
+
 }

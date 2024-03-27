@@ -53,6 +53,7 @@ public class ChessBoardUI implements GameEventListener {
         clearHighlights();
         getHighlightedPositions().clear();
         List<Position> moves = piece.calculateMoves(chessGameState,new GameUtils()) ;// 이동 가능한 위치 계산
+        moves.removeIf(move ->move.x() <0 || move.x()>= BOARD_SIZE || move.y()<0 || move.y()>= BOARD_SIZE); // 보드 바깥으로 나가는 위치 제거
         highlightMoves(moves);
         highlightedPositions.addAll(moves); // 하이라이트된 위치 목록에 추가합니다.
     }
@@ -82,6 +83,11 @@ public class ChessBoardUI implements GameEventListener {
         } else {
             throw new IllegalStateException("Expected JPanel at the given position but found another component type.");
         }
+    }
+
+    @Override
+    public void addPieceToPanel(ChessPiece piece, Position position) {
+
     }
 
 
@@ -154,7 +160,8 @@ public class ChessBoardUI implements GameEventListener {
         }
     }
 
-    private void addPieceToPanel(JPanel panel, JLabel pieceLabel) {
+    @Override
+    public void addPieceToPanel(JPanel panel, JLabel pieceLabel) {
         panel.removeAll();
         panel.setLayout(new GridBagLayout());
         panel.add(pieceLabel);
@@ -169,7 +176,7 @@ public class ChessBoardUI implements GameEventListener {
         clearSpecificPanel(oldPanel, oldIndex);
 
         JPanel newPanel = getPanelAtPosition(newPosition);
-        addPieceToPanel(newPanel, piece);
+        putPieceToPanel(newPanel, piece);
 
         updateUI(oldPanel, newPanel);
     }
@@ -182,7 +189,7 @@ public class ChessBoardUI implements GameEventListener {
         newPanel.repaint();
     }
 
-    private void addPieceToPanel(JPanel panel, ChessPiece piece) {
+    private void putPieceToPanel(JPanel panel, ChessPiece piece) {
         Icon icon = IconLoader.loadIcon(piece.getType(), piece.getColor());
         panel.add(new JLabel(icon));
     }

@@ -45,11 +45,6 @@ public class CastlingLogic {
     }
 
     private boolean isCastlingAttempt(ChessPiece piece, Position clickedPosition) {
-        System.out.println("CastlingLogic.isCastlingAttempt");
-        System.out.println(piece.getType() == Type.KING);
-        System.out.println(!piece.isMoved());
-        System.out.println(gameStatusListener.isRookUnmovedForCastling(piece.getColor(), clickedPosition));
-        System.out.println(!gameLogicActions.isKingInCheck(piece.getColor()));
         return piece.getType() == Type.KING && !piece.isMoved()
                 && gameStatusListener.isRookUnmovedForCastling(piece.getColor(), clickedPosition)
                 && !gameLogicActions.isKingInCheck(piece.getColor());

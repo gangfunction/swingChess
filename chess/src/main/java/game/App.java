@@ -2,10 +2,7 @@ package game;
 
 import game.command.CommandInvoker;
 import game.core.ChessGameTurn;
-import game.object.CastlingLogic;
-import game.object.ChessBoardUI;
-import game.object.ChessGameLogic;
-import game.object.ChessGameState;
+import game.object.*;
 import game.observer.ChessObserver;
 import game.status.DrawCondition;
 import game.status.VictoryCondition;
@@ -28,12 +25,17 @@ public class App {
 
             ChessBoardUI chessBoardUI = new ChessBoardUI(chessGameState);
             CastlingLogic castlingLogic = new CastlingLogic(chessBoardUI,commandInvoker,gameUtils);
-            ChessGameLogic chessGameLogic = new ChessGameLogic(chessGameTurn, commandInvoker, castlingLogic);
+            PromotionLogic promotionLogic = new PromotionLogic(chessGameState, chessBoardUI,chessGameTurn);
+
+            ChessGameLogic chessGameLogic = new ChessGameLogic(chessGameTurn, commandInvoker, castlingLogic,promotionLogic);
+            chessGameLogic.setGameEventListener(chessBoardUI,chessGameState);
             castlingLogic.setCastlingLogic(chessGameState, chessGameLogic);
-            chessGameLogic.setGameEventListener(chessBoardUI, chessGameState);
+
+
             chessBoardUI.setGameLogicActions(chessGameLogic);
             chessGameTurn.setChessGameState(chessGameState);
-            chessGameState.setGameLogicActions(chessGameLogic);
+            chessGameState.setGameLogicActions(chessGameLogic, chessBoardUI);
+
             victoryCondition.setVictoryCondition(chessGameState, gameUtils, chessGameTurn);
             drawCondition.setDrawCondition(chessGameState, chessGameLogic, chessGameTurn);
 
@@ -47,6 +49,7 @@ public class App {
 
             logFrame.setVisible(true);
         });
+
     }
 
     private static JFrame createLogFrame(JFrame primaryFrame, ChessGameTurn chessGameTurn) {

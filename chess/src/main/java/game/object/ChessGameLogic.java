@@ -20,6 +20,7 @@ public class ChessGameLogic  implements GameLogicActions {
     private GameStatusListener gameStatusListener;
 
     private final CastlingLogic castlingLogic;
+    private final PromotionLogic promotionLogic;
     boolean afterCastling = false;
     boolean queenCastleSide = false;
 
@@ -29,10 +30,11 @@ public class ChessGameLogic  implements GameLogicActions {
     }
 
 
-    public ChessGameLogic(ChessGameTurn chessGameTurn, CommandInvoker commandInvoker, CastlingLogic castlingLogic) {
+    public ChessGameLogic(ChessGameTurn chessGameTurn, CommandInvoker commandInvoker, CastlingLogic castlingLogic,PromotionLogic promotionLogic) {
         this.chessGameTurn = chessGameTurn;
         this.commandInvoker = commandInvoker;
         this.castlingLogic = castlingLogic;
+        this.promotionLogic = promotionLogic;
     }
 
     private final GameUtils gameUtils = new GameUtils();
@@ -46,7 +48,10 @@ public class ChessGameLogic  implements GameLogicActions {
             ChessPiece chessPiece = targetPiece.get();
             handlePieceSelection(chessPiece, clickedPosition);
         } else if (gameStatusListener.getSelectedPiece() != null) {
+            ChessPiece selectedPiece = gameStatusListener.getSelectedPiece();
             handlePieceMove(clickedPosition);
+            promotionLogic.promotePawn(selectedPiece, clickedPosition);
+
         } else {
             notifyInvalidMoveAttempted("No piece selected and no target piece at clicked position");
         }
@@ -226,7 +231,10 @@ public class ChessGameLogic  implements GameLogicActions {
     }
 
     private boolean isSelectable(ChessPiece piece) {
-        return chessGameTurn.getCurrentPlayerColor() == piece.getColor();
+        boolean answer = chessGameTurn.getCurrentPlayerColor() == piece.getColor();
+        System.out.println(chessGameTurn.getCurrentPlayerColor() + "랑 비교" + piece.getColor());
+        System.out.println(answer+"is not selectable");
+        return answer;
     }
 
 
