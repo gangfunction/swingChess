@@ -81,6 +81,16 @@ public class ChessGameState implements GameStatusListener {
         return Optional.empty();
     }
     @Override
+    public List<ChessPiece> getChessPiecesAt(Position targetPosition) {
+        List<ChessPiece> pieces = new ArrayList<>();
+        for (ChessPiece piece : chessPieces) {
+            if (piece.getPosition().equals(targetPosition)) {
+                pieces.add(piece);
+            }
+        }
+        return pieces;
+    }
+    @Override
     public ChessPiece getLastMovedPiece(){
         return this.lastMovedPiece;
     }

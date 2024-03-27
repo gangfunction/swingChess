@@ -22,6 +22,7 @@ public interface GameStatusListener {
     void updateLastMovedPawn(ChessPiece pawn, Position from, Position to);
 
     Optional<ChessPiece> getChessPieceAt(Position targetPosition);
+    List<ChessPiece> getChessPiecesAt(Position targetPosition);
 
     ChessPiece getLastMovedPiece();
 

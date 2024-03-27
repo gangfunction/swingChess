@@ -11,6 +11,7 @@ import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 
@@ -88,15 +89,17 @@ public class PromotionLogic implements ActionListener {
 
             System.out.println(promotionType +"이게 프로모션타입이다이;다");
             if (gameStatusListener != null) {
-                Optional<ChessPiece> chessPieceAt = gameStatusListener.getChessPieceAt(promotionPosition);
-                chessPieceAt.ifPresent(gameStatusListener::removeChessPiece);
-                ChessPiece newPiece = createNewPiece(pawn.getColor(), promotionPosition, promotionType);
-                gameStatusListener.removeChessPiece(pawn);
-                ChessPiece chessPiece = chessPieceAt.get();
-                System.out.println("chessPiece : " + chessPiece.getType()+ " " + chessPiece.getColor() + " " + chessPiece.getPosition());
-                gameEventListener.onPieceMoved(newPiece.getPosition(), newPiece);
+                Color color = pawn.getColor();
+                gameEventListener.onPieceMoved(promotionPosition, pawn);
+                List<ChessPiece> chessPiecesAt = gameStatusListener.getChessPiecesAt(promotionPosition);
+                for(ChessPiece chessPiece : chessPiecesAt){
+                    gameStatusListener.removeChessPiece(chessPiece);
+                }
+                ChessPiece newPiece = createNewPiece(color, promotionPosition, promotionType);
+                gameEventListener.onPieceMoved(promotionPosition, newPiece);
                 gameStatusListener.addChessPiece(newPiece);
                 gameTurnListener.nextTurn();
+
             }
         });
     }
