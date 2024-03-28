@@ -3,6 +3,7 @@ package game.object;
 import game.Position;
 import game.core.Color;
 import game.core.GameTurnListener;
+import game.core.Player;
 import game.factory.ChessPiece;
 import game.factory.Type;
 
@@ -12,11 +13,13 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Optional;
 import java.util.Set;
+import java.util.logging.Logger;
+
 
 public class PromotionLogic implements ActionListener {
 
+    private static final Logger logger = Logger.getLogger(PromotionLogic.class.getName());
     private final GameStatusListener gameStatusListener;
     private final GameEventListener gameEventListener;
     private final GameTurnListener gameTurnListener;
@@ -30,14 +33,16 @@ public class PromotionLogic implements ActionListener {
 
 
     public void promotePawn(ChessPiece pawn, Position promotionPosition) {
-        if (canPromote(pawn, promotionPosition) && !promotedPawns.contains(pawn) && gameStatusListener != null){
+        if(gameStatusListener == null || gameEventListener == null) {
+            logger.info("Listeners must not be null");
+        }
+        if (canPromote(pawn, promotionPosition) && !promotedPawns.contains(pawn)){
             //promotion의 선택지를 주기
             showAndSelectType(pawn, promotionPosition);
             promotedPawns.add(pawn);
 
-        }else if(gameStatusListener == null || gameEventListener == null) {
-            throw new IllegalStateException("Listeners must not be null");
         }
+
 
     }
     JButton queenButton, rookButton, bishopButton, knightButton;
@@ -52,62 +57,52 @@ public class PromotionLogic implements ActionListener {
             dialog.setSize(300, 100);
             dialog.setLayout(new FlowLayout());
 
-            // 프로모션 유형 선택을 위한 버튼 생성 및 추가
-            JButton queenButton = new JButton("Queen");
-            JButton rookButton = new JButton("Rook");
-            JButton bishopButton = new JButton("Bishop");
-            JButton knightButton = new JButton("Knight");
-
-            // 각 버튼에 대한 액션 리스너 설정
-            ActionListener actionListener = e -> {
-                JButton source = (JButton) e.getSource();
-                if (source == queenButton) {
-                    promotionType = Type.QUEEN;
-                } else if (source == rookButton) {
-                    promotionType = Type.ROOK;
-                } else if (source == bishopButton) {
-                    promotionType = Type.BISHOP;
-                } else if (source == knightButton) {
-                    promotionType = Type.KNIGHT;
-                }
-                dialog.dispose(); // 사용자가 선택을 완료하면 대화상자를 닫습니다.
-            };
-
-            queenButton.addActionListener(actionListener);
-            rookButton.addActionListener(actionListener);
-            bishopButton.addActionListener(actionListener);
-            knightButton.addActionListener(actionListener);
 
             // 버튼을 대화상자에 추가
-            dialog.add(queenButton);
-            dialog.add(rookButton);
-            dialog.add(bishopButton);
-            dialog.add(knightButton);
+            dialog.add(createPromotionButton("Queen", Type.QUEEN, dialog));
+            dialog.add(createPromotionButton("Rook", Type.ROOK, dialog));
+            dialog.add(createPromotionButton("Bishop", Type.BISHOP, dialog));
+            dialog.add(createPromotionButton("Knight", Type.KNIGHT, dialog));
 
             dialog.setLocationRelativeTo(null); // 대화상자를 화면 중앙에 위치시킵니다.
             dialog.setVisible(true); // 대화상자를 보여줍니다.
 
-            System.out.println(promotionType +"이게 프로모션타입이다이;다");
+            logger.info("Promotion type: " + promotionType);
             if (gameStatusListener != null) {
                 Color color = pawn.getColor();
                 gameEventListener.onPieceMoved(promotionPosition, pawn);
                 List<ChessPiece> chessPiecesAt = gameStatusListener.getChessPiecesAt(promotionPosition);
-                for(ChessPiece chessPiece : chessPiecesAt){
+                for (ChessPiece chessPiece : chessPiecesAt) {
                     gameStatusListener.removeChessPiece(chessPiece);
                 }
                 ChessPiece newPiece = createNewPiece(color, promotionPosition, promotionType);
                 gameEventListener.onPieceMoved(promotionPosition, newPiece);
                 gameStatusListener.addChessPiece(newPiece);
-                gameTurnListener.nextTurn();
-
+                Player currentPlayer = gameTurnListener.getCurrentPlayer();
+                if (currentPlayer.getColor() == Color.WHITE) {
+                    gameTurnListener.setPlayerTurn("jake");
+                    gameTurnListener.nextTurn();
+                } else {
+                    gameTurnListener.setPlayerTurn("pin");
+                    gameTurnListener.nextTurn();
+                }
             }
         });
     }
 
+    private JButton createPromotionButton(String label, Type type, JDialog dialog){
+        JButton button = new JButton(label);
+        button.addActionListener(e -> {
+            promotionType = type;
+            dialog.dispose();
+        });
+        return button;
+    }
+
 
     private boolean canPromote(ChessPiece pawn, Position position) {
-        // 폰이 마지막 랭크에 도달했는지 확인
-        return (pawn.getType() == Type.PAWN) && (position.y() == 0 || position.y() == 7);
+        boolean isLastRank = position.y() == 0 || position.y() == 7;
+        return pawn.getType() == Type.PAWN && isLastRank;
     }
 
     private ChessPiece createNewPiece(Color color, Position position, Type newType) {

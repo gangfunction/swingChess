@@ -21,6 +21,8 @@ public interface GameTurnListener {
 
     boolean isGameEnded();
 
+    void setPlayerTurn(String playerName);
+
     // 게임 종료 메서드
     void endGame();
 

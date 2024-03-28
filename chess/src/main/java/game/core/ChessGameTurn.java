@@ -81,6 +81,17 @@ public class ChessGameTurn implements GameTurnListener {
         return gameEnded;
     }
 
+    @Override
+    public void setPlayerTurn(String playerName) {
+        for (int i = 0; i < players.size(); i++) {
+            if (players.get(i).getName().equalsIgnoreCase(playerName)) {
+                currentPlayerIndex = i;
+                notifyObservers(playerName + "님의 차례입니다.");
+                break;
+            }
+        }
+    }
+
     // 게임 종료 메서드
     @Override
     public void endGame() {
