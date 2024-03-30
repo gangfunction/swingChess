@@ -49,7 +49,7 @@ public class VictoryCondition {
         return true;
     }
 
-    private boolean isKingInCheck(ChessPiece king) {
+    public boolean isKingInCheck(ChessPiece king) {
         List<ChessPiece> opponentPieces = chessGameState.getChessPieces().stream()
                 .filter(piece -> piece.getColor() != king.getColor())
                 .toList();

@@ -63,9 +63,12 @@ public class ChessGameTurn implements GameTurnListener {
             notifyObservers("스테일메이트! 무승부입니다.");
             endGame();
         }
-        else if (victoryCondition.isCheckMate()){
-            notifyObservers("체크메이트! " + player.getName() + "님이 승리하셨습니다.");
-            endGame();
+        else if (victoryCondition.isKingInCheck(chessGameState.getKing(getCurrentPlayerColor()))){
+            notifyObservers("체크 " + player.getName() + "님!");
+            if (victoryCondition.isCheckMate()) {
+                notifyObservers("체크메이트! " + player.getName() + "님의 승리입니다.");
+                endGame();
+            }
         }
     }
 

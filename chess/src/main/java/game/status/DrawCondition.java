@@ -76,7 +76,6 @@ public class DrawCondition {
         if (count == 0) {
             return true;
         }
-
         if (count == 1 ) {
 
             Type type = pieces.stream()

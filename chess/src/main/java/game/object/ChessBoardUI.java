@@ -54,9 +54,23 @@ public class ChessBoardUI implements GameEventListener {
         getHighlightedPositions().clear();
         List<Position> moves = piece.calculateMoves(chessGameState,new GameUtils()) ;// 이동 가능한 위치 계산
         moves.removeIf(move ->move.x() <0 || move.x()>= BOARD_SIZE || move.y()<0 || move.y()>= BOARD_SIZE); // 보드 바깥으로 나가는 위치 제거
+        if(gameLogicActions.isKingInCheck(piece.getColor())){
+            moves.removeIf(move -> !canMoveReleaseCheck(piece, move));
+           // moves.removeIf()로 체크일때는 체크를 막지않는 위치는 제거
+        }
         highlightMoves(moves);
         highlightedPositions.addAll(moves); // 하이라이트된 위치 목록에 추가합니다.
     }
+    private boolean canMoveReleaseCheck(ChessPiece piece, Position move) {
+        // 임시로 말을 이동시킨 후, 왕이 체크 상태인지를 검사
+        ChessPiece tempPiece = new ChessPiece(piece.getType(), move, piece.getColor());
+        chessGameState.addChessPiece(tempPiece); // 임시 말 추가
+        boolean isCheckAfterMove = gameLogicActions.isKingInCheck(piece.getColor());
+        chessGameState.removeChessPiece(tempPiece); // 임시 말 제거
+
+        return !isCheckAfterMove; // 이동 후에도 왕이 체크 상태가 아니라면, 이동 가능
+    }
+
 
     public void clearHighlights() {
         if (getBoardPanel() == null) {
@@ -67,6 +81,15 @@ public class ChessBoardUI implements GameEventListener {
             if (square != null) {
                 setDefaultTileBackground(i, square);
             }
+        }
+    }
+    public void clearHighlight(Position position){
+        if(getBoardPanel() == null){
+            return;
+        }
+        JPanel square = getPanelAtPosition(position);
+        if(square != null){
+            setDefaultTileBackground(position.y()*BOARD_SIZE + position.x(), square);
         }
     }
 
@@ -89,7 +112,6 @@ public class ChessBoardUI implements GameEventListener {
     public void addPieceToPanel(ChessPiece piece, Position position) {
 
     }
-
 
     public JPanel getBoardPanel() {
         return boardPanel;

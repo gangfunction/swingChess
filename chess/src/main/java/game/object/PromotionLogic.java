@@ -52,21 +52,13 @@ public class PromotionLogic implements ActionListener {
         SwingUtilities.invokeLater(() -> {
             // 모달 JDialog 생성
             final JDialog dialog = new JDialog();
-            dialog.setTitle("Promotion");
-            dialog.setModal(true); // 대화상자를 모달로 설정하여, 사용자가 선택을 완료할 때까지 기다립니다.
-            dialog.setSize(300, 100);
-            dialog.setLayout(new FlowLayout());
-
-
+            setupDialog(dialog);
             // 버튼을 대화상자에 추가
             dialog.add(createPromotionButton("Queen", Type.QUEEN, dialog));
             dialog.add(createPromotionButton("Rook", Type.ROOK, dialog));
             dialog.add(createPromotionButton("Bishop", Type.BISHOP, dialog));
             dialog.add(createPromotionButton("Knight", Type.KNIGHT, dialog));
-
-            dialog.setLocationRelativeTo(null); // 대화상자를 화면 중앙에 위치시킵니다.
             dialog.setVisible(true); // 대화상자를 보여줍니다.
-
             logger.info("Promotion type: " + promotionType);
             if (gameStatusListener != null) {
                 Color color = pawn.getColor();
@@ -90,6 +82,14 @@ public class PromotionLogic implements ActionListener {
         });
     }
 
+    private static void setupDialog(JDialog dialog) {
+        dialog.setTitle("Promotion");
+        dialog.setModal(true);
+        dialog.setSize(300, 100);
+        dialog.setLayout(new FlowLayout());
+        dialog.setLocationRelativeTo(null);
+    }
+
     private JButton createPromotionButton(String label, Type type, JDialog dialog){
         JButton button = new JButton(label);
         button.addActionListener(e -> {
@@ -100,9 +100,11 @@ public class PromotionLogic implements ActionListener {
     }
 
 
+    private boolean isAtPromotionRank(Position position) {
+        return position.y() == 0 || position.y() == 7;
+    }
     private boolean canPromote(ChessPiece pawn, Position position) {
-        boolean isLastRank = position.y() == 0 || position.y() == 7;
-        return pawn.getType() == Type.PAWN && isLastRank;
+        return pawn.getType() == Type.PAWN && isAtPromotionRank(position);
     }
 
     private ChessPiece createNewPiece(Color color, Position position, Type newType) {

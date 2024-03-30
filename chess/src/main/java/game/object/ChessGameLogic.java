@@ -51,7 +51,6 @@ public class ChessGameLogic  implements GameLogicActions {
             ChessPiece selectedPiece = gameStatusListener.getSelectedPiece();
             handlePieceMove(clickedPosition);
             promotionLogic.promotePawn(selectedPiece, clickedPosition);
-
         } else {
             notifyInvalidMoveAttempted("No piece selected and no target piece at clicked position");
         }

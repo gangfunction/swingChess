@@ -40,7 +40,6 @@ public class IconLoader {
     }
 
     private static String getIconName(Type type, Color color) {
-        System.out.println("type: " + type + ", color: " + color);
         String colorPrefix = (color == Color.WHITE) ? "white" : "black";
 
         return "/icons/" + colorPrefix + "/" + type.toString().toLowerCase() + ".png";
