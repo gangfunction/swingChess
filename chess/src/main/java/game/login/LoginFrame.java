@@ -4,6 +4,7 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.net.URISyntaxException;
 
 public class LoginFrame extends JFrame implements ActionListener {
     private final String url = "http://localhost:8000/api/login";
@@ -54,7 +55,11 @@ public class LoginFrame extends JFrame implements ActionListener {
         if (e.getSource() == loginButton) {
             String username = userTextField.getText();
             String password = new String(passwordField.getPassword());
-            HttpClient.sendLoginRequest(username, password);
+            try {
+                HttpClient.sendLoginRequest(username, password);
+            } catch (URISyntaxException ex) {
+                throw new RuntimeException(ex);
+            }
         } else if (e.getSource() == registerButton) {
             // 회원가입 창으로 이동
             new RegisterFrame();

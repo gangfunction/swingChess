@@ -10,12 +10,12 @@ repositories {
 }
 
 dependencies {
-    implementation group: 'org.apache.logging.log4j', name: 'log4j-core', version: '2.20.0'
-    implementation 'org.apache.logging.log4j:log4j-api:2.14.1'
+    implementation 'ch.qos.logback:logback-classic:1.2.3'
+    implementation 'org.slf4j:slf4j-api:1.7.30'
+    implementation 'ch.qos.logback:logback-classic:1.2.3'
+    implementation 'io.netty:netty-buffer:4.1.86.Final'
+
     implementation platform('io.projectreactor:reactor-bom:2020.0.24')
-
-//    implementation group: 'io.projectreactor', name: 'reactor-core', version: '3.5.11'
-
     implementation group: 'io.jsonwebtoken', name: 'jjwt-api', version: '0.11.5'
     implementation 'io.projectreactor.netty:reactor-netty-core'
     implementation 'io.projectreactor.netty:reactor-netty-http'

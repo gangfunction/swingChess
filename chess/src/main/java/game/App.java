@@ -7,27 +7,25 @@ import game.object.*;
 import game.observer.ChessObserver;
 import game.status.DrawCondition;
 import game.status.VictoryCondition;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.swing.*;
 import java.awt.*;
-import java.io.*;
-import java.net.ServerSocket;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.PrintWriter;
 import java.net.Socket;
 
-
 public class App {
-    
-    
+    private static Logger log = LoggerFactory.getLogger(App.class);
     public static void main(String[] args) {
         SwingUtilities.invokeLater(() -> {
             initializeUI();
             connectToServer();
             new LoginFrame();
-
-
         });
-
-
     }
 
     private static void connectToServer() {
@@ -36,7 +34,7 @@ public class App {
             out.println("Hello, server");
 
         } catch (IOException e) {
-            e.printStackTrace();
+            log.error("Failed to connect to server", e);
         }
     }
 
@@ -51,7 +49,7 @@ public class App {
         ChessGameTurn chessGameTurn = new ChessGameTurn(drawCondition,victoryCondition);
 
         ChessBoardUI chessBoardUI = new ChessBoardUI(chessGameState);
-        CastlingLogic castlingLogic = new CastlingLogic(chessBoardUI,commandInvoker,gameUtils);
+        CastlingLogic castlingLogic = new CastlingLogic(chessBoardUI);
         PromotionLogic promotionLogic = new PromotionLogic(chessGameState, chessBoardUI,chessGameTurn);
 
         ChessGameLogic chessGameLogic = new ChessGameLogic(chessGameTurn, commandInvoker, castlingLogic,promotionLogic);
@@ -90,7 +88,7 @@ public class App {
             System.out.println("Server response: " + response);
 
         }catch (IOException e){
-            e.printStackTrace();
+            log.error("Failed to send log to server", e);
         }
     }
 

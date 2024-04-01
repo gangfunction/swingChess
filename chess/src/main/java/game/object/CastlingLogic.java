@@ -15,20 +15,14 @@ public class CastlingLogic {
     private  GameStatusListener gameStatusListener;
     private final GameEventListener gameEventListener;
 
-    private final CommandInvoker commandInvoker;
-
-    private final GameUtils gameUtils;
-
 
     public void setCastlingLogic(GameStatusListener chessGameState, GameLogicActions gameLogicActions) {
         this.gameStatusListener = chessGameState;
         this.gameLogicActions = gameLogicActions;
     }
 
-    public CastlingLogic(GameEventListener gameEventListener, CommandInvoker commandInvoker, GameUtils gameUtils){
+    public CastlingLogic(GameEventListener gameEventListener){
         this.gameEventListener = gameEventListener;
-        this.commandInvoker = commandInvoker;
-        this.gameUtils = gameUtils;
     }
 
 

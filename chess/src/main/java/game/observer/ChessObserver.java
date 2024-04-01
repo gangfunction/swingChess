@@ -6,7 +6,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class ChessObserver implements Subject{
-    private List<Observer> observers;
+    private final List<Observer> observers;
     private String gameState;
     private ChessGameTurn game;
 

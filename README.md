@@ -1,5 +1,5 @@
 # 체스 게임 GUI 및 로직 프로젝트
-
+**![클다](https://github.com/gangfunction/swingChess/assets/62240333/f709cc7f-f942-4908-b6f8-979cfadf3bc5)**
 이 프로젝트는 Java Swing을 사용하여 체스 게임의 그래픽 사용자 인터페이스(GUI)와 게임 로직을 구현합니다. 아래에는 프로젝트의 주요 기능과 구현 방법에 대한 요약이 제공됩니다.
 
 ## 주요 기능
