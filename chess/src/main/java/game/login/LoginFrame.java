@@ -7,7 +7,6 @@ import java.awt.event.ActionListener;
 import java.net.URISyntaxException;
 
 public class LoginFrame extends JFrame implements ActionListener {
-    private final String url = "http://localhost:8000/api/login";
     private final JTextField userTextField;
     private final JTextField passwordField;
     private final JButton loginButton;

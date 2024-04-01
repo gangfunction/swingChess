@@ -1,6 +1,5 @@
 package game.login;
 
-import com.google.gson.Gson;
 import io.netty.bootstrap.Bootstrap;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
@@ -19,9 +18,6 @@ public class HttpClient extends SimpleChannelInboundHandler<HttpObject> {
     private static final Logger log = LoggerFactory.getLogger(HttpClient.class);
 
     private static final EventLoopGroup workerGroup = new NioEventLoopGroup();
-    public static void shutdown(){
-        workerGroup.shutdownGracefully();
-    }
 
     private static ResponseHandler responseHandler = new ResponseHandler();
 
@@ -43,6 +39,14 @@ public class HttpClient extends SimpleChannelInboundHandler<HttpObject> {
 
 
 
+    public static void sendIdDuplicateCheckRequest(String message) {
+        try {
+            sendRequest("http://localhost:8000/api/check/id/",message,HttpMethod.GET );
+        } catch (URISyntaxException | InterruptedException e) {
+            log.error("Failed to send id duplicate check request", e);
+        }
+    }
+
     public static void sendCreateRoomRequest(String message) {
         try {
             sendRequest("http://localhost:8000/api/room/create/", message, HttpMethod.POST);
@@ -50,7 +54,6 @@ public class HttpClient extends SimpleChannelInboundHandler<HttpObject> {
             log.error("Failed to send room create request", e);
         }
     }
-
     public static void sendLoginRequest(String message) throws URISyntaxException {
         try {
             sendRequest("http://localhost:8000/api/user/login/", message, HttpMethod.POST);
@@ -60,11 +63,12 @@ public class HttpClient extends SimpleChannelInboundHandler<HttpObject> {
             throw new RuntimeException(e);
         }
     }
+
     public static void sendRegisterRequest(String message){
         try {
             sendRequest("http://localhost:8000/api/user/register/", message,HttpMethod.POST );
         } catch (URISyntaxException | InterruptedException e) {
-            e.printStackTrace();
+            log.error("Failed to send register request", e);
         }
     }
 
@@ -104,25 +108,17 @@ public class HttpClient extends SimpleChannelInboundHandler<HttpObject> {
                         System.out.println("Request sent");
                     } else {
                         Throwable cause = channelFuture1.cause();
-                        cause.printStackTrace();
+                        log.error("Failed to send request", cause);
                     }
                 });
                 System.out.println("Connected to server");
             } else {
                 Throwable cause = future.cause();
-                cause.printStackTrace();
+                log.error("Failed to connect to server", cause);
             }
         });
     }
 
-
-    public static void sendIdDuplicateCheckRequest(String message) {
-        try {
-            sendRequest("http://localhost:8000/api/check/id/",message,HttpMethod.GET );
-        } catch (URISyntaxException | InterruptedException e) {
-            log.error("Failed to send id duplicate check request", e);
-        }
-    }
 
     @Override
     protected void channelRead0(ChannelHandlerContext ctx, HttpObject msg) {
