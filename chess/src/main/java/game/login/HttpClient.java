@@ -1,5 +1,6 @@
 package game.login;
 
+import com.google.gson.Gson;
 import io.netty.bootstrap.Bootstrap;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
@@ -12,6 +13,7 @@ import org.slf4j.LoggerFactory;
 
 import java.net.URI;
 import java.net.URISyntaxException;
+
 
 public class HttpClient extends SimpleChannelInboundHandler<HttpObject> {
     private static final Logger log = LoggerFactory.getLogger(HttpClient.class);
@@ -40,32 +42,33 @@ public class HttpClient extends SimpleChannelInboundHandler<HttpObject> {
 
 
 
-    public static void sendCreateRoomRequest(String roomName) {
+
+    public static void sendCreateRoomRequest(String message) {
         try {
-            sendRequest("http://localhost:8000/api/room/create", roomName, "", "", HttpMethod.POST);
+            sendRequest("http://localhost:8000/api/room/create/", message, HttpMethod.POST);
         } catch (URISyntaxException | InterruptedException e) {
             log.error("Failed to send room create request", e);
         }
     }
 
-    public static void sendLoginRequest(String username, String password) throws URISyntaxException {
+    public static void sendLoginRequest(String message) throws URISyntaxException {
         try {
-            sendRequest("http://localhost:8000/api/user/login", username, password, "", HttpMethod.GET);
+            sendRequest("http://localhost:8000/api/user/login/", message, HttpMethod.POST);
         } catch (URISyntaxException e) {
             log.error("Failed to send login request", e);
         } catch (InterruptedException e) {
             throw new RuntimeException(e);
         }
     }
-    public static void sendRegisterRequest(String username, String password, String email){
+    public static void sendRegisterRequest(String message){
         try {
-            sendRequest("http://localhost:8000/api/user/register", username, password, email,HttpMethod.POST );
+            sendRequest("http://localhost:8000/api/user/register/", message,HttpMethod.POST );
         } catch (URISyntaxException | InterruptedException e) {
             e.printStackTrace();
         }
     }
 
-    public static void sendRequest(String url, String username, String password, String email, HttpMethod method) throws URISyntaxException, InterruptedException {
+    public static void sendRequest(String url, String message, HttpMethod method) throws URISyntaxException, InterruptedException {
         URI uri = new URI(url);
         String host = uri.getHost();
         int port = uri.getPort();
@@ -84,11 +87,10 @@ public class HttpClient extends SimpleChannelInboundHandler<HttpObject> {
         connectFuture.addListener((ChannelFutureListener) future -> {
             if (future.isSuccess()) {
                 Channel ch = future.channel();
-                String content = String.format("{\"username\": \"%s\", \"password\": \"%s\", \"email\": \" %s\" }", username, password, email);
                 // HTTP 요청 준비
                 DefaultFullHttpRequest request = new DefaultFullHttpRequest(
                         HttpVersion.HTTP_1_1, method, uri.getRawPath(),
-                        Unpooled.wrappedBuffer(content.getBytes()));
+                        Unpooled.wrappedBuffer(message.getBytes()));
                 request.headers().set(HttpHeaderNames.HOST, host);
                 request.headers().set(HttpHeaderNames.CONNECTION, HttpHeaderValues.CLOSE);
                 request.headers().set(HttpHeaderNames.CONTENT_TYPE, "application/json");
@@ -113,9 +115,10 @@ public class HttpClient extends SimpleChannelInboundHandler<HttpObject> {
         });
     }
 
-    public static void sendIdDuplicateCheckRequest(String username) {
+
+    public static void sendIdDuplicateCheckRequest(String message) {
         try {
-            sendRequest("http://localhost:8000/api/check/id/", username, "", "",HttpMethod.GET );
+            sendRequest("http://localhost:8000/api/check/id/",message,HttpMethod.GET );
         } catch (URISyntaxException | InterruptedException e) {
             log.error("Failed to send id duplicate check request", e);
         }
@@ -146,7 +149,6 @@ public class HttpClient extends SimpleChannelInboundHandler<HttpObject> {
                 log.info("Response handler is null");
             }
 
-            new ResponseHandler().handleResponseContent(byteBuf);
             log.info("CONTENT: " + byteBuf);
             if (content instanceof LastHttpContent) {
                 ctx.close(); // 연결 종료

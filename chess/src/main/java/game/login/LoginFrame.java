@@ -9,7 +9,7 @@ import java.net.URISyntaxException;
 public class LoginFrame extends JFrame implements ActionListener {
     private final String url = "http://localhost:8000/api/login";
     private final JTextField userTextField;
-    private final JPasswordField passwordField;
+    private final JTextField passwordField;
     private final JButton loginButton;
     private final JButton registerButton;
 
@@ -53,10 +53,11 @@ public class LoginFrame extends JFrame implements ActionListener {
     @Override
     public void actionPerformed(ActionEvent e) {
         if (e.getSource() == loginButton) {
-            String username = userTextField.getText();
-            String password = new String(passwordField.getPassword());
+            String message = new MessageBuilder().add("username", userTextField.getText())
+                    .add("password", passwordField.getText())
+                    .buildJson();
             try {
-                HttpClient.sendLoginRequest(username, password);
+                HttpClient.sendLoginRequest(message);
             } catch (URISyntaxException ex) {
                 throw new RuntimeException(ex);
             }

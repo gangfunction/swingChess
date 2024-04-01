@@ -14,8 +14,8 @@ public class ResponseHandler {
      * @param content ByteBuf 타입의 Http 응답 본문
      */
     public void handleResponseContent(ByteBuf content) {
-        log.info("Response content: {}", content.toString());
         String response = content.toString(CharsetUtil.UTF_8);
+        log.info("Response content: {}",response);
         processResponse(response);
     }
 

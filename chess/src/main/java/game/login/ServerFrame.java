@@ -67,7 +67,8 @@ public class ServerFrame extends JFrame implements ActionListener {
 
     private void createRoom() {
         String roomName = JOptionPane.showInputDialog("Enter room name");
-        HttpClient.sendCreateRoomRequest(roomName);
+        String message = new MessageBuilder().add("room_name", roomName).buildJson();
+        HttpClient.sendCreateRoomRequest(message);
         if (roomName != null && !roomName.isEmpty()) {
             listModel.addElement(roomName);
         }

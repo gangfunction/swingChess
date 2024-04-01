@@ -23,8 +23,9 @@ public class RegisterFrame extends  JFrame {
         idPanel.add(idDuplicateCheckButton);
         idDuplicateCheckButton.addActionListener(e -> {
             String username = usernameField.getText();
+            String message = new MessageBuilder().add("username", username).buildJson();
             // 아이디 중복 확인 요청 처리
-            HttpClient.sendIdDuplicateCheckRequest(username);
+            HttpClient.sendIdDuplicateCheckRequest(message);
         });
         add(idPanel);
 
@@ -52,12 +53,13 @@ public class RegisterFrame extends  JFrame {
         JPanel buttonPanel = new JPanel();
         JButton registerButton = new JButton("Register");
         registerButton.addActionListener(e -> {
-            String username = usernameField.getText();
-            String password = new String(passwordField.getPassword());
-            String email = emailField.getText();
+            String message = new MessageBuilder().add("username", usernameField.getText())
+                    .add("password", passwordField.getPassword())
+                    .add("email", emailField.getText())
+                    .buildJson();
             // 회원가입 요청 처리
             // 예: HttpClient 클래스의 sendMessage 메서드를 사용하여 Django 서버로 회원가입 요청을 보냄
-            HttpClient.sendRegisterRequest( username, password, email);
+            HttpClient.sendRegisterRequest(message);
         });
         buttonPanel.add(registerButton);
         return buttonPanel;
