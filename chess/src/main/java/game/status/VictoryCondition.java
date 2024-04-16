@@ -4,17 +4,14 @@ import game.GameUtils;
 import game.Position;
 import game.core.Color;
 import game.core.GameTurnListener;
-import game.factory.Type;
-import game.object.ChessGameState;
 import game.factory.ChessPiece;
-import game.object.GameLogicActions;
 import game.object.GameStatusListener;
 import game.strategy.*;
 
+import javax.swing.*;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 public class VictoryCondition {
 

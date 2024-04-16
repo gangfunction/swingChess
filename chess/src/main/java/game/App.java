@@ -19,7 +19,7 @@ import java.io.PrintWriter;
 import java.net.Socket;
 
 public class App {
-    private static Logger log = LoggerFactory.getLogger(App.class);
+    private static final Logger log = LoggerFactory.getLogger(App.class);
     public static void main(String[] args) {
         SwingUtilities.invokeLater(() -> {
             initializeUI();
@@ -48,7 +48,7 @@ public class App {
         VictoryCondition victoryCondition = new VictoryCondition();
         ChessGameTurn chessGameTurn = new ChessGameTurn(drawCondition,victoryCondition);
 
-        ChessBoardUI chessBoardUI = new ChessBoardUI(chessGameState);
+        ChessBoardUI chessBoardUI = new ChessBoardUI(chessGameState, primaryFrame);
         CastlingLogic castlingLogic = new CastlingLogic(chessBoardUI);
         PromotionLogic promotionLogic = new PromotionLogic(chessGameState, chessBoardUI,chessGameTurn);
 
@@ -69,18 +69,20 @@ public class App {
         primaryFrame.setContentPane(chessBoardUI.getBoardPanel());
 
         centerFrameOnScreen(primaryFrame);
+
         primaryFrame.setVisible(true);
         JFrame logFrame = createLogFrame(primaryFrame, chessGameTurn);
 
         logFrame.setVisible(true);
-        sendLogToServer("Game initialized");
+        sendLogToServer();
     }
 
-    private static void sendLogToServer(String logMessage){
-        try{
-            Socket socket = new Socket("127.0.0.1", 8000);
+
+
+    private static void sendLogToServer(){
+        try(Socket socket = new Socket("127.0.0.1",8000)){
             PrintWriter out = new PrintWriter(socket.getOutputStream(), true);
-            String logMessageWithPrefix = "Client: " + logMessage;
+            String logMessageWithPrefix = "Client: " + "Game initialized";
             out.println(logMessageWithPrefix);
 
             BufferedReader in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
@@ -117,7 +119,7 @@ public class App {
     private static JFrame createPrimaryFrame() {
         JFrame primaryFrame = new JFrame("Chess Game");
         primaryFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        primaryFrame.setSize(600, 600);
+        primaryFrame.setSize(600, 650);
         return primaryFrame;
     }
 

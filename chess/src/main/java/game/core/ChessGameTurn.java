@@ -7,6 +7,7 @@ import game.observer.Observer;
 import game.status.DrawCondition;
 import game.status.VictoryCondition;
 
+import javax.swing.*;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -66,7 +67,7 @@ public class ChessGameTurn implements GameTurnListener {
         else if (victoryCondition.isKingInCheck(chessGameState.getKing(getCurrentPlayerColor()))){
             notifyObservers("체크 " + player.getName() + "님!");
             if (victoryCondition.isCheckMate()) {
-                notifyObservers("체크메이트! " + player.getName() + "님의 승리입니다.");
+                JOptionPane.showMessageDialog(null, "체크메이트! " + player.getName() + "님의 승리입니다.");
                 endGame();
             }
         }

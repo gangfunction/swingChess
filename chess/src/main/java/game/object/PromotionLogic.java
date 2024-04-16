@@ -5,7 +5,7 @@ import game.core.Color;
 import game.core.GameTurnListener;
 import game.core.Player;
 import game.factory.ChessPiece;
-import game.factory.Type;
+import game.factory.PieceType;
 
 import javax.swing.*;
 import java.awt.*;
@@ -46,7 +46,7 @@ public class PromotionLogic implements ActionListener {
 
     }
     JButton queenButton, rookButton, bishopButton, knightButton;
-    Type promotionType = null;
+    PieceType promotionPieceType = null;
     private void showAndSelectType(ChessPiece pawn, Position promotionPosition) {
         // Runnable 객체를 생성하여 SwingUtilities.invokeLater 메서드를 사용해 EDT에서 실행합니다.
         SwingUtilities.invokeLater(() -> {
@@ -54,12 +54,12 @@ public class PromotionLogic implements ActionListener {
             final JDialog dialog = new JDialog();
             setupDialog(dialog);
             // 버튼을 대화상자에 추가
-            dialog.add(createPromotionButton("Queen", Type.QUEEN, dialog));
-            dialog.add(createPromotionButton("Rook", Type.ROOK, dialog));
-            dialog.add(createPromotionButton("Bishop", Type.BISHOP, dialog));
-            dialog.add(createPromotionButton("Knight", Type.KNIGHT, dialog));
+            dialog.add(createPromotionButton("Queen", PieceType.QUEEN, dialog));
+            dialog.add(createPromotionButton("Rook", PieceType.ROOK, dialog));
+            dialog.add(createPromotionButton("Bishop", PieceType.BISHOP, dialog));
+            dialog.add(createPromotionButton("Knight", PieceType.KNIGHT, dialog));
             dialog.setVisible(true); // 대화상자를 보여줍니다.
-            logger.info("Promotion type: " + promotionType);
+            logger.info("Promotion type: " + promotionPieceType);
             if (gameStatusListener != null) {
                 Color color = pawn.getColor();
                 gameEventListener.onPieceMoved(promotionPosition, pawn);
@@ -67,7 +67,7 @@ public class PromotionLogic implements ActionListener {
                 for (ChessPiece chessPiece : chessPiecesAt) {
                     gameStatusListener.removeChessPiece(chessPiece);
                 }
-                ChessPiece newPiece = createNewPiece(color, promotionPosition, promotionType);
+                ChessPiece newPiece = createNewPiece(color, promotionPosition, promotionPieceType);
                 gameEventListener.onPieceMoved(promotionPosition, newPiece);
                 gameStatusListener.addChessPiece(newPiece);
                 Player currentPlayer = gameTurnListener.getCurrentPlayer();
@@ -90,10 +90,10 @@ public class PromotionLogic implements ActionListener {
         dialog.setLocationRelativeTo(null);
     }
 
-    private JButton createPromotionButton(String label, Type type, JDialog dialog){
+    private JButton createPromotionButton(String label, PieceType pieceType, JDialog dialog){
         JButton button = new JButton(label);
         button.addActionListener(e -> {
-            promotionType = type;
+            promotionPieceType = pieceType;
             dialog.dispose();
         });
         return button;
@@ -104,27 +104,27 @@ public class PromotionLogic implements ActionListener {
         return position.y() == 0 || position.y() == 7;
     }
     private boolean canPromote(ChessPiece pawn, Position position) {
-        return pawn.getType() == Type.PAWN && isAtPromotionRank(position);
+        return pawn.getType() == PieceType.PAWN && isAtPromotionRank(position);
     }
 
-    private ChessPiece createNewPiece(Color color, Position position, Type newType) {
+    private ChessPiece createNewPiece(Color color, Position position, PieceType newPieceType) {
         // 새 말 생성 로직, newType에 따라 적절한 말 객체를 생성하고 반환
-        return new ChessPiece(newType, position, color);
+        return new ChessPiece(newPieceType, position, color);
     }
 
     @Override
     public void actionPerformed(ActionEvent e) {
         if(e.getSource()== rookButton){
-            promotionType = Type.ROOK;
+            promotionPieceType = PieceType.ROOK;
         }
         else if(e.getSource()== bishopButton){
-            promotionType = Type.BISHOP;
+            promotionPieceType = PieceType.BISHOP;
         }
         else if(e.getSource()== knightButton){
-            promotionType = Type.KNIGHT;
+            promotionPieceType = PieceType.KNIGHT;
         }
         else if(e.getSource()== queenButton){
-            promotionType = Type.QUEEN;
+            promotionPieceType = PieceType.QUEEN;
         }
     }
 }

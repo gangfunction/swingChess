@@ -14,8 +14,12 @@ import java.util.List;
 import java.util.Set;
 import java.util.stream.IntStream;
 
-public class ChessBoardUI implements GameEventListener {
-    private final JPanel boardPanel = new JPanel(new GridLayout(8, 8));
+import static game.core.Color.*;
+
+public class ChessBoardUI extends JFrame implements GameEventListener {
+    private  JPanel boardPanel;
+//            = new JPanel(new GridLayout(8, 8));
+    private final JPanel statusPanel = new JPanel();
     private final ChessGameState chessGameState;
     private static final int BOARD_SIZE = 8;
     private GameLogicActions gameLogicActions;
@@ -27,11 +31,22 @@ public class ChessBoardUI implements GameEventListener {
     }
 
 
-    public ChessBoardUI(ChessGameState chessGameState) {
+    public ChessBoardUI(ChessGameState chessGameState, JFrame primaryFrame) {
         this.chessGameState = chessGameState;
         initializeBoard();
         placeChessPieces();
+        System.out.println(primaryFrame);
     }
+
+    private void initializeStatus() {
+        statusPanel.setLayout(new FlowLayout(FlowLayout.CENTER));
+        statusPanel.setPreferredSize(new Dimension(800, 50));
+        statusPanel.setBackground(Color.LIGHT_GRAY);
+        JLabel label = new JLabel("White's turn");
+        statusPanel.add(label);
+        statusPanel.setVisible(true);
+    }
+
     public void highlightMoves(List<Position> moves) {
         clearHighlights();
         moves.forEach(this::highlightSingleMove);
@@ -116,8 +131,20 @@ public class ChessBoardUI implements GameEventListener {
     public JPanel getBoardPanel() {
         return boardPanel;
     }
+    JPanel createStatusBar(){
+        JPanel statusPanel = new JPanel(){
+            @Override
+            public Dimension getPreferredSize(){
+                return new Dimension(getWidth(), 50);
+            }
+        };
+        statusPanel.setVisible(true);
+        return statusPanel;
+    }
+
 
     JPanel createSquare(int index) {
+
         final int x = index % BOARD_SIZE;
         final int y = index / BOARD_SIZE;
         JPanel square = new JPanel(new GridBagLayout()) {
@@ -139,6 +166,9 @@ public class ChessBoardUI implements GameEventListener {
     }
 
     private void initializeBoard() {
+        boardPanel = new JPanel(new GridLayout(8, 8));
+        boardPanel.setPreferredSize(new Dimension(600,600));
+        add(boardPanel, BorderLayout.CENTER);
         for (int i = 0; i < BOARD_SIZE * BOARD_SIZE; i++) {
             JPanel square = createSquare(i);
             boardPanel.add(square);
@@ -152,16 +182,16 @@ public class ChessBoardUI implements GameEventListener {
 
     private void placeChessPieces() {
         ChessPieceFactoryImpl factImpl = ChessPieceFactoryImpl.INSTANCE;
-        IntStream.range(0, BOARD_SIZE).forEach(i -> placePieceOnboard(factImpl.createChessPiece(Type.PAWN, new Position(i, 6), game.core.Color.WHITE)));
-        IntStream.range(0, BOARD_SIZE).forEach(i -> placePieceOnboard(factImpl.createChessPiece(Type.PAWN, new Position(i, 1), game.core.Color.BLACK)));
+        IntStream.range(0, BOARD_SIZE).forEach(i -> placePieceOnboard(factImpl.createChessPiece(PieceType.PAWN, new Position(i, 6), WHITE)));
+        IntStream.range(0, BOARD_SIZE).forEach(i -> placePieceOnboard(factImpl.createChessPiece(PieceType.PAWN, new Position(i, 1), BLACK)));
 
-        Type[] pieceTypes = {Type.ROOK, Type.KNIGHT, Type.BISHOP, Type.QUEEN, Type.KING, Type.BISHOP, Type.KNIGHT, Type.ROOK};
+        PieceType[] pieceTypes = {PieceType.ROOK, PieceType.KNIGHT, PieceType.BISHOP, PieceType.QUEEN, PieceType.KING, PieceType.BISHOP, PieceType.KNIGHT, PieceType.ROOK};
 
         for (int i = 0; i < BOARD_SIZE; i++) {
-            placePieceOnboard(factImpl.createChessPiece(pieceTypes[i], new Position(i, 7), game.core.Color.WHITE));
+            placePieceOnboard(factImpl.createChessPiece(pieceTypes[i], new Position(i, 7), WHITE));
         }
         for (int i = 0; i < BOARD_SIZE; i++) {
-            placePieceOnboard(factImpl.createChessPiece(pieceTypes[i], new Position(i, 0), game.core.Color.BLACK));
+            placePieceOnboard(factImpl.createChessPiece(pieceTypes[i], new Position(i, 0), BLACK));
         }
 
     }

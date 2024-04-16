@@ -3,9 +3,8 @@ package game.object;
 import game.Position;
 import game.core.Color;
 import game.factory.ChessPiece;
-import game.factory.Type;
+import game.factory.PieceType;
 
-import javax.swing.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -111,7 +110,7 @@ public class ChessGameState implements GameStatusListener {
                 new Position(7, kingPosition.y());  // 킹 사이드 캐슬링
 
         Optional<ChessPiece> rook = getChessPieceAt(rookPosition);
-        if(rook.isPresent() && rook.get().getType() == Type.ROOK && rook.get().getColor() == color){
+        if(rook.isPresent() && rook.get().getType() == PieceType.ROOK && rook.get().getColor() == color){
             return !rook.get().isMoved();
         }
         return false; // 해당 위치에 룩이 없거나 이미 이동했으면 false 반환
@@ -150,7 +149,7 @@ public class ChessGameState implements GameStatusListener {
     @Override
     public ChessPiece getKing(Color color) {
         for (ChessPiece piece : chessPieces) {
-            if (piece.getType() == Type.KING && piece.getColor() == color) {
+            if (piece.getType() == PieceType.KING && piece.getColor() == color) {
                 return piece;
             }
         }

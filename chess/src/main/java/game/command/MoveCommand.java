@@ -2,9 +2,8 @@ package game.command;
 
 import game.GameUtils;
 import game.Position;
-import game.object.ChessGameState;
+import game.factory.PieceType;
 import game.factory.ChessPiece;
-import game.factory.Type;
 import game.object.GameStatusListener;
 
 public class MoveCommand implements Command {
@@ -33,7 +32,7 @@ public class MoveCommand implements Command {
     public void execute() {
         piece.setPosition(endPosition);
 
-        if (piece.getType() == Type.PAWN && Math.abs(startPosition.y() - endPosition.y()) == 2) {
+        if (piece.getType() == PieceType.PAWN && Math.abs(startPosition.y() - endPosition.y()) == 2) {
             chessGameState.updateLastMovedPawn(piece, startPosition, endPosition);
         }
     }

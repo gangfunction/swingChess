@@ -8,7 +8,7 @@ import game.command.MoveCommand;
 import game.core.ChessGameTurn;
 import game.core.Color;
 import game.factory.ChessPiece;
-import game.factory.Type;
+import game.factory.PieceType;
 
 import javax.swing.*;
 import java.util.ArrayList;
@@ -21,8 +21,9 @@ public class ChessGameLogic  implements GameLogicActions {
 
     private final CastlingLogic castlingLogic;
     private final PromotionLogic promotionLogic;
-    boolean afterCastling = false;
-    boolean queenCastleSide = false;
+    private boolean afterCastling = false;
+    private boolean queenCastleSide = false;
+    private boolean kingCastleSide = false;
 
     public void setGameEventListener(GameEventListener gameEventListener,GameStatusListener gameStatusListener) {
         this.gameEventListener = gameEventListener;
@@ -62,6 +63,7 @@ public class ChessGameLogic  implements GameLogicActions {
             gameStatusListener.setSelectedPiece(piece);
             gameEventListener.highlightPossibleMoves(piece);
             castlingLogic.castlingJudgeLogic(piece, clickedPosition);
+
         } else {
             notifyInvalidMoveAttempted("Invalid move:  Piece not selectable.");
         }
@@ -92,7 +94,7 @@ public class ChessGameLogic  implements GameLogicActions {
             notifyInvalidMoveAttempted("Invalid move: No piece selected.");
             return;
         }
-        if(selectedPiece.getType() == Type.KING && isPositionUnderThreat(clickedPosition, selectedPiece.getColor())){
+        if(selectedPiece.getType() == PieceType.KING && isPositionUnderThreat(clickedPosition, selectedPiece.getColor())){
             notifyInvalidMoveAttempted("Invalid move: King cannot move to a threatened position.");
             return;
         }
@@ -123,7 +125,7 @@ public class ChessGameLogic  implements GameLogicActions {
     public boolean isKingInCheck(Color color) {
         List<ChessPiece> chessPieces = gameStatusListener.getChessPieces();
         Optional<ChessPiece> king = chessPieces.stream()
-                .filter(piece -> piece != null && piece.getType() == Type.KING && piece.getColor() == color)
+                .filter(piece -> piece != null && piece.getType() == PieceType.KING && piece.getColor() == color)
                 .findFirst();
         if (king.isEmpty()) {
             throw new IllegalStateException("King not found for color " + color);
@@ -162,6 +164,11 @@ public class ChessGameLogic  implements GameLogicActions {
                 new MoveCommand(gameStatusListener.getChessPieceAt(new Position(0, selectedPiece.getPosition().y())).get(), new Position(0, selectedPiece.getPosition().y()), new Position(3, selectedPiece.getPosition().y()), gameStatusListener, gameUtils).execute();
                 setAfterCastling(false);
             }
+            if(!kingCastleSide){
+                gameEventListener.onPieceMoved(new Position(5, selectedPiece.getPosition().y()), gameStatusListener.getChessPieceAt(new Position(7, selectedPiece.getPosition().y())).get());
+                new MoveCommand(gameStatusListener.getChessPieceAt(new Position(7, selectedPiece.getPosition().y())).get(), new Position(7, selectedPiece.getPosition().y()), new Position(5, selectedPiece.getPosition().y()), gameStatusListener, gameUtils).execute();
+                setAfterCastling(false);
+            }
             else{
                 gameEventListener.onPieceMoved(new Position(5, selectedPiece.getPosition().y()), gameStatusListener.getChessPieceAt(new Position(7, selectedPiece.getPosition().y())).get());
                 new MoveCommand(gameStatusListener.getChessPieceAt(new Position(7, selectedPiece.getPosition().y())).get(), new Position(7, selectedPiece.getPosition().y()), new Position(5, selectedPiece.getPosition().y()), gameStatusListener, gameUtils).execute();
@@ -177,7 +184,7 @@ public class ChessGameLogic  implements GameLogicActions {
 
 
     public void updateGameStateAfterMove(ChessPiece selectedPiece, Position clickedPosition) {
-        boolean isPawnMove = selectedPiece.getType() == Type.PAWN;
+        boolean isPawnMove = selectedPiece.getType() == PieceType.PAWN;
         boolean isCapture = gameStatusListener.getChessPieceAt(clickedPosition).isPresent();
         gameStatusListener.updateMoveWithoutPawnOrCaptureCount(isPawnMove, isCapture);
     }
@@ -192,12 +199,16 @@ public class ChessGameLogic  implements GameLogicActions {
         this.queenCastleSide = b;
 
     }
+    @Override
+    public void setKingCastleSide(boolean b) {
+        this.kingCastleSide = b;
+    }
 
     private void handleEnPassant(ChessPiece selectedPiece, Position clickedPosition) {
         if (checkEnPassantCondition(selectedPiece, clickedPosition)) {
             Position targetPawnPosition = new Position(clickedPosition.x(), selectedPiece.getColor() == Color.WHITE ? clickedPosition.y() + 1 : clickedPosition.y() - 1);
             Optional<ChessPiece> targetPawn = gameStatusListener.getChessPieceAt(targetPawnPosition);
-            if (targetPawn.isPresent() && targetPawn.get().getType() == Type.PAWN) {
+            if (targetPawn.isPresent() && targetPawn.get().getType() == PieceType.PAWN) {
                 gameStatusListener.removeChessPiece(targetPawn.get());
                 onPieceRemovePanel(targetPawn.get());
             }
@@ -207,13 +218,13 @@ public class ChessGameLogic  implements GameLogicActions {
     }
 
     private boolean checkEnPassantCondition(ChessPiece selectedPiece, Position moveTo) {
-        if (selectedPiece.getType() != Type.PAWN) return false;
+        if (selectedPiece.getType() != PieceType.PAWN) return false;
         int direction = selectedPiece.getColor() == Color.WHITE ? 1 : -1;
         Position adjacentPawnPosition = new Position(moveTo.x(), moveTo.y() + direction);
         Optional<ChessPiece> adjacentPawn = gameStatusListener.getChessPieceAt(adjacentPawnPosition);
         if (adjacentPawn.isEmpty()) return false;
         ChessPiece adjacent = adjacentPawn.get();
-        return adjacent.getType() == Type.PAWN;
+        return adjacent.getType() == PieceType.PAWN;
     }
 
     public void onPieceRemovePanel(ChessPiece piece) {

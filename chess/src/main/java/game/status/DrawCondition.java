@@ -5,7 +5,7 @@ import game.Position;
 import game.core.Color;
 import game.core.GameTurnListener;
 import game.factory.ChessPiece;
-import game.factory.Type;
+import game.factory.PieceType;
 import game.object.GameLogicActions;
 import game.object.GameStatusListener;
 
@@ -77,9 +77,9 @@ public class DrawCondition {
         boolean isBishopColorConsistent = true;
 
         for (ChessPiece piece : pieces) {
-            if (piece.getType() != Type.KING) {
+            if (piece.getType() != PieceType.KING) {
                 nonKingCount++;
-                if (piece.getType() == Type.BISHOP) {
+                if (piece.getType() == PieceType.BISHOP) {
                     bishopCount++;
                     int color = (piece.getPosition().x() + piece.getPosition().y()) % 2;
                     if (bishopColor == null) {
@@ -87,7 +87,7 @@ public class DrawCondition {
                     } else if (bishopColor != color) {
                         isBishopColorConsistent = false;
                     }
-                } else if (piece.getType() == Type.KNIGHT && nonKingCount > 1) {
+                } else if (piece.getType() == PieceType.KNIGHT && nonKingCount > 1) {
                     return false;
                 }
             }
@@ -96,7 +96,7 @@ public class DrawCondition {
         if (nonKingCount == 0) {
             return true;
         } else if (nonKingCount == 1) {
-            return bishopCount == 1 || (bishopCount == 0 && pieces.stream().anyMatch(p -> p.getType() == Type.KNIGHT));
+            return bishopCount == 1 || (bishopCount == 0 && pieces.stream().anyMatch(p -> p.getType() == PieceType.KNIGHT));
         } else {
             return bishopCount == nonKingCount && isBishopColorConsistent;
         }

@@ -4,5 +4,5 @@ import game.core.Color;
 import game.Position;
 
 public interface ChessPieceFactory {
-    ChessPiece createChessPiece(Type type, Position position, Color color);
+    ChessPiece createChessPiece(PieceType pieceType, Position position, Color color);
 }

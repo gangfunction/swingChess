@@ -12,7 +12,7 @@ import java.util.logging.Logger;
 
 public class ChessPiece {
     private static final Logger LOGGER = Logger.getLogger(ChessPiece.class.getName());
-    private Type type;
+    private PieceType pieceType;
     private Position position;
     private Color color;
     private boolean moved = false;
@@ -23,15 +23,15 @@ public class ChessPiece {
 
     private MoveStrategy moveStrategy;
 
-    public ChessPiece(Type type, Position position, Color color) {
-        this.type = type;
+    public ChessPiece(PieceType pieceType, Position position, Color color) {
+        this.pieceType = pieceType;
         this.position = position;
         this.color = color;
-        this.moveStrategy = createMoveStrategy(type);
+        this.moveStrategy = createMoveStrategy(pieceType);
     }
 
-    private MoveStrategy createMoveStrategy(Type type) {
-        return switch ( type) {
+    private MoveStrategy createMoveStrategy(PieceType pieceType) {
+        return switch (pieceType) {
             case PAWN -> new PawnStrategy();
             case ROOK -> new RookStrategy();
             case KNIGHT -> new KnightStrategy();
@@ -45,7 +45,7 @@ public class ChessPiece {
     }
 
     public void setMoved(boolean moved) {
-        LOGGER.fine(this.type + "set to" + (moved ? "moved" : "not moved"));
+        LOGGER.fine(this.pieceType + "set to" + (moved ? "moved" : "not moved"));
         this.moved = moved;
     }
 
@@ -65,7 +65,7 @@ public class ChessPiece {
         return color;
     }
 
-    public Type getType() {
-        return type;
+    public PieceType getType() {
+        return pieceType;
     }
 }

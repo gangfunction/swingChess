@@ -19,4 +19,6 @@ public interface GameLogicActions {
     void setAfterCastling(boolean b);
 
     void setQueenCastleSide(boolean b);
+
+    void setKingCastleSide(boolean b);
 }

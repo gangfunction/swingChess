@@ -57,6 +57,7 @@ public class LoginFrame extends JFrame implements ActionListener {
                     .buildJson();
             try {
                 HttpClient.sendLoginRequest(message);
+                this.dispose();
             } catch (URISyntaxException ex) {
                 throw new RuntimeException(ex);
             }

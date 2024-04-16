@@ -1,7 +1,7 @@
 package game.ui;
 
 import game.core.Color;
-import game.factory.Type;
+import game.factory.PieceType;
 
 import javax.imageio.ImageIO;
 import javax.swing.*;
@@ -15,8 +15,8 @@ public class IconLoader {
     private static final int ICON_HEIGHT = 50;
 
 
-    public static Icon loadIcon(Type type, Color color) {
-        String iconName = getIconName(type, color);
+    public static Icon loadIcon(PieceType pieceType, Color color) {
+        String iconName = getIconName(pieceType, color);
         URL iconURL = IconLoader.class.getResource(iconName);
         if (iconURL != null) {
             return createIconFromURL(iconURL);
@@ -39,10 +39,10 @@ public class IconLoader {
         return null;
     }
 
-    private static String getIconName(Type type, Color color) {
+    private static String getIconName(PieceType pieceType, Color color) {
         String colorPrefix = (color == Color.WHITE) ? "white" : "black";
 
-        return "/icons/" + colorPrefix + "/" + type.toString().toLowerCase() + ".png";
+        return "/icons/" + colorPrefix + "/" + pieceType.toString().toLowerCase() + ".png";
 
     }
 }

@@ -4,7 +4,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class MessageBuilder{
-    private Map<String, Object> messageData;
+    private final Map<String, Object> messageData;
     public MessageBuilder(){
         messageData = new HashMap<>();
     }
