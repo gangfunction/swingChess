@@ -10,13 +10,11 @@ public interface GameEventListener {
     void addPieceToPanel(JPanel panel, JLabel pieceLabel);
 
     void onPieceMoved(Position newPosition, ChessPiece piece);
-    void onPieceSelected(ChessPiece piece);
     void onInvalidMoveAttempted(String reason);
-    void onMovesCalculated(List<Position> moves);
 
     void highlightPossibleMoves(ChessPiece piece);
     void clearHighlights();
     void highlightMoves(List<Position> moves);
     JPanel getPanelAtPosition(Position position);
-    void addPieceToPanel(ChessPiece piece, Position position);
+    void onGameDraw();
 }

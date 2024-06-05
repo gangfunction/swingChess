@@ -1,0 +1,10 @@
+
+x
+java:S1948"0Make "chessGameState" transient or serializable.(Í«œúÿÿÿÿ8¢ÃŠ¶ş1J$f7dca1c4-502a-4463-bfcd-c2f828f81fed
+u
+java:S1948"2Make "gameLogicActions" transient or serializable.(‘ÑåÇ8¢ÃŠ¶ş1J$7315ca00-d888-4067-ad97-34c974fa66f6
+f	java:S106("+Replace this use of System.out by a logger.(§ÿÉ›J$bfd2dd7b-fd1e-411f-9db7-5b9bb84f475c
+‚
+java:S6201j"FReplace this instanceof check and cast with 'instanceof JPanel jpanel'(½ıŸJ$2d3cab70-3d97-4e5a-8f37-0a605994770e
+v
+java:S1144+"5Remove this unused private "initializeStatus" method.(ó§ƒÉúÿÿÿÿJ$9f791144-aedb-48c7-b68f-ef529d47c1ed

@@ -1,0 +1,4 @@
+
+m	java:S1060"+Replace this use of System.out by a logger.(Д‰ЛЉ8ЅЃХжэ1J$0919623a-6e8f-4bb6-96ba-a9ec3f16fc0c
+Ѕ
+java:S62043"zReplace this usage of 'Stream.collect(Collectors.toList())' with 'Stream.toList()' and ensure that the list is unmodified.(Є™Ё№8У ‰зэ1J$6c69d1e8-c1aa-4488-b5fc-ec29f17aa18b

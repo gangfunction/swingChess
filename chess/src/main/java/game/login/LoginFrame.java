@@ -55,12 +55,8 @@ public class LoginFrame extends JFrame implements ActionListener {
             String message = new MessageBuilder().add("username", userTextField.getText())
                     .add("password", passwordField.getText())
                     .buildJson();
-            try {
-                HttpClient.sendLoginRequest(message);
-                this.dispose();
-            } catch (URISyntaxException ex) {
-                throw new RuntimeException(ex);
-            }
+            HttpClient.sendLoginRequest(message);
+            this.dispose();
         } else if (e.getSource() == registerButton) {
             // 회원가입 창으로 이동
             new RegisterFrame();

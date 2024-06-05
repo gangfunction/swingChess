@@ -3,12 +3,16 @@
   <component name="NewModuleRootManager">
     <output url="file://$MODULE_DIR$/../../chess/build/classes/java/main" />
     <exclude-output />
+    <content url="file://$MODULE_DIR$/../../chess/build/generated/sources/annotationProcessor/java/main">
+      <sourceFolder url="file://$MODULE_DIR$/../../chess/build/generated/sources/annotationProcessor/java/main" isTestSource="false" generated="true" />
+    </content>
     <content url="file://$MODULE_DIR$/../../chess/src/main">
       <sourceFolder url="file://$MODULE_DIR$/../../chess/src/main/java" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/../../chess/src/main/resources" type="java-resource" />
     </content>
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />
+    <orderEntry type="library" name="Gradle: org.projectlombok:lombok:1.18.30" level="project" />
     <orderEntry type="library" name="Gradle: ch.qos.logback:logback-classic:1.4.14" level="project" />
     <orderEntry type="library" name="Gradle: org.slf4j:slf4j-api:2.0.7" level="project" />
     <orderEntry type="library" name="Gradle: io.projectreactor.netty:reactor-netty-http:1.0.24" level="project" />

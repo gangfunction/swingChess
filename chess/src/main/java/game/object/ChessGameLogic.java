@@ -9,9 +9,11 @@ import game.core.ChessGameTurn;
 import game.core.Color;
 import game.factory.ChessPiece;
 import game.factory.PieceType;
+import game.observer.ChessObserver;
+import game.status.DrawCondition;
+import lombok.Setter;
 
 import javax.swing.*;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -21,88 +23,84 @@ public class ChessGameLogic  implements GameLogicActions {
 
     private final CastlingLogic castlingLogic;
     private final PromotionLogic promotionLogic;
+    private final DrawCondition drawCondition ;
+    private final GameUtils gameUtils = new GameUtils();
+    private final ChessGameTurn chessGameTurn;
+    private final CommandInvoker commandInvoker;
+    private final ChessObserver chessObserver;
+    @Setter
     private boolean afterCastling = false;
-    private boolean queenCastleSide = false;
-    private boolean kingCastleSide = false;
-
-    public void setGameEventListener(GameEventListener gameEventListener,GameStatusListener gameStatusListener) {
-        this.gameEventListener = gameEventListener;
-        this.gameStatusListener = gameStatusListener;
-    }
 
 
-    public ChessGameLogic(ChessGameTurn chessGameTurn, CommandInvoker commandInvoker, CastlingLogic castlingLogic,PromotionLogic promotionLogic) {
+
+    public ChessGameLogic(ChessGameTurn chessGameTurn, CommandInvoker commandInvoker, CastlingLogic castlingLogic, PromotionLogic promotionLogic) {
         this.chessGameTurn = chessGameTurn;
         this.commandInvoker = commandInvoker;
         this.castlingLogic = castlingLogic;
         this.promotionLogic = promotionLogic;
+        this.chessObserver = new ChessObserver();
+        this.drawCondition = new DrawCondition();
+        this.chessObserver.addObserver(new GameUIObserver());
     }
 
-    private final GameUtils gameUtils = new GameUtils();
-    private final ChessGameTurn chessGameTurn;
-    private final CommandInvoker commandInvoker;
+    public void setGameEventListener(GameEventListener gameEventListener,GameStatusListener gameStatusListener) {
+        this.gameEventListener = gameEventListener;
+        this.gameStatusListener = gameStatusListener;
+        this.drawCondition.setDrawCondition(gameStatusListener, this, chessGameTurn);
+        this.castlingLogic.setCastlingLogic(gameStatusListener, this);
+
+    }
+
 
     public void handleSquareClick(int x, int y) {
         Position clickedPosition = new Position(x, y);
         Optional<ChessPiece> targetPiece = gameUtils.findPieceAtPosition(gameStatusListener, clickedPosition);
         if (targetPiece.isPresent() && gameStatusListener.getSelectedPiece() == null) {
-            ChessPiece chessPiece = targetPiece.get();
-            handlePieceSelection(chessPiece, clickedPosition);
+            handlePieceSelection(targetPiece.get(), clickedPosition);
         } else if (gameStatusListener.getSelectedPiece() != null) {
             ChessPiece selectedPiece = gameStatusListener.getSelectedPiece();
             handlePieceMove(clickedPosition);
-            promotionLogic.promotePawn(selectedPiece, clickedPosition);
+            if (selectedPiece.getType() == PieceType.PAWN && promotionLogic.isAtPromotionRank(clickedPosition)) {
+                promotionLogic.promotePawn(selectedPiece, clickedPosition);
+            }
+            if(checkDraw()){
+                gameEventListener.onGameDraw();
+            }
         } else {
             notifyInvalidMoveAttempted("No piece selected and no target piece at clicked position");
         }
     }
 
     private void handlePieceSelection(ChessPiece piece, Position clickedPosition) {
-
         if (isSelectable(piece)) {
             gameStatusListener.setSelectedPiece(piece);
             gameEventListener.highlightPossibleMoves(piece);
             castlingLogic.castlingJudgeLogic(piece, clickedPosition);
-
         } else {
-            notifyInvalidMoveAttempted("Invalid move:  Piece not selectable.");
+            notifyInvalidMoveAttempted("Invalid move: Piece not selectable.");
         }
     }
 
-    public List<Position> getPositions(ChessPiece piece, Position clickedPosition) {
-        Position currentPosition1 = piece.getPosition();
-        List<Position> path3 = new ArrayList<>();
-
-        // 킹 사이드 캐슬링 경로
-        if (clickedPosition.x() > currentPosition1.x()) {
-            for (int x1 = currentPosition1.x() + 1; x1 <= clickedPosition.x(); x1++) {
-                path3.add(new Position(x1, currentPosition1.y()));
-            }
-        } else {
-            for (int x1 = currentPosition1.x() - 1; x1 >= clickedPosition.x(); x1--) {
-                path3.add(new Position(x1, currentPosition1.y()));
-            }
-        }
-
-        return path3;
-    }
 
     private void handlePieceMove(Position clickedPosition) {
         ChessPiece selectedPiece = gameStatusListener.getSelectedPiece();
-        System.out.println(gameStatusListener.isAvailableMoveTarget(clickedPosition, this));
-        if(selectedPiece == null){
+        if (selectedPiece == null) {
             notifyInvalidMoveAttempted("Invalid move: No piece selected.");
             return;
         }
-        if(selectedPiece.getType() == PieceType.KING && isPositionUnderThreat(clickedPosition, selectedPiece.getColor())){
+        if (selectedPiece.getType() == PieceType.KING && isPositionUnderThreat(clickedPosition, selectedPiece.getColor())) {
             notifyInvalidMoveAttempted("Invalid move: King cannot move to a threatened position.");
             return;
         }
         if (gameStatusListener.isAvailableMoveTarget(clickedPosition, this)) {
             executeMove(selectedPiece, clickedPosition);
             selectedPiece.setMoved(true);
+            if (selectedPiece.getType() == PieceType.PAWN && promotionLogic.isAtPromotionRank(clickedPosition)) {
+                promotionLogic.promotePawn(selectedPiece, clickedPosition);
+            }
             chessGameTurn.nextTurn();
             gameStatusListener.setSelectedPiece(null);
+            chessObserver.setGameState("Piece moved to " + clickedPosition);
         } else {
             notifyInvalidMoveAttempted("Invalid move: Target position not available.");
         }
@@ -148,6 +146,10 @@ public class ChessGameLogic  implements GameLogicActions {
         }
     }
 
+    public boolean checkDraw(){
+        Color currentPlayerColor = chessGameTurn.getCurrentPlayerColor();
+        return drawCondition.isDraw(currentPlayerColor);
+    }
     private void executeMove(ChessPiece selectedPiece, Position clickedPosition) {
         Command moveCommand = new MoveCommand(selectedPiece, selectedPiece.getPosition(), clickedPosition, gameStatusListener, gameUtils);
         Optional<ChessPiece> opponentPiece = gameUtils.findPieceAtPosition(gameStatusListener, clickedPosition);
@@ -157,29 +159,34 @@ public class ChessGameLogic  implements GameLogicActions {
         });
         gameEventListener.onPieceMoved(clickedPosition, selectedPiece);
         commandInvoker.executeCommand(moveCommand);
-        gameEventListener.clearHighlights();
         if(afterCastling){
-            if(!queenCastleSide){
-                gameEventListener.onPieceMoved(new Position(3, selectedPiece.getPosition().y()), gameStatusListener.getChessPieceAt(new Position(0, selectedPiece.getPosition().y())).get());
-                new MoveCommand(gameStatusListener.getChessPieceAt(new Position(0, selectedPiece.getPosition().y())).get(), new Position(0, selectedPiece.getPosition().y()), new Position(3, selectedPiece.getPosition().y()), gameStatusListener, gameUtils).execute();
-                setAfterCastling(false);
-            }
-            if(!kingCastleSide){
-                gameEventListener.onPieceMoved(new Position(5, selectedPiece.getPosition().y()), gameStatusListener.getChessPieceAt(new Position(7, selectedPiece.getPosition().y())).get());
-                new MoveCommand(gameStatusListener.getChessPieceAt(new Position(7, selectedPiece.getPosition().y())).get(), new Position(7, selectedPiece.getPosition().y()), new Position(5, selectedPiece.getPosition().y()), gameStatusListener, gameUtils).execute();
-                setAfterCastling(false);
-            }
-            else{
-                gameEventListener.onPieceMoved(new Position(5, selectedPiece.getPosition().y()), gameStatusListener.getChessPieceAt(new Position(7, selectedPiece.getPosition().y())).get());
-                new MoveCommand(gameStatusListener.getChessPieceAt(new Position(7, selectedPiece.getPosition().y())).get(), new Position(7, selectedPiece.getPosition().y()), new Position(5, selectedPiece.getPosition().y()), gameStatusListener, gameUtils).execute();
-                setAfterCastling(false);
-            }
-
+            handleCastlingMove(selectedPiece);
+            setAfterCastling(false);
+            updateGameStateAfterMove(selectedPiece, clickedPosition);
         }
+        gameEventListener.clearHighlights();
+
         gameStatusListener.setSelectedPiece(null);
 
         handleEnPassant(selectedPiece, clickedPosition);
         updateGameStateAfterMove(selectedPiece, clickedPosition);
+    }
+
+    private void handleCastlingMove(ChessPiece king) {
+        if (!castlingLogic.isQueenSide()) {
+            moveRookForCastling(new Position(7, king.getPosition().y()), new Position(5, king.getPosition().y()));
+        } else {
+            moveRookForCastling(new Position(0, king.getPosition().y()), new Position(3, king.getPosition().y()));
+        }
+    }
+
+    private void moveRookForCastling(Position from, Position to) {
+        Optional<ChessPiece> rook = gameStatusListener.getChessPieceAt(from);
+        if (rook.isPresent()) {
+            Command moveRookCommand = new MoveCommand(rook.get(), from, to, gameStatusListener, gameUtils);
+            gameEventListener.onPieceMoved(to, rook.get());
+            commandInvoker.executeCommand(moveRookCommand);
+        }
     }
 
 
@@ -189,19 +196,11 @@ public class ChessGameLogic  implements GameLogicActions {
         gameStatusListener.updateMoveWithoutPawnOrCaptureCount(isPawnMove, isCapture);
     }
 
-    @Override
-    public void setAfterCastling(boolean afterCastling) {
-        this.afterCastling = afterCastling;
-    }
+
 
     @Override
-    public void setQueenCastleSide(boolean b) {
-        this.queenCastleSide = b;
-
-    }
-    @Override
-    public void setKingCastleSide(boolean b) {
-        this.kingCastleSide = b;
+    public boolean isKingInCheckAfterMove(ChessPiece piece, Position clickedPosition) {
+        return isKingInCheck(piece.getColor());
     }
 
     private void handleEnPassant(ChessPiece selectedPiece, Position clickedPosition) {
@@ -241,10 +240,7 @@ public class ChessGameLogic  implements GameLogicActions {
     }
 
     private boolean isSelectable(ChessPiece piece) {
-        boolean answer = chessGameTurn.getCurrentPlayerColor() == piece.getColor();
-        System.out.println(chessGameTurn.getCurrentPlayerColor() + "랑 비교" + piece.getColor());
-        System.out.println(answer+"is not selectable");
-        return answer;
+        return chessGameTurn.getCurrentPlayerColor() == piece.getColor();
     }
 
 

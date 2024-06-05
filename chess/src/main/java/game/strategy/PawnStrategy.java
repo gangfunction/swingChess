@@ -17,10 +17,6 @@ public class PawnStrategy implements MoveStrategy {
     private static final int MOVE_ONE_STEP = 1;
     private static final int MOVE_TWO_STEPS = 2;
 
-
-    public PawnStrategy() {
-    }
-
     private int getMoveDirection(Color color) {
         return (color == Color.WHITE) ? -MOVE_ONE_STEP : MOVE_ONE_STEP;
     }

@@ -1,5 +1,8 @@
 package game.login;
 
+import lombok.Getter;
+import lombok.Setter;
+
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
@@ -12,14 +15,8 @@ public class ServerFrame extends JFrame implements ActionListener {
     private final JList<String> roomList;
     private final DefaultListModel<String> listModel;
 
-    public boolean isMaxRoom() {
-        return MaxRoom;
-    }
-
-    public void setMaxRoom(boolean maxRoom) {
-        MaxRoom = maxRoom;
-    }
-
+    @Getter
+    @Setter
     private boolean MaxRoom = false;
     
     public ServerFrame() {
@@ -75,15 +72,6 @@ public class ServerFrame extends JFrame implements ActionListener {
         }
     }
 
-    /*
-      1. db로직으로 참가하는 사람의 의사를 백엔드에 보낸다.
-      2. 백엔드는 받아서 저장한다.
-      3. 방의 상태를 백엔드에서 업데이트한다.
-      4. 백엔드는 참가자에게 응답을 보낸다.
-      5. 응답에 방의 상태와 참가자의 정보를 보낸다.
-      6. 참가자는 방의 상태를 업데이트한다.
-      7. 참가자는 게임을 시작한다.
-     */
     private void joinRoom() {
         String selectedRoom = roomList.getSelectedValue();
         if (selectedRoom != null) {

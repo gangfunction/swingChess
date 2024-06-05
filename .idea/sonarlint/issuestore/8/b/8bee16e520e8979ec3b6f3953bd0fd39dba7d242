@@ -1,0 +1,7 @@
+
+
+java:S3252"LUse static access with "javax.swing.WindowConstants" for "DISPOSE_ON_CLOSE".(Ì—İ8Á²Ç¶ş1J$ecc59065-711e-43ab-8048-2c1bc9d339a7
+o
+java:S1602.",Remove useless curly braces around statement(…ùÈÀ8Ä²Ç¶ş1J$27457bef-3e2c-4c53-9074-d2251b4d8444
+r	java:S1064"+Replace this use of System.out by a logger.(§½öÍûÿÿÿÿ8Æ²Ç¶ş1J$120b5c94-9084-4674-b3cc-1804dd225aec
+m	java:S1069"+Replace this use of System.out by a logger.(•ä¾®8Æ²Ç¶ş1J$a15f37fa-6919-4161-9cd8-845ac931d9db

@@ -4,6 +4,7 @@ import game.Position;
 import game.core.Color;
 import game.factory.ChessPiece;
 import game.factory.PieceType;
+import lombok.Setter;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -13,19 +14,12 @@ public class ChessGameState implements GameStatusListener {
 
     private final List<ChessPiece> chessPieces = new ArrayList<>();
     private ChessPiece selectedPiece = null;
-    private ChessPiece lastMovedPiece = null; // 마지막으로 이동한 폰
-    private boolean lastMoveWasDoubleStep = false; // 마지막 이동이 두 칸이었는지 여부
+    private ChessPiece lastMovedPiece = null;
+    private boolean lastMoveWasDoubleStep = false;
     private boolean canCastle = false;
+    @Setter
     private GameLogicActions gameLogicActions;
-    private GameEventListener gameEventListener;
-    public void setGameLogicActions(GameLogicActions gameLogicActions, GameEventListener gameEventListener){
-        this.gameLogicActions = gameLogicActions;
-        this.gameEventListener = gameEventListener;
-    }
-
-
-    public ChessGameState() {
-    }
+    private int moveWithoutPawnOrCaptureCount = 0;
 
     @Override
     public void addChessPiece(ChessPiece chessPiece) {
@@ -38,47 +32,38 @@ public class ChessGameState implements GameStatusListener {
     }
 
     @Override
-    public void clearChessPieces() {
-        chessPieces.clear();
-    }
-
-
-    @Override
     public ChessPiece getSelectedPiece() {
         return selectedPiece;
     }
 
     @Override
-    public void setSelectedPiece(ChessPiece piece){
+    public void setSelectedPiece(ChessPiece piece) {
         this.selectedPiece = piece;
     }
 
-    // 필요에 따라 추가 메서드 구현
     @Override
     public void updateLastMovedPawn(ChessPiece pawn, Position from, Position to) {
-        // 폰의 이동 거리 계산
         int distanceMoved = Math.abs(from.y() - to.y());
-
-        // 이동한 거리가 2칸인 경우만 업데이트
         if (distanceMoved == 2) {
             this.lastMovedPiece = pawn;
             this.lastMoveWasDoubleStep = true;
         } else {
-            // 이동 거리가 2칸이 아니면 앙파썽 관련 정보 초기화
-            this.lastMovedPiece = null;
-            this.lastMoveWasDoubleStep = false;
+            resetLastMove();
         }
+    }
+
+    private void resetLastMove() {
+        this.lastMovedPiece = null;
+        this.lastMoveWasDoubleStep = false;
     }
 
     @Override
     public Optional<ChessPiece> getChessPieceAt(Position targetPosition) {
-        for (ChessPiece piece : chessPieces) {
-            if (piece.getPosition().equals(targetPosition)) {
-                return Optional.of(piece);
-            }
-        }
-        return Optional.empty();
+        return chessPieces.stream()
+                .filter(piece -> piece.getPosition().equals(targetPosition))
+                .findFirst();
     }
+
     @Override
     public List<ChessPiece> getChessPiecesAt(Position targetPosition) {
         List<ChessPiece> pieces = new ArrayList<>();
@@ -89,12 +74,14 @@ public class ChessGameState implements GameStatusListener {
         }
         return pieces;
     }
+
     @Override
-    public ChessPiece getLastMovedPiece(){
+    public ChessPiece getLastMovedPiece() {
         return this.lastMovedPiece;
     }
+
     @Override
-    public boolean getLastMoveWasDoubleStep(){
+    public boolean getLastMoveWasDoubleStep() {
         return this.lastMoveWasDoubleStep;
     }
 
@@ -102,22 +89,18 @@ public class ChessGameState implements GameStatusListener {
     public void removeChessPiece(ChessPiece targetPawn) {
         chessPieces.remove(targetPawn);
     }
+
     @Override
     public boolean isRookUnmovedForCastling(Color color, Position kingPosition) {
-        // 캐슬링이 가능한 룩의 위치를 확인
         Position rookPosition = kingPosition.x() == 2 ?
                 new Position(0, kingPosition.y()) : // 퀸 사이드 캐슬링
                 new Position(7, kingPosition.y());  // 킹 사이드 캐슬링
 
-        Optional<ChessPiece> rook = getChessPieceAt(rookPosition);
-        if(rook.isPresent() && rook.get().getType() == PieceType.ROOK && rook.get().getColor() == color){
-            return !rook.get().isMoved();
-        }
-        return false; // 해당 위치에 룩이 없거나 이미 이동했으면 false 반환
+        return getChessPieceAt(rookPosition)
+                .filter(rook -> rook.getType() == PieceType.ROOK && rook.getColor() == color && rook.isMoved())
+                .isPresent();
     }
 
-
-    private int moveWithoutPawnOrCaptureCount = 0;
     @Override
     public void updateMoveWithoutPawnOrCaptureCount(boolean isPawnMove, boolean isCapture) {
         if (isPawnMove || isCapture) {
@@ -134,26 +117,26 @@ public class ChessGameState implements GameStatusListener {
 
     @Override
     public boolean isAvailableMoveTarget(Position position, ChessGameLogic chessGameLogic) {
-        ChessPiece selectedPiece = getSelectedPiece();
-        System.out.println("selectedPiece:" + selectedPiece.getPosition().x() + " " + selectedPiece.getPosition().y());
-        List<Position> validMoves = chessGameLogic.calculateMovesForPiece(selectedPiece);
-        if(canCastle){
-            validMoves.add(new Position(2, selectedPiece.getPosition().y()));
-            validMoves.add(new Position(6, selectedPiece.getPosition().y()));
+        ChessPiece thisPiece = getSelectedPiece();
+        if (thisPiece == null) {
+            return false;
+        }
+        List<Position> validMoves = chessGameLogic.calculateMovesForPiece(thisPiece);
+        if (canCastle) {
+            validMoves.add(new Position(2, thisPiece.getPosition().y()));
+            validMoves.add(new Position(6, thisPiece.getPosition().y()));
             gameLogicActions.setAfterCastling(true);
         }
 
-        return validMoves.contains(position) && !chessGameLogic.isFriendlyPieceAtPosition(position, selectedPiece);
+        return validMoves.contains(position) && !chessGameLogic.isFriendlyPieceAtPosition(position, thisPiece);
     }
 
     @Override
     public ChessPiece getKing(Color color) {
-        for (ChessPiece piece : chessPieces) {
-            if (piece.getType() == PieceType.KING && piece.getColor() == color) {
-                return piece;
-            }
-        }
-        return null;
+        return chessPieces.stream()
+                .filter(piece -> piece.getType() == PieceType.KING && piece.getColor() == color)
+                .findFirst()
+                .orElse(null);
     }
 
     @Override
@@ -167,24 +150,9 @@ public class ChessGameState implements GameStatusListener {
     }
 
     @Override
-    public void setCanCastle(boolean b) {
-        this.canCastle = true;
+    public void setCanCastle(boolean canCastle) {
+        this.canCastle = canCastle;
     }
 
-    @Override
-    public void placePieceAt(ChessPiece newPiece, Position promotionPosition) {
-        newPiece.setPosition(promotionPosition);
-    }
-
-    @Override
-    public void onPawnPromotion(ChessPiece pawn, ChessPiece newPiece) {
-        placePieceAt(newPiece, pawn.getPosition());
-        System.out.println(newPiece.getType() + " " + newPiece.getColor() + " " + newPiece.getPosition().x() + " " + newPiece.getPosition().y());
-        removeChessPiece(pawn);
-        gameEventListener.onPieceMoved(newPiece.getPosition(), newPiece);
-        addChessPiece(newPiece);
-
-
-    }
 
 }

@@ -9,12 +9,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class KnightStrategy implements MoveStrategy {
-
-
-    public KnightStrategy() {
-
-    }
-
     @Override
     public List<Position> calculateMoves(GameStatusListener chessBoard, ChessPiece piece, GameUtils utils) {
         List<Position> validMoves = new ArrayList<>();

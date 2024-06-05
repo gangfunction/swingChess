@@ -1,7 +1,10 @@
 package game.core;
 
+import lombok.Getter;
+
 import java.util.Objects;
 
+@Getter
 public class Player {
     private String name; // 플레이어의 이름
     private final Color color; // 플레이어가 가진 체스말의 색상
@@ -15,18 +18,11 @@ public class Player {
         this.color = color;
     }
 
-    public String getName() {
-        return name;
-    }
     public void setName(String name) {
         if (name == null || name.trim().isEmpty()) {
             throw new IllegalArgumentException("Player name cannot be null or empty");
         }
         this.name = name;
-    }
-
-    public Color getColor() {
-        return color;
     }
 
     @Override

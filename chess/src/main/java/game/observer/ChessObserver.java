@@ -1,21 +1,19 @@
 package game.observer;
 
 import game.core.ChessGameTurn;
+import lombok.Getter;
 
 import java.util.ArrayList;
 import java.util.List;
 
 public class ChessObserver implements Subject{
     private final List<Observer> observers;
+    @Getter
     private String gameState;
     private ChessGameTurn game;
 
     public ChessObserver() {
         observers = new ArrayList<>();
-    }
-    public ChessObserver(ChessGameTurn game) {
-        this();
-        this.game = game;
     }
 
     public void setGameState(String gameState) {
@@ -40,10 +38,6 @@ public class ChessObserver implements Subject{
         for (Observer observer : observers) {
             observer.update(gameState);
         }
-    }
-
-    public String getGameState() {
-        return gameState;
     }
 
 }

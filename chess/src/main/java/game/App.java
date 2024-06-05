@@ -20,6 +20,11 @@ import java.net.Socket;
 
 public class App {
     private static final Logger log = LoggerFactory.getLogger(App.class);
+    private static final String SERVER_ADDRESS = "127.0.0.1";
+    private static final int SERVER_PORT = 8080;
+    private static final int LOG_SERVER_PORT = 8000;
+
+
     public static void main(String[] args) {
         SwingUtilities.invokeLater(() -> {
             initializeUI();
@@ -29,90 +34,112 @@ public class App {
     }
 
     private static void connectToServer() {
-        try(Socket socket = new Socket("127.0.0.1",8080)) {
-            PrintWriter out = new PrintWriter(socket.getOutputStream(), true);
-            out.println("Hello, server");
-
-        } catch (IOException e) {
-            log.error("Failed to connect to server", e);
-        }
+        new SwingWorker<Void, Void>() {
+            @Override
+            protected Void doInBackground() {
+                try (Socket socket = new Socket(SERVER_ADDRESS, SERVER_PORT)) {
+                    PrintWriter out = new PrintWriter(socket.getOutputStream(), true);
+                    out.println("Hello, server");
+                } catch (IOException e) {
+                    log.error("Failed to connect to server", e);
+                }
+                return null;
+            }
+        }.execute();
     }
 
     private static void initializeUI() {
         JFrame primaryFrame = createPrimaryFrame();
-
         ChessGameState chessGameState = new ChessGameState();
         CommandInvoker commandInvoker = new CommandInvoker();
         DrawCondition drawCondition = new DrawCondition();
         GameUtils gameUtils = new GameUtils();
         VictoryCondition victoryCondition = new VictoryCondition();
-        ChessGameTurn chessGameTurn = new ChessGameTurn(drawCondition,victoryCondition);
+        ChessGameTurn chessGameTurn = new ChessGameTurn(drawCondition, victoryCondition);
 
-        ChessBoardUI chessBoardUI = new ChessBoardUI(chessGameState, primaryFrame);
-        CastlingLogic castlingLogic = new CastlingLogic(chessBoardUI);
-        PromotionLogic promotionLogic = new PromotionLogic(chessGameState, chessBoardUI,chessGameTurn);
+        ChessBoardUI chessBoardUI = createChessBoardUI(chessGameState, primaryFrame);
+        ChessGameLogic chessGameLogic = createChessGameLogic(chessGameTurn, commandInvoker, chessBoardUI, chessGameState);
 
-        ChessGameLogic chessGameLogic = new ChessGameLogic(chessGameTurn, commandInvoker, castlingLogic,promotionLogic);
-        chessGameLogic.setGameEventListener(chessBoardUI,chessGameState);
-        castlingLogic.setCastlingLogic(chessGameState, chessGameLogic);
+        setupGameLogic(chessGameLogic, chessBoardUI, chessGameState, chessGameTurn, drawCondition, victoryCondition, gameUtils);
 
+        setupPrimaryFrame(primaryFrame, chessBoardUI);
+        setupLogFrame(primaryFrame, chessGameTurn);
 
-        chessBoardUI.setGameLogicActions(chessGameLogic);
-        chessGameTurn.setChessGameState(chessGameState);
-        chessGameState.setGameLogicActions(chessGameLogic, chessBoardUI);
-
-        victoryCondition.setVictoryCondition(chessGameState, gameUtils, chessGameTurn);
-        drawCondition.setDrawCondition(chessGameState, chessGameLogic, chessGameTurn);
-
-        ChessGameLauncher.createAndShowGUI(primaryFrame);
-
-        primaryFrame.setContentPane(chessBoardUI.getBoardPanel());
-
-        centerFrameOnScreen(primaryFrame);
-
-        primaryFrame.setVisible(true);
-        JFrame logFrame = createLogFrame(primaryFrame, chessGameTurn);
-
-        logFrame.setVisible(true);
         sendLogToServer();
     }
 
+    private static ChessBoardUI createChessBoardUI(ChessGameState chessGameState, JFrame primaryFrame) {
+        return new ChessBoardUI(chessGameState, primaryFrame);
+    }
 
 
-    private static void sendLogToServer(){
-        try(Socket socket = new Socket("127.0.0.1",8000)){
-            PrintWriter out = new PrintWriter(socket.getOutputStream(), true);
-            String logMessageWithPrefix = "Client: " + "Game initialized";
-            out.println(logMessageWithPrefix);
+    private static ChessGameLogic createChessGameLogic(ChessGameTurn chessGameTurn, CommandInvoker commandInvoker, ChessBoardUI chessBoardUI, ChessGameState chessGameState) {
+        CastlingLogic castlingLogic = new CastlingLogic(chessBoardUI);
+        PromotionLogic promotionLogic = new PromotionLogic(chessGameState, chessBoardUI);
+        ChessGameLogic chessGameLogic = new ChessGameLogic(chessGameTurn, commandInvoker, castlingLogic, promotionLogic);
+        chessGameLogic.setGameEventListener(chessBoardUI, chessGameState);
+        castlingLogic.setCastlingLogic(chessGameState, chessGameLogic);
+        return chessGameLogic;
+    }
 
-            BufferedReader in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
-            String response = in.readLine();
-            System.out.println("Server response: " + response);
+    private static void setupGameLogic(ChessGameLogic chessGameLogic, ChessBoardUI chessBoardUI, ChessGameState chessGameState, ChessGameTurn chessGameTurn, DrawCondition drawCondition, VictoryCondition victoryCondition, GameUtils gameUtils) {
+        chessBoardUI.setGameLogicActions(chessGameLogic);
+        chessGameTurn.setChessGameState(chessGameState);
+        chessGameState.setGameLogicActions(chessGameLogic);
 
-        }catch (IOException e){
-            log.error("Failed to send log to server", e);
-        }
+        victoryCondition.setVictoryCondition(chessGameState, gameUtils, chessGameTurn);
+        drawCondition.setDrawCondition(chessGameState, chessGameLogic, chessGameTurn);
+    }
+
+    private static void setupPrimaryFrame(JFrame primaryFrame, ChessBoardUI chessBoardUI) {
+        ChessGameLauncher.createAndShowGUI(primaryFrame);
+        primaryFrame.setContentPane(chessBoardUI.getBoardPanel());
+        centerFrameOnScreen(primaryFrame);
+        primaryFrame.setVisible(true);
+    }
+
+    private static void setupLogFrame(JFrame primaryFrame, ChessGameTurn chessGameTurn) {
+        JFrame logFrame = createLogFrame(primaryFrame, chessGameTurn);
+        logFrame.setVisible(true);
+    }
+
+    private static void sendLogToServer() {
+        new SwingWorker<Void, Void>() {
+            @Override
+            protected Void doInBackground() {
+                try (Socket socket = new Socket(SERVER_ADDRESS, LOG_SERVER_PORT)) {
+                    PrintWriter out = new PrintWriter(socket.getOutputStream(), true);
+                    String logMessageWithPrefix = "Client: Game initialized";
+                    out.println(logMessageWithPrefix);
+
+                    BufferedReader in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+                    String response = in.readLine();
+                    System.out.println("Server response: " + response);
+                } catch (IOException e) {
+                    log.error("Failed to send log to server", e);
+                }
+                return null;
+            }
+        }.execute();
     }
 
     private static JFrame createLogFrame(JFrame primaryFrame, ChessGameTurn chessGameTurn) {
         JFrame logFrame = new JFrame("Game Log");
         logFrame.setSize(600, 100);
         logFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        int x = primaryFrame.getLocation().x;
-        int y = primaryFrame.getLocation().y + primaryFrame.getHeight();
-        logFrame.setLocation(x, y);
+        logFrame.setLocationRelativeTo(primaryFrame);
 
         JTextArea textArea = new JTextArea();
-        logFrame.setVisible(true);
-        ChessObserver observer = new ChessObserver();
-        GameLog gameLog = new GameLog(observer, textArea);
-        chessGameTurn.addObserver(gameLog);
-
         textArea.setEditable(false);
         textArea.setLineWrap(true);
         textArea.setWrapStyleWord(true);
         JScrollPane scrollPane = new JScrollPane(textArea);
         logFrame.add(scrollPane, BorderLayout.CENTER);
+
+        ChessObserver observer = new ChessObserver();
+        GameLog gameLog = new GameLog(observer, textArea);
+        chessGameTurn.addObserver(gameLog);
+
         return logFrame;
     }
 
@@ -122,8 +149,6 @@ public class App {
         primaryFrame.setSize(600, 650);
         return primaryFrame;
     }
-
-
 
     private static void centerFrameOnScreen(JFrame frame) {
         Dimension dim = Toolkit.getDefaultToolkit().getScreenSize();

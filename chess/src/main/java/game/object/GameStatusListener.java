@@ -12,13 +12,10 @@ public interface GameStatusListener {
 
     List<ChessPiece> getChessPieces();
 
-    void clearChessPieces();
-
     ChessPiece getSelectedPiece();
 
     void setSelectedPiece(ChessPiece piece);
 
-    // 필요에 따라 추가 메서드 구현
     void updateLastMovedPawn(ChessPiece pawn, Position from, Position to);
 
     Optional<ChessPiece> getChessPieceAt(Position targetPosition);
@@ -45,7 +42,5 @@ public interface GameStatusListener {
 
     void setCanCastle(boolean b);
 
-    void placePieceAt(ChessPiece newPiece, Position promotionPosition);
 
-    void onPawnPromotion(ChessPiece pawn, ChessPiece newPiece);
 }

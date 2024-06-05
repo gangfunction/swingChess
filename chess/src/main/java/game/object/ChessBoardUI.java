@@ -4,6 +4,8 @@ import game.GameUtils;
 import game.Position;
 import game.factory.*;
 import game.ui.IconLoader;
+import lombok.Getter;
+import lombok.Setter;
 
 import javax.swing.*;
 import java.awt.*;
@@ -17,18 +19,18 @@ import java.util.stream.IntStream;
 import static game.core.Color.*;
 
 public class ChessBoardUI extends JFrame implements GameEventListener {
+    @Getter
     private  JPanel boardPanel;
-//            = new JPanel(new GridLayout(8, 8));
     private final JPanel statusPanel = new JPanel();
     private final ChessGameState chessGameState;
     private static final int BOARD_SIZE = 8;
+    @Setter
     private GameLogicActions gameLogicActions;
+    @Getter
+    private static final Set<Position> highlightedPositions = new HashSet<>();
     private static final Color LIGHT_SQUARE_COLOR = Color.WHITE;
     private static final Color DARK_SQUARE_COLOR = Color.GRAY;
 
-    public void setGameLogicActions(GameLogicActions gameLogicActions) {
-        this.gameLogicActions = gameLogicActions;
-    }
 
 
     public ChessBoardUI(ChessGameState chessGameState, JFrame primaryFrame) {
@@ -54,15 +56,11 @@ public class ChessBoardUI extends JFrame implements GameEventListener {
 
     public void highlightSingleMove(Position position) {
         JPanel square = getPanelAtPosition(position);
-        square.setBackground(Color.YELLOW);
+        if(square != null){
+            square.setBackground(Color.YELLOW);
+        }
     }
 
-    private static final Set<Position> highlightedPositions = new HashSet<>();
-
-
-    public static Set<Position> getHighlightedPositions() {
-        return highlightedPositions;
-    }
 
     public void highlightPossibleMoves(ChessPiece piece) {
         clearHighlights();
@@ -71,19 +69,17 @@ public class ChessBoardUI extends JFrame implements GameEventListener {
         moves.removeIf(move ->move.x() <0 || move.x()>= BOARD_SIZE || move.y()<0 || move.y()>= BOARD_SIZE); // 보드 바깥으로 나가는 위치 제거
         if(gameLogicActions.isKingInCheck(piece.getColor())){
             moves.removeIf(move -> !canMoveReleaseCheck(piece, move));
-           // moves.removeIf()로 체크일때는 체크를 막지않는 위치는 제거
         }
         highlightMoves(moves);
-        highlightedPositions.addAll(moves); // 하이라이트된 위치 목록에 추가합니다.
+        highlightedPositions.addAll(moves);
     }
     private boolean canMoveReleaseCheck(ChessPiece piece, Position move) {
-        // 임시로 말을 이동시킨 후, 왕이 체크 상태인지를 검사
         ChessPiece tempPiece = new ChessPiece(piece.getType(), move, piece.getColor());
-        chessGameState.addChessPiece(tempPiece); // 임시 말 추가
+        chessGameState.addChessPiece(tempPiece);
         boolean isCheckAfterMove = gameLogicActions.isKingInCheck(piece.getColor());
-        chessGameState.removeChessPiece(tempPiece); // 임시 말 제거
+        chessGameState.removeChessPiece(tempPiece);
 
-        return !isCheckAfterMove; // 이동 후에도 왕이 체크 상태가 아니라면, 이동 가능
+        return !isCheckAfterMove;
     }
 
 
@@ -98,48 +94,20 @@ public class ChessBoardUI extends JFrame implements GameEventListener {
             }
         }
     }
-    public void clearHighlight(Position position){
-        if(getBoardPanel() == null){
-            return;
-        }
-        JPanel square = getPanelAtPosition(position);
-        if(square != null){
-            setDefaultTileBackground(position.y()*BOARD_SIZE + position.x(), square);
-        }
-    }
 
     public JPanel getPanelAtPosition(Position position) {
 
         int index = position.y() * BOARD_SIZE + position.x();
         if (index < 0 || index >= boardPanel.getComponentCount()) {
-            throw new IllegalArgumentException("Position is out of board's bounds.");
+            return null;
         }
 
         Component comp = boardPanel.getComponent(index);
         if (comp instanceof JPanel) {
             return (JPanel) comp;
         } else {
-            throw new IllegalStateException("Expected JPanel at the given position but found another component type.");
+            return null;
         }
-    }
-
-    @Override
-    public void addPieceToPanel(ChessPiece piece, Position position) {
-
-    }
-
-    public JPanel getBoardPanel() {
-        return boardPanel;
-    }
-    JPanel createStatusBar(){
-        JPanel statusPanel = new JPanel(){
-            @Override
-            public Dimension getPreferredSize(){
-                return new Dimension(getWidth(), 50);
-            }
-        };
-        statusPanel.setVisible(true);
-        return statusPanel;
     }
 
 
@@ -194,6 +162,10 @@ public class ChessBoardUI extends JFrame implements GameEventListener {
             placePieceOnboard(factImpl.createChessPiece(pieceTypes[i], new Position(i, 0), BLACK));
         }
 
+    }
+    @Override
+    public void onGameDraw(){
+        JOptionPane.showMessageDialog(null, "Draw");
     }
 
 
@@ -250,21 +222,13 @@ public class ChessBoardUI extends JFrame implements GameEventListener {
         panel.removeAll();
         setDefaultTileBackground(index, panel);
     }
-    @Override
-    public void onPieceSelected(ChessPiece piece) {
-        highlightPossibleMoves(piece);
-
-    }
 
     @Override
     public void onInvalidMoveAttempted(String reason) {
         JOptionPane.showMessageDialog(null,reason);
     }
 
-    @Override
-    public void onMovesCalculated(List<Position> moves) {
 
-    }
 
 
 }

@@ -2,17 +2,16 @@ package game.strategy.calculator;
 
 import game.GameUtils;
 import game.Position;
-import game.object.ChessGameState;
 import game.factory.ChessPiece;
 import game.object.GameStatusListener;
-import game.strategy.MoveCalculator;
+import game.strategy.MoveStrategy;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class StraightMoveCalculator implements MoveCalculator {
+public class StraightMoveCalculator implements MoveStrategy {
     @Override
-    public List<Position> calculate(GameStatusListener chessGameState, ChessPiece chessPiece, GameUtils gameUtils) {
+    public List<Position> calculateMoves(GameStatusListener chessGameState, ChessPiece chessPiece, GameUtils gameUtils) {
         List<Position> validMoves = new ArrayList<>();
         Position position = chessPiece.getPosition();
         int[][] directions = {{1, 0}, {-1, 0}, {0, 1}, {0, -1}}; // 상, 하, 좌, 우 이동

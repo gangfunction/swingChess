@@ -9,12 +9,8 @@ import game.strategy.calculator.StraightMoveCalculator;
 
 import java.util.List;
 public class RookStrategy implements MoveStrategy {
-
-    public RookStrategy() {
-    }
-
     @Override
     public List<Position> calculateMoves(GameStatusListener chessGameState, ChessPiece chessPiece, GameUtils gameUtils) {
-        return new StraightMoveCalculator().calculate(chessGameState, chessPiece, gameUtils);
+        return new StraightMoveCalculator().calculateMoves(chessGameState, chessPiece, gameUtils);
     }
 }
