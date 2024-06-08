@@ -2,35 +2,38 @@ package game.object;
 
 import game.GameUtils;
 import game.Position;
-import game.command.Command;
 import game.command.CommandInvoker;
 import game.command.MoveCommand;
 import game.core.ChessGameTurn;
 import game.core.Color;
 import game.factory.ChessPiece;
 import game.factory.PieceType;
+import game.object.castling.CastlingHandler;
+import game.object.castling.CastlingLogic;
 import game.observer.ChessObserver;
 import game.status.DrawCondition;
+import game.status.VictoryCondition;
 import lombok.Setter;
 
-import javax.swing.*;
-import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
-public class ChessGameLogic  implements GameLogicActions {
+public class ChessGameLogic implements GameLogicActions {
     private GameEventListener gameEventListener;
     private GameStatusListener gameStatusListener;
 
     private final CastlingLogic castlingLogic;
     private final PromotionLogic promotionLogic;
-    private final DrawCondition drawCondition ;
-    private final GameUtils gameUtils = new GameUtils();
+    private final DrawCondition drawCondition;
+    private final VictoryCondition victoryCondition;
     private final ChessGameTurn chessGameTurn;
     private final CommandInvoker commandInvoker;
     private final ChessObserver chessObserver;
+    private CastlingHandler castlingHandler;
+    private final ChessRuleHandler chessRuleHandler;
+
     @Setter
     private boolean afterCastling = false;
-
 
 
     public ChessGameLogic(ChessGameTurn chessGameTurn, CommandInvoker commandInvoker, CastlingLogic castlingLogic, PromotionLogic promotionLogic) {
@@ -38,34 +41,31 @@ public class ChessGameLogic  implements GameLogicActions {
         this.commandInvoker = commandInvoker;
         this.castlingLogic = castlingLogic;
         this.promotionLogic = promotionLogic;
+        this.victoryCondition = new VictoryCondition();
         this.chessObserver = new ChessObserver();
         this.drawCondition = new DrawCondition();
         this.chessObserver.addObserver(new GameUIObserver());
+        this.chessRuleHandler = new ChessRuleHandler();
     }
 
-    public void setGameEventListener(GameEventListener gameEventListener,GameStatusListener gameStatusListener) {
+    public void setGameEventListener(GameEventListener gameEventListener, GameStatusListener gameStatusListener) {
         this.gameEventListener = gameEventListener;
         this.gameStatusListener = gameStatusListener;
+        this.victoryCondition.setVictoryCondition(gameStatusListener, chessGameTurn);
         this.drawCondition.setDrawCondition(gameStatusListener, this, chessGameTurn);
         this.castlingLogic.setCastlingLogic(gameStatusListener, this);
+        this.castlingHandler = new CastlingHandler(gameStatusListener, gameEventListener, chessGameTurn, commandInvoker);
 
     }
 
 
     public void handleSquareClick(int x, int y) {
         Position clickedPosition = new Position(x, y);
-        Optional<ChessPiece> targetPiece = gameUtils.findPieceAtPosition(gameStatusListener, clickedPosition);
-        if (targetPiece.isPresent() && gameStatusListener.getSelectedPiece() == null) {
-            handlePieceSelection(targetPiece.get(), clickedPosition);
+        ChessPiece targetPiece = GameUtils.findPieceAtPosition(gameStatusListener, clickedPosition).orElse(null);
+        if (targetPiece != null && gameStatusListener.getSelectedPiece() == null) {
+            handlePieceSelection(targetPiece, clickedPosition);
         } else if (gameStatusListener.getSelectedPiece() != null) {
-            ChessPiece selectedPiece = gameStatusListener.getSelectedPiece();
             handlePieceMove(clickedPosition);
-            if (selectedPiece.getType() == PieceType.PAWN && promotionLogic.isAtPromotionRank(clickedPosition)) {
-                promotionLogic.promotePawn(selectedPiece, clickedPosition);
-            }
-            if(checkDraw()){
-                gameEventListener.onGameDraw();
-            }
         } else {
             notifyInvalidMoveAttempted("No piece selected and no target piece at clicked position");
         }
@@ -81,64 +81,59 @@ public class ChessGameLogic  implements GameLogicActions {
         }
     }
 
+    private boolean canMoveBreakCheck(ChessPiece piece, Position targetPosition) {
+        Position originalPosition = piece.getPosition();
+        piece.setPosition(targetPosition);
+        boolean breaksCheck = !isKingInCheck(piece.getColor());
+        piece.setPosition(originalPosition);
+        return breaksCheck;
+    }
 
     private void handlePieceMove(Position clickedPosition) {
         ChessPiece selectedPiece = gameStatusListener.getSelectedPiece();
-        if (selectedPiece == null) {
-            notifyInvalidMoveAttempted("Invalid move: No piece selected.");
+        if (!canMoveSelectedPiece(selectedPiece, clickedPosition)) {
             return;
         }
-        if (selectedPiece.getType() == PieceType.KING && isPositionUnderThreat(clickedPosition, selectedPiece.getColor())) {
-            notifyInvalidMoveAttempted("Invalid move: King cannot move to a threatened position.");
-            return;
-        }
+
         if (gameStatusListener.isAvailableMoveTarget(clickedPosition, this)) {
             executeMove(selectedPiece, clickedPosition);
-            selectedPiece.setMoved(true);
-            if (selectedPiece.getType() == PieceType.PAWN && promotionLogic.isAtPromotionRank(clickedPosition)) {
-                promotionLogic.promotePawn(selectedPiece, clickedPosition);
-            }
-            chessGameTurn.nextTurn();
-            gameStatusListener.setSelectedPiece(null);
-            chessObserver.setGameState("Piece moved to " + clickedPosition);
+            postMoveActions(selectedPiece, clickedPosition);
         } else {
-            notifyInvalidMoveAttempted("Invalid move: Target position not available.");
+            notifyInvalidMove("Target position not available.");
         }
     }
 
-    private boolean isPositionUnderThreat(Position clickedPosition, Color color) {
-        List<ChessPiece> opponentPieces = gameStatusListener.getChessPieces().stream()
-                .filter(piece -> piece.getColor() != color)
-                .toList();
-
-        for (ChessPiece piece : opponentPieces) {
-            List<Position> validMoves = calculateMovesForPiece(piece);
-            if (validMoves.contains(clickedPosition)) {
-                return true; // 주어진 위치가 상대방의 말에 의해 위협받고 있음
-            }
+    private boolean canMoveSelectedPiece(ChessPiece selectedPiece, Position clickedPosition) {
+        if (selectedPiece == null) {
+            notifyInvalidMove("No piece selected.");
+            return false;
         }
-        return false; // 주어진 위치가 안전함
-    }
-
-    public boolean isKingInCheck(Color color) {
-        List<ChessPiece> chessPieces = gameStatusListener.getChessPieces();
-        Optional<ChessPiece> king = chessPieces.stream()
-                .filter(piece -> piece != null && piece.getType() == PieceType.KING && piece.getColor() == color)
-                .findFirst();
-        if (king.isEmpty()) {
-            throw new IllegalStateException("King not found for color " + color);
+        if (isKingInCheck(selectedPiece.getColor()) &&
+                !canMoveBreakCheck(selectedPiece, clickedPosition)) {
+            notifyInvalidMove("King is in check and move does not break check.");
+            return false;
         }
-        ChessPiece king1 = king.get();
-        List<ChessPiece> chessPieces1 = gameStatusListener.getChessPieces();
-        return chessPieces1.stream()
-                .filter(piece -> piece != null && piece.getColor() != king1.getColor())
-                .anyMatch(piece -> calculateMovesForPiece(piece).contains(king1.getPosition()));
+        return true;
     }
 
 
+    private void notifyInvalidMove(String reason) {
+        if (gameEventListener != null) {
+            gameEventListener.onInvalidMoveAttempted(reason);
+        }
+    }
 
-
-
+    private void postMoveActions(ChessPiece selectedPiece, Position clickedPosition) {
+        selectedPiece.setMoved(true);
+        if (selectedPiece.getType() == PieceType.PAWN && promotionLogic.isAtPromotionRank(clickedPosition)) {
+            promotionLogic.promotePawn(selectedPiece, clickedPosition);
+        }
+        chessGameTurn.nextTurn();
+        gameStatusListener.setSelectedPiece(null);
+        chessObserver.setGameState("Piece moved to " + clickedPosition);
+    }
+    
+    
 
     private void notifyInvalidMoveAttempted(String reason) {
         if (gameEventListener != null) {
@@ -146,96 +141,68 @@ public class ChessGameLogic  implements GameLogicActions {
         }
     }
 
-    public boolean checkDraw(){
-        Color currentPlayerColor = chessGameTurn.getCurrentPlayerColor();
-        return drawCondition.isDraw(currentPlayerColor);
-    }
-    private void executeMove(ChessPiece selectedPiece, Position clickedPosition) {
-        Command moveCommand = new MoveCommand(selectedPiece, selectedPiece.getPosition(), clickedPosition, gameStatusListener, gameUtils);
-        Optional<ChessPiece> opponentPiece = gameUtils.findPieceAtPosition(gameStatusListener, clickedPosition);
-        opponentPiece.ifPresent(p -> {
-            ChessPiece chessPiece = opponentPiece.get();
-            onPieceRemovePanel(chessPiece);
-        });
-        gameEventListener.onPieceMoved(clickedPosition, selectedPiece);
-        commandInvoker.executeCommand(moveCommand);
-        if(afterCastling){
-            handleCastlingMove(selectedPiece);
-            setAfterCastling(false);
-            updateGameStateAfterMove(selectedPiece, clickedPosition);
-        }
-        gameEventListener.clearHighlights();
-
-        gameStatusListener.setSelectedPiece(null);
-
-        handleEnPassant(selectedPiece, clickedPosition);
+    void executeMove(ChessPiece selectedPiece, Position clickedPosition) {
+        removeCapturedPieceIfExists(clickedPosition);
+        updatePiecePosition(selectedPiece, clickedPosition);
+        handleCastlingMove(selectedPiece);
+        handleEnPassantCapture(selectedPiece, clickedPosition);
         updateGameStateAfterMove(selectedPiece, clickedPosition);
     }
-
-    private void handleCastlingMove(ChessPiece king) {
-        if (!castlingLogic.isQueenSide()) {
-            moveRookForCastling(new Position(7, king.getPosition().y()), new Position(5, king.getPosition().y()));
-        } else {
-            moveRookForCastling(new Position(0, king.getPosition().y()), new Position(3, king.getPosition().y()));
+    private void removeCapturedPieceIfExists(Position clickedPosition) {
+        ChessPiece piece = gameStatusListener.getChessPieceAt(clickedPosition);
+        if (piece != null) {
+            gameStatusListener.removeChessPiece(piece);
+            onPieceRemoved(piece);
         }
     }
 
-    private void moveRookForCastling(Position from, Position to) {
-        Optional<ChessPiece> rook = gameStatusListener.getChessPieceAt(from);
-        if (rook.isPresent()) {
-            Command moveRookCommand = new MoveCommand(rook.get(), from, to, gameStatusListener, gameUtils);
-            gameEventListener.onPieceMoved(to, rook.get());
-            commandInvoker.executeCommand(moveRookCommand);
+    private void onPieceRemoved(ChessPiece piece) {
+        if (piece == null) return;
+        gameEventListener.onPieceRemoved(piece);
+        gameEventListener.clearHighlights();
+    }
+
+    private void handleEnPassantCapture(ChessPiece selectedPiece, Position clickedPosition) {
+        if (chessRuleHandler.checkEnPassantCondition(selectedPiece, clickedPosition, gameStatusListener)) {
+            Position targetPawnPosition = getEnPassantTargetPosition(clickedPosition, selectedPiece.getColor());
+            ChessPiece targetPawn = gameStatusListener.getChessPieceAt(targetPawnPosition);
+            if (targetPawn != null && targetPawn.getType() == PieceType.PAWN) {
+                gameStatusListener.removeChessPiece(targetPawn);
+                onPieceRemoved(targetPawn);
+            }
         }
     }
 
+    private Position getEnPassantTargetPosition(Position clickedPosition, Color color) {
+        int direction = color == Color.WHITE ? 1 : -1;
+        return new Position(clickedPosition.x(), clickedPosition.y() + direction);
+    }
+    private void handleCastlingMove(ChessPiece selectedPiece) {
+        if (afterCastling) {
+            castlingHandler.handleCastlingMove(selectedPiece, castlingLogic.isQueenSide());
+            setAfterCastling(false);
+        }
+    }
+    private void updatePiecePosition(ChessPiece selectedPiece, Position clickedPosition) {
+        gameEventListener.onPieceMoved(clickedPosition, selectedPiece);
+        MoveCommand moveCommand = commandInvoker.executeCommand(selectedPiece, selectedPiece.getPosition(), clickedPosition, gameStatusListener, chessGameTurn);
+        commandInvoker.returnCommand(moveCommand);
+    }
 
     public void updateGameStateAfterMove(ChessPiece selectedPiece, Position clickedPosition) {
         boolean isPawnMove = selectedPiece.getType() == PieceType.PAWN;
-        boolean isCapture = gameStatusListener.getChessPieceAt(clickedPosition).isPresent();
+        boolean isCapture = gameStatusListener.getChessPieceAt(clickedPosition) != null;
         gameStatusListener.updateMoveWithoutPawnOrCaptureCount(isPawnMove, isCapture);
     }
-
-
 
     @Override
     public boolean isKingInCheckAfterMove(ChessPiece piece, Position clickedPosition) {
         return isKingInCheck(piece.getColor());
     }
 
-    private void handleEnPassant(ChessPiece selectedPiece, Position clickedPosition) {
-        if (checkEnPassantCondition(selectedPiece, clickedPosition)) {
-            Position targetPawnPosition = new Position(clickedPosition.x(), selectedPiece.getColor() == Color.WHITE ? clickedPosition.y() + 1 : clickedPosition.y() - 1);
-            Optional<ChessPiece> targetPawn = gameStatusListener.getChessPieceAt(targetPawnPosition);
-            if (targetPawn.isPresent() && targetPawn.get().getType() == PieceType.PAWN) {
-                gameStatusListener.removeChessPiece(targetPawn.get());
-                onPieceRemovePanel(targetPawn.get());
-            }
-            gameEventListener.onPieceMoved(clickedPosition, selectedPiece);
-            gameEventListener.clearHighlights();
-        }
-    }
-
-    private boolean checkEnPassantCondition(ChessPiece selectedPiece, Position moveTo) {
-        if (selectedPiece.getType() != PieceType.PAWN) return false;
-        int direction = selectedPiece.getColor() == Color.WHITE ? 1 : -1;
-        Position adjacentPawnPosition = new Position(moveTo.x(), moveTo.y() + direction);
-        Optional<ChessPiece> adjacentPawn = gameStatusListener.getChessPieceAt(adjacentPawnPosition);
-        if (adjacentPawn.isEmpty()) return false;
-        ChessPiece adjacent = adjacentPawn.get();
-        return adjacent.getType() == PieceType.PAWN;
-    }
-
-    public void onPieceRemovePanel(ChessPiece piece) {
-        JPanel panel = gameEventListener.getPanelAtPosition(piece.getPosition());
-        panel.removeAll();
-        panel.revalidate();
-        panel.repaint();
-    }
-
 
     boolean isFriendlyPieceAtPosition(Position position, ChessPiece selectedPiece) {
-        Optional<ChessPiece> pieceAtPosition = gameUtils.findPieceAtPosition(gameStatusListener, position);
+        Optional<ChessPiece> pieceAtPosition = GameUtils.findPieceAtPosition(gameStatusListener, position);
         return pieceAtPosition.isPresent() && pieceAtPosition.get().getColor() == selectedPiece.getColor();
     }
 
@@ -244,8 +211,11 @@ public class ChessGameLogic  implements GameLogicActions {
     }
 
 
-    public List<Position> calculateMovesForPiece(ChessPiece piece) {
-        return piece.calculateMoves(gameStatusListener, gameUtils);
+    public Set<Position> calculateMovesForPiece(ChessPiece piece) {
+        return piece.calculateMoves(gameStatusListener);
+    }
+    public boolean isKingInCheck(Color color){
+        return chessRuleHandler.isKingInCheck(color, gameStatusListener);
     }
 
 

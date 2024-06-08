@@ -34,30 +34,28 @@ public class PromotionLogic implements ActionListener {
     }
 
     public void promotePawn(ChessPiece pawn, Position promotionPosition) {
-        if(gameStatusListener == null || gameEventListener == null) {
+        if (gameStatusListener == null || gameEventListener == null) {
             logger.info("Listeners must not be null");
         }
-        if (canPromote(pawn, promotionPosition) && !promotedPawns.contains(pawn)){
+        if (canPromote(pawn, promotionPosition) && !promotedPawns.contains(pawn)) {
             showAndSelectType(pawn, promotionPosition);
             promotedPawns.add(pawn);
 
         }
-
-
     }
 
-private void showAndSelectType(ChessPiece pawn, Position promotionPosition) {
-    SwingUtilities.invokeLater(() -> {
-        JDialog dialog = createPromotionDialog();
-        dialog.setVisible(true);
+    private void showAndSelectType(ChessPiece pawn, Position promotionPosition) {
+        SwingUtilities.invokeLater(() -> {
+            JDialog dialog = createPromotionDialog();
+            dialog.setVisible(true);
 
-        if (promotionPieceType != null) {
-            handlePromotion(pawn, promotionPosition);
-        } else {
-            logger.warning("Promotion type was not selected.");
-        }
-    });
-}
+            if (promotionPieceType != null) {
+                handlePromotion(pawn, promotionPosition);
+            } else {
+                logger.warning("Promotion type was not selected.");
+            }
+        });
+    }
 
     private JDialog createPromotionDialog() {
         JDialog dialog = new JDialog();
@@ -72,14 +70,13 @@ private void showAndSelectType(ChessPiece pawn, Position promotionPosition) {
     private void handlePromotion(ChessPiece pawn, Position promotionPosition) {
         Color color = pawn.getColor();
         gameEventListener.onPieceMoved(promotionPosition, pawn);
-        List<ChessPiece> chessPiecesAt = gameStatusListener.getChessPiecesAt(promotionPosition);
-        for (ChessPiece chessPiece : chessPiecesAt) {
-            gameStatusListener.removeChessPiece(chessPiece);
-        }
+        ChessPiece chessPiece = gameStatusListener.getChessPieces().get(promotionPosition);
+        gameStatusListener.removeChessPiece(chessPiece);
         ChessPiece newPiece = createNewPiece(color, promotionPosition, promotionPieceType);
         gameEventListener.onPieceMoved(promotionPosition, newPiece);
-        gameStatusListener.addChessPiece(newPiece);
+        gameStatusListener.addChessPiece(promotionPosition, newPiece);
     }
+
     private static void setupDialog(JDialog dialog) {
         dialog.setTitle("Promotion");
         dialog.setModal(true);
@@ -88,7 +85,7 @@ private void showAndSelectType(ChessPiece pawn, Position promotionPosition) {
         dialog.setLocationRelativeTo(null);
     }
 
-    private JButton createPromotionButton(String label, PieceType pieceType, JDialog dialog){
+    private JButton createPromotionButton(String label, PieceType pieceType, JDialog dialog) {
         JButton button = new JButton(label);
         button.addActionListener(e -> {
             promotionPieceType = pieceType;
@@ -111,16 +108,13 @@ private void showAndSelectType(ChessPiece pawn, Position promotionPosition) {
 
     @Override
     public void actionPerformed(ActionEvent e) {
-        if(e.getSource()== rookButton){
+        if (e.getSource() == rookButton) {
             promotionPieceType = PieceType.ROOK;
-        }
-        else if(e.getSource()== bishopButton){
+        } else if (e.getSource() == bishopButton) {
             promotionPieceType = PieceType.BISHOP;
-        }
-        else if(e.getSource()== knightButton){
+        } else if (e.getSource() == knightButton) {
             promotionPieceType = PieceType.KNIGHT;
-        }
-        else if(e.getSource()== queenButton){
+        } else if (e.getSource() == queenButton) {
             promotionPieceType = PieceType.QUEEN;
         }
     }

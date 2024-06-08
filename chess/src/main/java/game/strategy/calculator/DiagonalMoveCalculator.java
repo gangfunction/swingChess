@@ -6,23 +6,23 @@ import game.factory.ChessPiece;
 import game.object.GameStatusListener;
 import game.strategy.MoveStrategy;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashSet;
+import java.util.Set;
 
 public class DiagonalMoveCalculator implements MoveStrategy {
     @Override
-    public List<Position> calculateMoves(GameStatusListener chessGameState, ChessPiece chessPiece, GameUtils gameUtils) {
-        List<Position> validMoves = new ArrayList<>();
+    public Set<Position> calculateMoves(GameStatusListener chessGameState, ChessPiece chessPiece) {
+        Set<Position> validMoves = new HashSet<>();
         Position position = chessPiece.getPosition();
         int[][] directions = {{1, 1}, {1, -1}, {-1, 1}, {-1, -1}};
 
         for (int[] direction : directions) {
-            addMovesInDirection(validMoves, position, direction, chessGameState, chessPiece, gameUtils);
+            addMovesInDirection(validMoves, position, direction, chessGameState, chessPiece);
         }
         return validMoves;
     }
 
-    private void addMovesInDirection(List<Position> validMoves, Position startPosition, int[] direction, GameStatusListener chessGameState, ChessPiece chessPiece, GameUtils gameUtils) {
+    private void addMovesInDirection(Set<Position> validMoves, Position startPosition, int[] direction, GameStatusListener chessGameState, ChessPiece chessPiece) {
         int x = startPosition.x();
         int y = startPosition.y();
 
@@ -31,15 +31,14 @@ public class DiagonalMoveCalculator implements MoveStrategy {
             y += direction[1];
             Position newPosition = new Position(x, y);
 
-            if (!gameUtils.isValidPosition(newPosition)) {
+            if (!GameUtils.isValidPosition(newPosition)) {
                 break;
             }
 
-            if (gameUtils.isPositionEmpty(newPosition, chessGameState)) {
-                // 빈 위치인 경우 유효한 이동으로 추가
+            if (GameUtils.isPositionEmpty(newPosition, chessGameState)) {
                 validMoves.add(newPosition);
             } else {
-                if (gameUtils.isPositionOccupiedByOpponent(newPosition, chessPiece.getColor(), chessGameState)) {
+                if (GameUtils.isPositionOccupiedByOpponent(newPosition, chessPiece.getColor(), chessGameState)) {
                     validMoves.add(newPosition);
                 }
                 break;

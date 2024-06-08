@@ -5,12 +5,16 @@ import game.core.Color;
 import game.factory.ChessPiece;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
+import java.util.Stack;
 
 public interface GameStatusListener {
-    void addChessPiece(ChessPiece chessPiece);
+    void addChessPiece(Position move, ChessPiece chessPiece);
 
-    List<ChessPiece> getChessPieces();
+    Stack<ChessPiece> getCapturedPieces();
+
+    Map<Position, ChessPiece> getChessPieces();
 
     ChessPiece getSelectedPiece();
 
@@ -18,8 +22,7 @@ public interface GameStatusListener {
 
     void updateLastMovedPawn(ChessPiece pawn, Position from, Position to);
 
-    Optional<ChessPiece> getChessPieceAt(Position targetPosition);
-    List<ChessPiece> getChessPiecesAt(Position targetPosition);
+    ChessPiece getChessPieceAt(Position targetPosition);
 
     ChessPiece getLastMovedPiece();
 
@@ -34,6 +37,7 @@ public interface GameStatusListener {
     int getMoveWithoutPawnOrCaptureCount();
 
     boolean isAvailableMoveTarget(Position position, ChessGameLogic chessGameLogic);
+
     ChessPiece getKing(Color color);
 
     Position getEnPassantTarget();
@@ -42,5 +46,6 @@ public interface GameStatusListener {
 
     void setCanCastle(boolean b);
 
+    void clearBoard();
 
 }

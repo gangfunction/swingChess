@@ -9,8 +9,9 @@ import game.object.GameLogicActions;
 import game.object.GameStatusListener;
 
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
+import java.util.Set;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 public class DrawCondition {
@@ -25,8 +26,8 @@ public class DrawCondition {
         this.gameTurnListener = chessGameTurn;
     }
 
-    public boolean isDraw(Color currentPlayerColor) {
-        return isStalemate(currentPlayerColor) || isInsufficientMaterial() || isThreefoldRepetition() || isFiftyMoveRule();
+    public boolean isDraw() {
+        return isInsufficientMaterial() || isThreefoldRepetition() || isFiftyMoveRule();
     }
 
     private boolean isThreefoldRepetition() {
@@ -36,9 +37,9 @@ public class DrawCondition {
     }
 
     public boolean isStalemate(Color currentPlayerColor) {
-        List<ChessPiece> currentPlayerPieces = getCurrentPlayerPieces(currentPlayerColor);
+        Map<Position, ChessPiece> currentPlayerPieces = getCurrentPlayerPieces(currentPlayerColor);
 
-        for (ChessPiece piece : currentPlayerPieces) {
+        for (ChessPiece piece : currentPlayerPieces.values()) {
             if (hasLegalMove(piece, currentPlayerColor)) {
                 return false;
             }
@@ -46,14 +47,18 @@ public class DrawCondition {
         return true;
     }
 
-    private List<ChessPiece> getCurrentPlayerPieces(Color currentPlayerColor) {
-        return gameStatusListener.getChessPieces().stream()
-                .filter(piece -> piece.getColor() == currentPlayerColor)
-                .collect(Collectors.toList());
+    private Map<Position, ChessPiece> getCurrentPlayerPieces(Color color) {
+        return gameStatusListener.getChessPieces().values().stream()
+                .filter(piece -> piece.getColor() == color)
+                .collect(Collectors.toMap(
+                        ChessPiece::getPosition,
+                        Function.identity(),
+                        (existing, replacement) -> existing // 중복 키가 발생할 경우 기존 값을 유지
+                ));
     }
 
     private boolean hasLegalMove(ChessPiece piece, Color currentPlayerColor) {
-        List<Position> possibleMoves = gameLogicActions.calculateMovesForPiece(piece);
+        Set<Position> possibleMoves = gameLogicActions.calculateMovesForPiece(piece);
         for (Position move : possibleMoves) {
             if (tryMoveAndCheck(piece, move, currentPlayerColor)) {
                 return true;
@@ -64,7 +69,7 @@ public class DrawCondition {
 
     private boolean tryMoveAndCheck(ChessPiece piece, Position move, Color currentPlayerColor) {
         Position originalPosition = piece.getPosition();
-        ChessPiece capturedPiece = gameStatusListener.getChessPieceAt(move).orElse(null);
+        ChessPiece capturedPiece = gameStatusListener.getChessPieceAt(move);
 
         movePiece(piece, move, capturedPiece);
         boolean isInCheck = gameLogicActions.isKingInCheck(currentPlayerColor);
@@ -85,28 +90,34 @@ public class DrawCondition {
         piece.setPosition(originalPosition);
         piece.setMoved(false);
         if (capturedPiece != null) {
-            gameStatusListener.addChessPiece(capturedPiece);
+            gameStatusListener.addChessPiece(originalPosition, capturedPiece);
         }
     }
 
     private boolean isInsufficientMaterial() {
-        List<ChessPiece> pieces = gameStatusListener.getChessPieces();
-        long nonKingCount = pieces.stream().filter(piece -> piece.getType() != PieceType.KING).count();
-        long bishopCount = pieces.stream().filter(piece -> piece.getType() == PieceType.BISHOP).count();
-        boolean isBishopColorConsistent = isBishopColorConsistent(pieces);
-
+        Map<Position, ChessPiece> pieces = gameStatusListener.getChessPieces();
+        long nonKingCount = pieces.values().stream().filter(piece -> piece.getType() != PieceType.KING).count();
         if (nonKingCount == 0) {
             return true;
         } else if (nonKingCount == 1) {
-            return bishopCount == 1 || pieces.stream().anyMatch(p -> p.getType() == PieceType.KNIGHT);
+            return hasSingleMinorPiece(pieces);
         } else {
-            return bishopCount == nonKingCount && isBishopColorConsistent;
+            return hasOnlyBishopsOfSameColor(pieces);
         }
     }
+    private boolean hasSingleMinorPiece(Map<Position, ChessPiece> pieces) {
+        long bishopCount = pieces.values().stream().filter(piece -> piece.getType() == PieceType.BISHOP).count();
+        return bishopCount == 1 || pieces.values().stream().anyMatch(p -> p.getType() == PieceType.KNIGHT);
+    }
 
-    private boolean isBishopColorConsistent(List<ChessPiece> pieces) {
+    private boolean hasOnlyBishopsOfSameColor(Map<Position, ChessPiece> pieces) {
+        long bishopCount = pieces.values().stream().filter(piece -> piece.getType() == PieceType.BISHOP).count();
+        return bishopCount == pieces.size() - 1 && isBishopColorConsistent(pieces);
+    }
+
+    private boolean isBishopColorConsistent(Map<Position, ChessPiece> pieces) {
         Integer bishopColor = null;
-        for (ChessPiece piece : pieces) {
+        for (ChessPiece piece : pieces.values()) {
             if (piece.getType() == PieceType.BISHOP) {
                 int color = (piece.getPosition().x() + piece.getPosition().y()) % 2;
                 if (bishopColor == null) {

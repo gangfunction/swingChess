@@ -3,12 +3,11 @@ package game.strategy;
 import game.GameUtils;
 import game.Position;
 import game.core.Color;
-import game.object.ChessGameState;
 import game.factory.ChessPiece;
 import game.object.GameStatusListener;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashSet;
+import java.util.Set;
 
 public class PawnStrategy implements MoveStrategy {
 
@@ -21,34 +20,30 @@ public class PawnStrategy implements MoveStrategy {
         return (color == Color.WHITE) ? -MOVE_ONE_STEP : MOVE_ONE_STEP;
     }
     @Override
-    public List<Position> calculateMoves(GameStatusListener chessBoard, ChessPiece piece, GameUtils utils) {
-        List<Position> validMoves = new ArrayList<>();
+    public Set<Position> calculateMoves(GameStatusListener chessBoard, ChessPiece piece) {
+        Set<Position> validMoves = new HashSet<>();
         Position position = piece.getPosition();
         Color color = piece.getColor();
 
-        calculateStandardMoves(chessBoard, validMoves, position, color, utils);
-        calculateAttackMoves(chessBoard, validMoves, position, color, utils);
-        calculateEnPassantMoves(chessBoard, validMoves, position, color, utils);
+        calculateStandardMoves(chessBoard, validMoves, position, color);
+        calculateAttackMoves(chessBoard, validMoves, position, color);
+        calculateEnPassantMoves(chessBoard, validMoves, position, color);
         return validMoves;
     }
 
-    private void calculateStandardMoves(GameStatusListener chessBoard, final List<Position> validMoves, Position position, Color color, GameUtils utils) {
+    private void calculateStandardMoves(GameStatusListener chessBoard, final Set<Position> validMoves, Position position, Color color) {
         int direction = getMoveDirection(color);
         int startY = position.y();
 
-        // Check single step
-        tryToAddMove(chessBoard, validMoves, position, direction, MOVE_ONE_STEP, utils);
+        tryToAddMove(chessBoard, validMoves, position, direction, MOVE_ONE_STEP);
 
-        // Check double step for first move
         if (isOnStartRow(color, startY)) {
-            tryToAddMove(chessBoard, validMoves, position, direction, MOVE_TWO_STEPS, utils);
+            tryToAddMove(chessBoard, validMoves, position, direction, MOVE_TWO_STEPS);
         }
     }
 
 
-    private void calculateEnPassantMoves(GameStatusListener chessBoard, final List<Position> validMoves, Position position, Color color, GameUtils utils) {
-        // 앙파썽 조건 확인: 폰이 첫 이동으로 두 칸 전진했는지 확인
-
+    private void calculateEnPassantMoves(GameStatusListener chessBoard, final Set<Position> validMoves, Position position, Color color) {
         int direction = (color == Color.WHITE) ? -MOVE_ONE_STEP : +MOVE_ONE_STEP;
         int enPassantY = position.y() + direction;
         int[] enPassantXs = {position.x() - 1, position.x() + 1};
@@ -57,7 +52,7 @@ public class PawnStrategy implements MoveStrategy {
             if (enPassantX < 0 || enPassantX >= 8) continue; // 보드를 벗어나는 위치는 제외
 
             Position targetPawnPosition = new Position(enPassantX, position.y());
-            if (utils.isPositionOccupiedByOpponent(targetPawnPosition, color, chessBoard) &&
+            if (GameUtils.isPositionOccupiedByOpponent(targetPawnPosition, color, chessBoard) &&
                     wasPawnMovedTwoSteps(position, chessBoard)) {
                 Position enPassantPos = new Position(enPassantX, enPassantY); // 앙파썽 수행 후 폰이 도착할 위치
                 validMoves.add(enPassantPos);
@@ -76,7 +71,7 @@ public class PawnStrategy implements MoveStrategy {
         return (lastMovedPosition.y() == currentY) && (Math.abs(lastMovedPosition.x() - currentX) == 1);
     }
 
-    private void calculateAttackMoves(GameStatusListener chessBoard, final List<Position> validMoves, Position position, Color color, GameUtils gameUtils) {
+    private void calculateAttackMoves(GameStatusListener chessBoard, final Set<Position> validMoves, Position position, Color color) {
         int direction = getMoveDirection(color);
         int startX = position.x();
         int startY = position.y();
@@ -84,15 +79,15 @@ public class PawnStrategy implements MoveStrategy {
         int[] attackOffsets = {-1, 1}; // Attack left and right
         for (int xOffset : attackOffsets) {
             Position attackPos = new Position(startX + xOffset, startY + direction);
-            if (gameUtils.isPositionOccupiedByOpponent(attackPos, color, chessBoard)){
+            if (GameUtils.isPositionOccupiedByOpponent(attackPos, color, chessBoard)){
                 validMoves.add(attackPos);
             }
         }
     }
 
-    private void tryToAddMove(GameStatusListener chessBoard, final List<Position> validMoves, Position position, int directionY, int steps, GameUtils gameUtils) {
+    private void tryToAddMove(GameStatusListener chessBoard, final Set<Position> validMoves, Position position, int directionY, int steps) {
         Position potentialPosition = new Position(position.x(), position.y() + (directionY * steps));
-        if (gameUtils.isPositionEmpty(potentialPosition, chessBoard)) {
+        if (GameUtils.isPositionEmpty(potentialPosition, chessBoard)) {
             validMoves.add(potentialPosition);
         }
     }

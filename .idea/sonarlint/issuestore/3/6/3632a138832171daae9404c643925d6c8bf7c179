@@ -1,7 +1,0 @@
-
-¶
-java:S6204"zReplace this usage of 'Stream.collect(Collectors.toList())' with 'Stream.toList()' and ensure that the list is unmodified.(ª™¨¹J$852a2609-3ebe-42b8-8266-95f4a9f7def3
-T
-java:S1128"7Remove this unused import 'game.object.ChessGameState'.(îªµŒ8ýâ¶·þ1
-X
-java:S1128"<Remove this unused import 'javax.tools.DiagnosticCollector'.(å××T8ýâ¶·þ1

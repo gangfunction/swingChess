@@ -2,17 +2,17 @@ package game.strategy;
 
 import game.GameUtils;
 import game.Position;
-import game.object.ChessGameState;
 import game.factory.ChessPiece;
 import game.object.GameStatusListener;
 
-import java.util.List;
+import java.util.Set;
+
 @FunctionalInterface
 public interface MoveStrategy {
-    List<Position> calculateMoves(GameStatusListener chessGameState, ChessPiece chessPiece, GameUtils utils);
-    default boolean isValidMove(Position position, ChessPiece piece, GameStatusListener chessGameState, GameUtils utils) {
-        return utils.isValidPosition(position) &&
-                (utils.isPositionEmpty(position, chessGameState) ||
-                        utils.isPositionOccupiedByOpponent(position, piece.getColor(), chessGameState));
+    Set<Position> calculateMoves(GameStatusListener chessGameState, ChessPiece chessPiece);
+    default boolean isValidMove(Position position, ChessPiece piece, GameStatusListener chessGameState) {
+        return GameUtils.isValidPosition(position) &&
+                (GameUtils.isPositionEmpty(position, chessGameState) ||
+                        GameUtils.isPositionOccupiedByOpponent(position, piece.getColor(), chessGameState));
     }
 }

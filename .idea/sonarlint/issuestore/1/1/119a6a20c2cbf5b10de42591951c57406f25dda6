@@ -1,6 +1,26 @@
 
-m	java:S106u"+Replace this use of System.out by a logger.(é´8®Ùğ¶ş1J$11abd12f-1a80-40e0-8c41-456a38160e6f
-Œ
-java:S3252"IUse static access with "javax.swing.WindowConstants" for "EXIT_ON_CLOSE".(Ôíãp8¯Ùğ¶ş1J$028733ec-2341-4ae4-bd1e-b139870b79ef
+š
+java:S1104#"XMake chessBoardUI a static final constant or non-public and provide accessors if needed.(ò§]8–í‡ÿ1J$428f5263-7dff-489e-9fc0-39261afbdf32
+€
+java:S2629÷"7Use the built-in formatting to construct this argument.(Ò¢º³üÿÿÿÿ8—í‡ÿ1J$4b964483-95fe-4db3-bedc-c6d791aa1426
+{
+java:S2629Š"7Use the built-in formatting to construct this argument.(¤õßÇ8—í‡ÿ1J$46eb57e3-d770-4c0e-8c2e-af901dc6df58
+t
+java:S1444#"2Make this "public static chessBoardUI" field final(ò§]8–í‡ÿ1J$dbd96673-94bf-4826-a0ac-b692934eea87
+ 
+java:S1450&"]Remove the "chessGameLogic" field and declare it as a local variable in the relevant methods.(¦ÃÊó8ö±Ş›ÿ1J$ff59bd5a-34d5-46b1-b606-5ea4fb306af6
+¢
+java:S1450%"_Remove the "victoryCondition" field and declare it as a local variable in the relevant methods.(ôÒÚú8³–À³ÿ1J$cd7d6d90-eaf2-43e1-bd7a-7e366e6ff693
+O
+java:S1602±",Remove useless curly braces around statement(ÊÃ±Õşÿÿÿÿ8ñÍªµÿ1
+J
+java:S1602·",Remove useless curly braces around statement(¬¿í8òÍªµÿ1
+Š
+java:S3457â"AFormat specifiers should be used instead of string concatenation.(®Òş¼øÿÿÿÿ8Èãµ›ÿ1J$0427a2fe-c2a1-4a67-bd24-95f30761b229
+Š
+java:S3457÷"AFormat specifiers should be used instead of string concatenation.(Ò¢º³üÿÿÿÿ8Éãµ›ÿ1J$c0357e2f-42ae-4a65-81d0-0d88e4e897ed
+…
+java:S3457Š"AFormat specifiers should be used instead of string concatenation.(¤õßÇ8Êãµ›ÿ1J$35c4842e-3701-4760-8ccb-1fdba25f3494
+n	java:S106«"+Replace this use of System.out by a logger.(é´8Ìãµ›ÿ1J$2ec95325-d12a-46cb-9957-cd49495e42e8
 
-java:S3252”"IUse static access with "javax.swing.WindowConstants" for "EXIT_ON_CLOSE".(úßçš8±Ùğ¶ş1J$3ca26279-a992-4417-9758-a9502cc02f1c
+java:S3252·"IUse static access with "javax.swing.WindowConstants" for "EXIT_ON_CLOSE".(úßçš8‡ù¤µÿ1J$52e69404-0e8c-47d5-aa28-9b6ce502216b

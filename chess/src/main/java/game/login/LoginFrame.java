@@ -11,6 +11,7 @@ public class LoginFrame extends JFrame implements ActionListener {
     private final JTextField passwordField;
     private final JButton loginButton;
     private final JButton registerButton;
+    private final JButton offlineButton;
 
     public LoginFrame() {
         setTitle("Login Form");
@@ -46,7 +47,14 @@ public class LoginFrame extends JFrame implements ActionListener {
         registerButton.addActionListener(this);
         panel.add(registerButton);
         add(panel);
+
+        offlineButton = new JButton("Offline");
+        offlineButton.addActionListener(this);
+        panel.add(offlineButton);
+        add(panel);
+
         setVisible(true);
+
     }
 
     @Override
@@ -60,6 +68,11 @@ public class LoginFrame extends JFrame implements ActionListener {
         } else if (e.getSource() == registerButton) {
             // 회원가입 창으로 이동
             new RegisterFrame();
+            this.dispose();
+        }
+        else if (e.getSource() == offlineButton) {
+            // 오프라인 모드로 이동
+            JOptionPane.showMessageDialog(null, "Offline mode");
             this.dispose();
         }
     }

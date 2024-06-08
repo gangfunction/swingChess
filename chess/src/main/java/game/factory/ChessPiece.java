@@ -1,23 +1,27 @@
 package game.factory;
 
-import game.GameUtils;
 import game.Position;
 import game.core.Color;
 import game.object.GameStatusListener;
 import game.strategy.*;
 import lombok.Getter;
+import lombok.Setter;
 
 import java.util.List;
+import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 public class ChessPiece {
     private static final Logger LOGGER = Logger.getLogger(ChessPiece.class.getName());
-    private final PieceType pieceType;
+    @Getter
+    @Setter
+    private PieceType pieceType;
     @Getter
     private Position position;
     @Getter
-    private final Color color;
+    @Setter
+    private Color color;
     @Getter
     private boolean moved = false;
     private final MoveStrategy moveStrategy;
@@ -26,22 +30,11 @@ public class ChessPiece {
         this.pieceType = pieceType;
         this.position = position;
         this.color = color;
-        this.moveStrategy = createMoveStrategy(pieceType);
+        this.moveStrategy = MoveStrategyFactory.createMoveStrategy(pieceType);
     }
 
-    private MoveStrategy createMoveStrategy(PieceType pieceType) {
-        return switch (pieceType) {
-            case PAWN -> new PawnStrategy();
-            case ROOK -> new RookStrategy();
-            case KNIGHT -> new KnightStrategy();
-            case BISHOP -> new BishopStrategy();
-            case QUEEN -> new QueenStrategy();
-            case KING -> new KingStrategy();
-        };
-    }
-
-    public List<Position> calculateMoves(GameStatusListener chessGameState, GameUtils utils) {
-        return moveStrategy.calculateMoves(chessGameState, this, utils);
+    public Set<Position> calculateMoves(GameStatusListener chessGameState) {
+        return moveStrategy.calculateMoves(chessGameState, this);
     }
 
     public void setMoved(boolean moved) {

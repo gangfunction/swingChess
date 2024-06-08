@@ -1,2 +1,20 @@
 
-r	java:S106a"+Replace this use of System.out by a logger.(İî«™üÿÿÿÿ8ş½ı¶ş1J$5c458ec6-acda-4899-a629-461b5593bff1
+x
+java:S1948 "0Make "chessGameState" transient or serializable.(ù¶×öıÿÿÿÿ8”¤¾ÿ1J$ed94a49f-83f3-48ef-b409-c2a6335d976b
+q
+java:S1948"")Make "players" transient or serializable.(¿Ÿáºùÿÿÿÿ8”¤¾ÿ1J$1dfdce91-284e-4474-853e-874ba0bfafa9
+s
+java:S1948#"+Make "observers" transient or serializable.(ÂèæÌÿÿÿÿÿ8•¤¾ÿ1J$929722f1-e055-4813-9189-2dcb4f231162
+r
+java:S1948'"/Make "drawCondition" transient or serializable.(Ëı…8•¤¾ÿ1J$e345218a-47bd-495e-8a36-b710e02e88b0
+u
+java:S1948("2Make "victoryCondition" transient or serializable.(š‰Ÿ»8•¤¾ÿ1J$9e3b0cb0-b9f1-4863-ba9e-dc83150c75e8
+q
+java:S1948)"/Make "chessObserver" transient or serializable.(ıİæa8•¤¾ÿ1J$96a59292-ba9a-4778-9c3f-ed0b9943357b
+~
+java:S1117A";Rename "players" which hides the field declared at line 34.(ãáÁÁ8³¬Ì½ÿ1J$66830296-88ff-4737-b4d1-377c8c7095ed
+†
+java:S1117¸"=Rename "gameEnded" which hides the field declared at line 38.(˜¬È‹ûÿÿÿÿ8º¬Ì½ÿ1J$5d7f862c-d8cd-4ca9-98cd-6b6169d6a766
+l	java:S108½")Either remove or fill this block of code.(ØÕŞÚ8ôÑôÃÿ1J$f2e8e066-69ce-4951-9719-d62add6c4250
+q	java:S108À")Either remove or fill this block of code.(‡Âº˜üÿÿÿÿ8­†õÃÿ1J$9655a3e6-3631-4bb2-94ee-823b44bd2d7d
+s	java:S106É"+Replace this use of System.out by a logger.(ÆÃ¨âÿÿÿÿÿ8»¬Ì½ÿ1J$875b094f-2e86-45aa-bd21-66b14c0821a4

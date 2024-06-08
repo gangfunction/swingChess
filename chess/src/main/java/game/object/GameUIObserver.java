@@ -1,12 +1,14 @@
 package game.object;
 
 import game.observer.Observer;
+import lombok.extern.slf4j.Slf4j;
 
+@Slf4j
 public class GameUIObserver implements Observer {
 
     @Override
     public void update(String gameState) {
-        System.out.println("Game state: " + gameState);
+        log.info("Game state updated to: {}", gameState);
     }
 
 }

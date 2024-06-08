@@ -12,7 +12,7 @@ repositories {
 dependencies {
     implementation 'org.projectlombok:lombok:1.18.30'
     annotationProcessor 'org.projectlombok:lombok:1.18.30'
-
+    implementation 'org.swinglabs.swingx:swingx-all:1.6.5-1'
     implementation 'ch.qos.logback:logback-classic:1.4.14'
     implementation 'org.slf4j:slf4j-api:1.7.30'
     implementation 'ch.qos.logback:logback-classic:1.4.14'

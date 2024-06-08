@@ -2,26 +2,43 @@ package game.core;
 
 import game.Position;
 import game.factory.ChessPiece;
+import game.factory.PieceType;
 import game.object.GameStatusListener;
+import game.observer.ChessObserver;
 import game.observer.Observer;
 import game.status.DrawCondition;
+import game.status.GameStatus;
 import game.status.VictoryCondition;
+import game.ui.IconLoader;
 import lombok.Setter;
+import lombok.extern.slf4j.Slf4j;
 
 import javax.swing.*;
+import java.io.Serial;
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 
-public class ChessGameTurn implements GameTurnListener {
+import static game.app.ChessGameManager.chessBoardUI;
+import static game.app.ChessGameManager.updateUI;
+
+@Slf4j
+public class ChessGameTurn implements GameTurnListener, Serializable {
+    @Serial
+    private static final long serialVersionUID = 1L;
     @Setter
     private GameStatusListener chessGameState;
-    private List<Player> players = new ArrayList<>();
-    private final List<Observer> observers = new ArrayList<>();
-    private static final int NUMBER_OF_PLAYERS = 2; // 플레이어 수
-    private int currentPlayerIndex; // 현재 차례인 플레이어의 인덱스
-    private boolean gameEnded; // 게임 종료 여부
+
+    private final List<Player> players;
+    private final List<Observer> observers;
+    private static final int NUMBER_OF_PLAYERS = 2;
+    private int currentPlayerIndex;
+    private boolean gameEnded;
     private final DrawCondition drawCondition;
     private final VictoryCondition victoryCondition;
+    private final ChessObserver chessObserver;
 
     /**
      * Constructor for ChessGameTurn.
@@ -35,6 +52,8 @@ public class ChessGameTurn implements GameTurnListener {
         this.players = initializePlayers();
         this.currentPlayerIndex = 0;
         this.gameEnded = false;
+        this.observers = new ArrayList<>();
+        this.chessObserver = new ChessObserver();
     }
 
     /**
@@ -43,6 +62,7 @@ public class ChessGameTurn implements GameTurnListener {
      * @return the list of players
      */
     private List<Player> initializePlayers() {
+        List<Player> players = new ArrayList<>();
         players.add(new Player("pin", Color.WHITE));
         players.add(new Player("jake", Color.BLACK));
         return players;
@@ -51,6 +71,7 @@ public class ChessGameTurn implements GameTurnListener {
     @Override
     public void addObserver(Observer observer) {
         observers.add(observer);
+        chessObserver.addObserver(observer);
     }
 
     @Override
@@ -58,26 +79,51 @@ public class ChessGameTurn implements GameTurnListener {
         for (Observer observer : observers) {
             observer.update(message);
         }
+        chessObserver.setGameState(serializeGameState());
     }
 
-    /**
-     * Advances to the next player's turn.
-     */
     @Override
     public void nextTurn() {
-        currentPlayerIndex = (currentPlayerIndex + 1) % NUMBER_OF_PLAYERS; // 리스트의 다음 인덱스로 이동. 플레이어 수를 초과하는 경우 0으로 되돌림
+        currentPlayerIndex = (currentPlayerIndex + 1) % NUMBER_OF_PLAYERS;
         Player player = getCurrentPlayer();
         notifyObservers(player.getName() + "님의 차례입니다.");
+        checkGameStatusAndConditions(player);
+        victoryCondition.invalidateKingInCheckCache();
+    }
 
-        if (drawCondition.isStalemate(getCurrentPlayerColor())) {
-            notifyObservers("스테일메이트! 무승부입니다.");
-            endGame();
-        } else if (victoryCondition.isKingInCheck(chessGameState.getKing(getCurrentPlayerColor()))) {
-            notifyObservers("체크 " + player.getName() + "님!");
-            if (victoryCondition.isCheckMate()) {
+    private void checkGameStatusAndConditions(Player player) {
+        GameStatus gameStatus = determineGameStatus();
+        switch (gameStatus) {
+            case CHECKMATE:
                 JOptionPane.showMessageDialog(null, "체크메이트! " + player.getName() + "님의 승리입니다.");
                 endGame();
-            }
+                break;
+            case STALEMATE:
+                notifyObservers("스테일메이트! 무승부입니다.");
+                endGame();
+                break;
+            case DRAW:
+                notifyObservers("무승부입니다.");
+                endGame();
+                break;
+            case ONGOING:
+                if (victoryCondition.isKingInCheck(chessGameState.getKing(getCurrentPlayerColor()))) {
+                    notifyObservers("체크 " + player.getName() + "님!");
+                }
+                break;
+        }
+    }
+
+    private GameStatus determineGameStatus() {
+        Color currentPlayerColor = getCurrentPlayerColor();
+        if (victoryCondition.isCheckMate()) {
+            return GameStatus.CHECKMATE;
+        } else if (drawCondition.isStalemate(currentPlayerColor)) {
+            return GameStatus.STALEMATE;
+        } else if (drawCondition.isDraw()) {
+            return GameStatus.DRAW;
+        } else {
+            return GameStatus.ONGOING;
         }
     }
 
@@ -93,36 +139,90 @@ public class ChessGameTurn implements GameTurnListener {
 
     @Override
     public Player getCurrentPlayer() {
-        Player currentPlayer = players.get(currentPlayerIndex);
-        System.out.println("It's " + currentPlayer + "'s turn. (" + currentPlayer.getColor() + ")");
-        return currentPlayer;
+        if (players.isEmpty()) {
+            throw new IllegalStateException("플레이어가 초기화되지 않았습니다.");
+        }
+        return players.get(currentPlayerIndex);
     }
 
     @Override
     public Color getCurrentPlayerColor() {
-        return getCurrentPlayer().getColor();
+        return players.get(currentPlayerIndex).getColor();
     }
 
     @Override
     public String serializeGameState() {
         StringBuilder builder = new StringBuilder();
-        List<ChessPiece> pieces = chessGameState.getChessPieces();
+        List<ChessPiece> pieces = new ArrayList<>(chessGameState.getChessPieces().values());
         for (ChessPiece piece : pieces) {
             builder.append(piece.getType())
+                    .append("_")
                     .append(piece.getColor())
+                    .append(":")
                     .append(piece.getPosition().x())
+                    .append(" ")
                     .append(piece.getPosition().y())
-                    .append(";");
+                    .append(";")
+                    .append("\n");
         }
-        Color currentPlayerColor = getCurrentPlayerColor();
-        builder.append("Turn:").append(currentPlayerColor).append(";");
-        builder.append("Castling:").append(chessGameState.getCastlingRights()).append(";");
-        Position enPassantTarget = chessGameState.getEnPassantTarget();
-        if (enPassantTarget != null) {
-            builder.append("EnPassant:").append(enPassantTarget).append(";");
-        }
-        builder.append("GameEnded:").append(isGameEnded() ? "Yes" : "No").append(";");
+        builder.append("TURN:").append(getCurrentPlayerColor()).append(";").append("\n");
+        builder.append("CASTLING:").append(chessGameState.getCastlingRights()).append(";").append("\n");
+        Optional.ofNullable(chessGameState.getEnPassantTarget())
+                .ifPresent(target -> builder.append("EnPassant:").append(target).append(";").append("\n"));
+        builder.append("GameEnded:").append(isGameEnded() ? "Yes" : "No").append(";").append("\n");
+        String gameState = builder.toString();
+        chessObserver.setGameState(gameState);
+        return gameState;
+    }
+    @Override
+    public void deserializeGameState(String gameState) {
+            chessGameState.clearBoard();
+            chessBoardUI.clearHighlights();
 
-        return builder.toString();
+            String[] parts = gameState.split("\n");
+            Color currentPlayerColor = null;
+            boolean gameEnded = false;
+
+        for (String part : parts) {
+                if (part.startsWith("TURN:")) {
+                    currentPlayerColor = Color.valueOf(part.split(":")[1].trim().replace(";", ""));
+                } else if (part.startsWith("CASTLING:")) {
+                } else if (part.startsWith("GameEnded:")) {
+                    gameEnded = part.split(":")[1].trim().equalsIgnoreCase("YES");
+                } else if (part.startsWith("EnPassant:")) {
+                } else {
+                    String[] pieceInfo = part.split(":");
+                    String[] pieceHeader = pieceInfo[0].split("_");
+                    String[] pieceBody = pieceInfo[1].split(" ");
+                    PieceType type = PieceType.valueOf(pieceHeader[0].trim().toUpperCase());
+                    Color color = Color.valueOf(pieceHeader[1].trim().toUpperCase().replace(";", ""));
+                    int x = Integer.parseInt(pieceBody[0]);
+                    int y = Integer.parseInt(pieceBody[1].replace(";", ""));
+                    System.out.println("Piece: " + type + " " + color + " at " + x + " " + y);
+                    chessGameState.getChessPieces().put(new Position(x, y), new ChessPiece(type, new Position(x, y),color));
+                }
+            }
+            this.gameEnded = gameEnded;
+
+            for (int i = 0; i < players.size(); i++) {
+                if (players.get(i).getColor().equals(currentPlayerColor)) {
+                    currentPlayerIndex = i;
+                    break;
+                }
+            }
+            for(Map.Entry<Position, ChessPiece> entry : chessGameState.getChessPieces().entrySet()){
+                chessGameState.getChessPieces().put(entry.getKey(), entry.getValue());
+                JPanel panel = chessBoardUI.getPanelAtPosition(entry.getKey());
+                chessBoardUI.addPieceToPanel(panel, new JLabel(IconLoader.loadIcon(entry.getValue().getType(), entry.getValue().getColor())));
+            }
+            updateUI();
+            notifyObservers("Game state deserialized and UI updated.");
+            chessObserver.setGameState(gameState);
+    }
+
+    public void previousTurn() {
+        currentPlayerIndex = (currentPlayerIndex - 1 + NUMBER_OF_PLAYERS) % NUMBER_OF_PLAYERS;
+        Player player = getCurrentPlayer();
+        notifyObservers(player.getName() + "님의 차례입니다.");
     }
 }
