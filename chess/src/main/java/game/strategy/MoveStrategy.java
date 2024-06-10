@@ -2,8 +2,8 @@ package game.strategy;
 
 import game.GameUtils;
 import game.Position;
-import game.factory.ChessPiece;
-import game.object.GameStatusListener;
+import game.core.factory.ChessPiece;
+import game.model.GameStatusListener;
 
 import java.util.Set;
 

@@ -3,12 +3,12 @@ package game.app;
 import game.Position;
 import game.command.CommandInvoker;
 import game.core.ChessGameTurn;
-import game.factory.ChessPiece;
-import game.object.ChessBoardUI;
-import game.object.ChessGameLogic;
-import game.object.ChessGameState;
-import game.object.PromotionLogic;
-import game.object.castling.CastlingLogic;
+import game.core.factory.ChessPiece;
+import game.ui.ChessBoardUI;
+import game.model.ChessGameLogic;
+import game.model.ChessGameState;
+import game.model.PromotionLogic;
+import game.model.castling.CastlingLogic;
 import game.status.DrawCondition;
 import game.status.VictoryCondition;
 

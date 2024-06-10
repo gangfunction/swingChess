@@ -19,7 +19,6 @@ public class ChessObserver implements Subject{
     public void setGameState(String gameState) {
         if(this.gameState == null || !this.gameState.equals(gameState)){
             this.gameState = gameState;
-            notifyObservers();
         }
     }
 

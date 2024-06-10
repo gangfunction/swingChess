@@ -1,10 +1,11 @@
 package game.status;
 
 import game.Position;
-import game.core.Color;
+import game.util.Color;
 import game.core.GameTurnListener;
-import game.factory.ChessPiece;
-import game.object.GameStatusListener;
+import game.core.PlayerManager;
+import game.core.factory.ChessPiece;
+import game.model.GameStatusListener;
 import game.strategy.*;
 
 import java.util.HashSet;
@@ -32,7 +33,7 @@ public class VictoryCondition {
 
     public boolean isCheckMate() {
         ensureInitialized();
-        ChessPiece king = chessGameState.getKing(chessGameTurn.getCurrentPlayerColor());
+        ChessPiece king = chessGameState.getKing(PlayerManager.getCurrentPlayerColor());
         if (king == null) {
             throw new IllegalStateException("King not found for current player");
         }
@@ -83,19 +84,8 @@ public class VictoryCondition {
     }
 
     private Set<Position> calculateMovesForPiece(ChessPiece piece) {
-        MoveStrategy strategy = getMoveStrategy(piece);
+        MoveStrategy strategy = piece.getMoveStrategy();
         return new HashSet<>(strategy.calculateMoves(chessGameState, piece));
-    }
-
-    private MoveStrategy getMoveStrategy(ChessPiece piece) {
-        return switch (piece.getType()) {
-            case PAWN -> new PawnStrategy();
-            case KNIGHT -> new KnightStrategy();
-            case BISHOP -> new BishopStrategy();
-            case ROOK -> new RookStrategy();
-            case QUEEN -> new QueenStrategy();
-            case KING -> new KingStrategy();
-        };
     }
 
     public void invalidateKingInCheckCache() {

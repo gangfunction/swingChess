@@ -1,6 +1,7 @@
 
-}
-java:S3416"5Update this logger to use "ServerCommunicator.class".(Æ±¬úÿÿÿÿ8²‡ûµÿ1J$2f7004af-5b75-4965-a844-d23b8ac8eded
 ‚
-java:S1118":Add a private constructor to hide the implicit public one.(™¢ó˜ÿÿÿÿÿ8²‡ûµÿ1J$0d23ad9d-c839-47c3-bebb-05300c437f78
-m	java:S106-"+Replace this use of System.out by a logger.(é´8µ‡ûµÿ1J$3b969ff1-c14b-4293-970e-911829b2312a
+java:S1118":Add a private constructor to hide the implicit public one.(™¢ó˜ÿÿÿÿÿ8²‡ûµÿ1J$fcf027a9-ec2b-46ff-89bc-3f0fec6c0c92
+v
+java:S1128"3Remove this unused import 'java.io.BufferedReader'.(€é²Å8şÂ¿Äÿ1J$912aa6d9-76f8-4462-9431-c2b962e8e0dc
+y
+java:S1128	"6Remove this unused import 'java.io.InputStreamReader'.(ãˆÎÉ8şÂ¿Äÿ1J$352d7ecc-2054-41ad-ae41-e011da5ceabf

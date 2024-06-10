@@ -1,8 +1,8 @@
 package game.strategy;
 
 import game.*;
-import game.factory.ChessPiece;
-import game.object.GameStatusListener;
+import game.core.factory.ChessPiece;
+import game.model.GameStatusListener;
 
 import java.util.HashSet;
 import java.util.Set;

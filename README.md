@@ -1,48 +1,100 @@
-# 체스 게임 GUI 및 로직 프로젝트
-**![클다](https://github.com/gangfunction/swingChess/assets/62240333/f709cc7f-f942-4908-b6f8-979cfadf3bc5)**
-이 프로젝트는 Java Swing을 사용하여 체스 게임의 그래픽 사용자 인터페이스(GUI)와 게임 로직을 구현합니다. 아래에는 프로젝트의 주요 기능과 구현 방법에 대한 요약이 제공됩니다.
+# Chess Game
+## 1. Game Introduction
+The chess game, which is commonly known, has been implemented using a Swing GUI.
 
-## 주요 기능
+## 2. Installation Method
+### 2.1 Execution Environment
+- Java 17 or higher
 
-1. **GUI 디자인**: 8x8 격자로 구성된 체스판을 표시하고, 각 말을 고유한 아이콘 또는 이미지로 표현합니다.
+## 3. Game Development Status
+### 3.1 Component Implementation
+- [x] Chessboard implementation
+- [x] Piece implementation
+- [x] Piece movement implementation
+- [x] Castling implementation
+    - [x] Kingside castling implementation
+    - [x] Queenside castling implementation
+- [x] Pawn promotion implementation
+- [x] En passant implementation
 
-2. **게임 로직 구현**: 말의 이동 규칙, 턴 관리, 체크 및 체크메이트 상황 검사, 프로모션, 앙파상, 캐슬링 등을 코드로 구현합니다.
+### 3.2 Game End Conditions Implementation
+- [x] Victory conditions implementation
+    - [x] Checkmate implementation
+    - [x] Check implementation
+- [ ] Draw conditions implementation
+    - [x] Stalemate implementation
+    - [x] 50-move rule implementation
+    - [x] Threefold repetition rule implementation
+    - [ ] Draw by agreement implementation
 
-3. **말 이동**: 사용자가 말을 클릭하면 가능한 이동 경로를 계산하고 표시한 후, 사용자가 이동할 위치를 클릭하면 말을 해당 위치로 이동시킵니다.
+### 3.3 Log Implementation
+- [x] Turn display log implementation
 
-4. **턴 관리**: 각 플레이어(흰색과 검은색)의 턴을 관리하고, 현재 턴인 플레이어만 말을 움직일 수 있도록 합니다.
+### 3.4 Game Save and Load Implementation
+- [x] Game save implementation
+    - [x] Game serialization implementation
+    - [x] Save file name with UTC time implementation
+- [x] Game load implementation
+    - [x] Game deserialization implementation
+    - [x] Load game by file name implementation
 
-5. **게임 상태 관리**: 게임의 현재 상태(진행 중, 체크, 체크메이트, 스테일메이트)를 추적하고 사용자에게 표시합니다.
+### 3.5 Additional Features Implementation
+- [x] Game start screen implementation
+- [x] Undo implementation
+- [x] Redo implementation
+- [x] Game end screen implementation
 
-6. **게임 재시작 및 종료**: 사용자가 게임을 새로 시작하거나 종료할 수 있는 옵션을 제공합니다.
+### 4. Computer Match Implementation
+- [x] Integration with open-source chess engine (Stockfish)
+- [ ] Improvement of serialization state and logging method (planned to use FEN (Forsyth-Edwards Notation))
+- [ ] Implementation of rating setting function for computer matches
 
-## 선택적 기능
+---------
 
-1. **시간 제한**: 각 플레이어에게 제한 시간을 설정할 수 있습니다.
+# 체스 게임(Chess Game)
+## 1. 게임소개
+일반적으로 알고있던 체스게임을 스윙 GUI를 통하여 구현했습니다.
+## 2. 설치방법
+### 2.1. 실행환경
+- Java 17 이상
+## 3. 게임개발 현황
+### 3.1 구성요소 구현
+- [x] 체스판 구현
+- [x] 말 구현
+- [x] 말 이동 구현
+- [x] 캐슬링 구현
+  - [x] 킹사이드 캐슬링 구현
+  - [x] 퀸사이드 캐슬링 구현
+- [x] 폰 프로모션 구현
+- [x] 앙파상 구현
 
-2. **기록 및 되돌리기**: 수를 기록하고, 사용자가 이전 수로 되돌릴 수 있는 기능을 추가할 수 있습니다.
+### 3.2 게임종료 조건 구현
+- [x] 승리 조건 구현
+  - [x] 체크메이트 구현
+  - [x] 체크 구현
+- [ ] 무승부 조건 구현
+  - [x] 스테일메이트 구현
+  - [x] 50수 룰 구현
+  - [x] 3회 반복 룰 구현
+  - [ ] 무승부 동의 구현
 
-3. **인공지능 대전**: 컴퓨터 상대와 플레이할 수 있도록 인공지능을 구현할 수 있습니다. (선택적)
+### 3.3 로그 구현
+- [x] 차례 표시 로그 구현
+### 3.4 게임 저장 및 불러오기 구현
+- [x] 게임 저장 구현
+  - [x] 게임 직렬화 구현
+  - [x] utc 시간으로 파일명 저장 구현
+- [x] 게임 불러오기 구현
+  - [x] 게임 역직렬화 구현
+  - [x] 파일명으로 게임 불러오기 구현
 
-## 프로젝트 구조
+### 3.5 부가 요소 구현
+- [x] 게임 시작 화면 구현
+- [x] undo 구현
+- [x] redo 구현
+- [x] 게임 종료 화면 구현
 
-- `ChessGame.java`: 메인 클래스로, GUI 및 게임 로직을 초기화하고 실행합니다.
-- `ChessBoardPanel.java`: Swing을 사용하여 체스판 GUI를 그리는 클래스입니다.
-- `ChessPiece.java`: 각 체스 말을 나타내는 클래스로, 말의 종류와 위치를 저장합니다.
-- `ChessPieceIconLoader.java`: 말에 사용될 아이콘 또는 이미지를 로드하는 유틸리티 클래스입니다.
-- `ChessGameLogic.java`: 게임 로직을 구현하는 클래스로, 말의 이동 규칙, 턴 관리, 상태 검사 등을 처리합니다.
-
-## 사용 방법
-
-1. 이 저장소를 클론하거나 다운로드합니다.
-2. Java 개발 환경에서 프로젝트를 엽니다.
-3. `ChessGame.java` 파일을 실행하여 체스 게임을 시작합니다.
-4. 사용자 인터페이스를 통해 게임을 플레이하고, 선택적 기능을 활용합니다.
-
-## 참고 사항
-
-- Java Swing을 사용하여 GUI를 구현하므로, Java에 대한 기본 지식이 필요합니다.
-- 프로젝트에 적절한 아이콘 또는 이미지를 제공하여 각 체스 말을 표현해야 합니다.
-- 선택적 기능을 추가하려면 해당 기능에 대한 추가적인 코드와 UI 요소를 구현해야 합니다.
-
-이 프로젝트는 초보자부터 중급자까지 다양한 수준의 프로그래머들이 참여할 수 있으며, 체스 게임을 구현하고 GUI 프로그래밍에 대한 이해를 높일 수 있는 훌륭한 학습 경험을 제공할 것입니다.
+### 4. 컴퓨터 대전 구현
+- [x] 오픈소스 체스 엔진 연동 (Stockfish)
+- [ ] 직렬화 상태 및 로그방법의 개선 (FEN(Forsyth-Edwards Notation) 사용 예정)
+- [ ] 컴퓨터 대전시 레이팅 설정 기능 구현

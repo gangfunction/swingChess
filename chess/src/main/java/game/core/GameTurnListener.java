@@ -1,9 +1,6 @@
 package game.core;
 
 import game.observer.Observer;
-import game.status.DrawCondition;
-
-import java.util.List;
 
 public interface GameTurnListener {
 
@@ -16,11 +13,6 @@ public interface GameTurnListener {
     boolean isGameEnded();
 
     void endGame();
-
-    Player getCurrentPlayer();
-
-
-    Color getCurrentPlayerColor();
 
     String serializeGameState();
 

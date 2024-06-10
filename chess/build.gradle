@@ -1,25 +1,30 @@
 plugins {
     id 'java'
+    id 'application'
 }
 
 group = 'hello'
 version = '1.0-SNAPSHOT'
+
+application {
+    mainClass = 'game.app.Main'
+}
 
 repositories {
     mavenCentral()
 }
 
 dependencies {
+    implementation group: 'com.formdev', name: 'flatlaf', version: '3.4.1'
     implementation 'org.projectlombok:lombok:1.18.30'
     annotationProcessor 'org.projectlombok:lombok:1.18.30'
     implementation 'org.swinglabs.swingx:swingx-all:1.6.5-1'
     implementation 'ch.qos.logback:logback-classic:1.4.14'
     implementation 'org.slf4j:slf4j-api:1.7.30'
-    implementation 'ch.qos.logback:logback-classic:1.4.14'
     implementation 'io.netty:netty-buffer:4.1.86.Final'
     implementation 'com.google.code.gson:gson:2.9.0'
     implementation platform('io.projectreactor:reactor-bom:2020.0.24')
-    implementation group: 'io.jsonwebtoken', name: 'jjwt-api', version: '0.11.5'
+    implementation 'io.jsonwebtoken:jjwt-api:0.11.5'
     implementation 'io.projectreactor.netty:reactor-netty-core'
     implementation 'io.projectreactor.netty:reactor-netty-http'
     testImplementation platform('org.junit:junit-bom:5.9.1')
@@ -28,4 +33,13 @@ dependencies {
 
 test {
     useJUnitPlatform()
+}
+
+jar {
+    manifest {
+        attributes(
+                'Main-Class': 'game.app.Main',
+                'Class-Path': configurations.runtimeClasspath.collect { it.toURI().toURL().toString().replaceFirst("file:/", "/") }.join(' ')
+        )
+    }
 }

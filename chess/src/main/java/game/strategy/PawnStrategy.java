@@ -2,9 +2,9 @@ package game.strategy;
 
 import game.GameUtils;
 import game.Position;
-import game.core.Color;
-import game.factory.ChessPiece;
-import game.object.GameStatusListener;
+import game.util.Color;
+import game.core.factory.ChessPiece;
+import game.model.GameStatusListener;
 
 import java.util.HashSet;
 import java.util.Set;

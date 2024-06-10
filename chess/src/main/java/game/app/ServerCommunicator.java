@@ -11,7 +11,7 @@ import java.io.PrintWriter;
 import java.net.Socket;
 
 public class ServerCommunicator {
-    private static final Logger log = LoggerFactory.getLogger(App.class);
+    private static final Logger log = LoggerFactory.getLogger(ServerCommunicator.class);
     private static final String SERVER_ADDRESS = "127.0.0.1";
     private static final int SERVER_PORT = 8080;
     private static final int LOG_SERVER_PORT = 8000;
@@ -40,9 +40,6 @@ public class ServerCommunicator {
                     String logMessageWithPrefix = "Client: Game initialized";
                     out.println(logMessageWithPrefix);
 
-                    BufferedReader in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
-                    String response = in.readLine();
-                    System.out.println("Server response: " + response);
                 } catch (IOException e) {
                     log.error("Failed to send log to server", e);
                 }

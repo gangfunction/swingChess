@@ -2,8 +2,8 @@ package game.command;
 
 import game.Position;
 import game.core.ChessGameTurn;
-import game.factory.ChessPiece;
-import game.object.GameStatusListener;
+import game.core.factory.ChessPiece;
+import game.model.GameStatusListener;
 
 import java.util.ArrayDeque;
 import java.util.ArrayList;

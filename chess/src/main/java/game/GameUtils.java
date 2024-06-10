@@ -1,8 +1,8 @@
 package game;
 
-import game.core.Color;
-import game.factory.ChessPiece;
-import game.object.GameStatusListener;
+import game.util.Color;
+import game.core.factory.ChessPiece;
+import game.model.GameStatusListener;
 
 import java.util.Optional;
 

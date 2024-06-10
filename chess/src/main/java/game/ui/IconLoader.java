@@ -1,7 +1,7 @@
 package game.ui;
 
-import game.core.Color;
-import game.factory.PieceType;
+import game.util.Color;
+import game.util.PieceType;
 
 import javax.imageio.ImageIO;
 import javax.swing.*;

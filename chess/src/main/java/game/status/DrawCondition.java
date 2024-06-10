@@ -1,12 +1,12 @@
 package game.status;
 
 import game.Position;
-import game.core.Color;
+import game.util.Color;
 import game.core.GameTurnListener;
-import game.factory.ChessPiece;
-import game.factory.PieceType;
-import game.object.GameLogicActions;
-import game.object.GameStatusListener;
+import game.core.factory.ChessPiece;
+import game.util.PieceType;
+import game.model.GameLogicActions;
+import game.model.GameStatusListener;
 
 import java.util.HashMap;
 import java.util.Map;

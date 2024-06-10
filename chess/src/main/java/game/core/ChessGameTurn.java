@@ -1,15 +1,16 @@
 package game.core;
 
 import game.Position;
-import game.factory.ChessPiece;
-import game.factory.PieceType;
-import game.object.GameStatusListener;
+import game.core.factory.ChessPiece;
+import game.util.PieceType;
+import game.model.GameStatusListener;
 import game.observer.ChessObserver;
 import game.observer.Observer;
 import game.status.DrawCondition;
 import game.status.GameStatus;
 import game.status.VictoryCondition;
 import game.ui.IconLoader;
+import game.util.Color;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 
@@ -31,7 +32,7 @@ public class ChessGameTurn implements GameTurnListener, Serializable {
     @Setter
     private GameStatusListener chessGameState;
 
-    private final List<Player> players;
+    private final PlayerManager playerManager;
     private final List<Observer> observers;
     private static final int NUMBER_OF_PLAYERS = 2;
     private int currentPlayerIndex;
@@ -49,24 +50,13 @@ public class ChessGameTurn implements GameTurnListener, Serializable {
     public ChessGameTurn(DrawCondition drawCondition, VictoryCondition victoryCondition) {
         this.drawCondition = drawCondition;
         this.victoryCondition = victoryCondition;
-        this.players = initializePlayers();
+        this.playerManager = new PlayerManager();
         this.currentPlayerIndex = 0;
         this.gameEnded = false;
         this.observers = new ArrayList<>();
         this.chessObserver = new ChessObserver();
     }
 
-    /**
-     * Initializes the players for the game.
-     *
-     * @return the list of players
-     */
-    private List<Player> initializePlayers() {
-        List<Player> players = new ArrayList<>();
-        players.add(new Player("pin", Color.WHITE));
-        players.add(new Player("jake", Color.BLACK));
-        return players;
-    }
 
     @Override
     public void addObserver(Observer observer) {
@@ -85,7 +75,8 @@ public class ChessGameTurn implements GameTurnListener, Serializable {
     @Override
     public void nextTurn() {
         currentPlayerIndex = (currentPlayerIndex + 1) % NUMBER_OF_PLAYERS;
-        Player player = getCurrentPlayer();
+        Player player = playerManager.getCurrentPlayer();
+        playerManager.nextPlayer();
         notifyObservers(player.getName() + "님의 차례입니다.");
         checkGameStatusAndConditions(player);
         victoryCondition.invalidateKingInCheckCache();
@@ -107,7 +98,7 @@ public class ChessGameTurn implements GameTurnListener, Serializable {
                 endGame();
                 break;
             case ONGOING:
-                if (victoryCondition.isKingInCheck(chessGameState.getKing(getCurrentPlayerColor()))) {
+                if (victoryCondition.isKingInCheck(chessGameState.getKing(PlayerManager.getCurrentPlayerColor()))) {
                     notifyObservers("체크 " + player.getName() + "님!");
                 }
                 break;
@@ -115,7 +106,7 @@ public class ChessGameTurn implements GameTurnListener, Serializable {
     }
 
     private GameStatus determineGameStatus() {
-        Color currentPlayerColor = getCurrentPlayerColor();
+        Color currentPlayerColor = PlayerManager.getCurrentPlayerColor();
         if (victoryCondition.isCheckMate()) {
             return GameStatus.CHECKMATE;
         } else if (drawCondition.isStalemate(currentPlayerColor)) {
@@ -138,19 +129,6 @@ public class ChessGameTurn implements GameTurnListener, Serializable {
     }
 
     @Override
-    public Player getCurrentPlayer() {
-        if (players.isEmpty()) {
-            throw new IllegalStateException("플레이어가 초기화되지 않았습니다.");
-        }
-        return players.get(currentPlayerIndex);
-    }
-
-    @Override
-    public Color getCurrentPlayerColor() {
-        return players.get(currentPlayerIndex).getColor();
-    }
-
-    @Override
     public String serializeGameState() {
         StringBuilder builder = new StringBuilder();
         List<ChessPiece> pieces = new ArrayList<>(chessGameState.getChessPieces().values());
@@ -165,7 +143,7 @@ public class ChessGameTurn implements GameTurnListener, Serializable {
                     .append(";")
                     .append("\n");
         }
-        builder.append("TURN:").append(getCurrentPlayerColor()).append(";").append("\n");
+        builder.append("TURN:").append(PlayerManager.getCurrentPlayerColor()).append(";").append("\n");
         builder.append("CASTLING:").append(chessGameState.getCastlingRights()).append(";").append("\n");
         Optional.ofNullable(chessGameState.getEnPassantTarget())
                 .ifPresent(target -> builder.append("EnPassant:").append(target).append(";").append("\n"));
@@ -204,8 +182,8 @@ public class ChessGameTurn implements GameTurnListener, Serializable {
             }
             this.gameEnded = gameEnded;
 
-            for (int i = 0; i < players.size(); i++) {
-                if (players.get(i).getColor().equals(currentPlayerColor)) {
+            for (int i = 0; i < playerManager.getPlayers().size(); i++) {
+                if (playerManager.getPlayers().get(i).equals(currentPlayerColor)) {
                     currentPlayerIndex = i;
                     break;
                 }
@@ -222,7 +200,7 @@ public class ChessGameTurn implements GameTurnListener, Serializable {
 
     public void previousTurn() {
         currentPlayerIndex = (currentPlayerIndex - 1 + NUMBER_OF_PLAYERS) % NUMBER_OF_PLAYERS;
-        Player player = getCurrentPlayer();
+        Player player = playerManager.getCurrentPlayer();
         notifyObservers(player.getName() + "님의 차례입니다.");
     }
 }
