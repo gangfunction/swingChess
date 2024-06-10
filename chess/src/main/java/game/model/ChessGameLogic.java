@@ -36,10 +36,15 @@ public class ChessGameLogic implements GameLogicActions {
 
     @Setter
     private boolean afterCastling = false;
-    private final PlayerManager playerManagerActions;
+    private PlayerManager playerManager;
 
 
-    public ChessGameLogic(ChessGameTurn chessGameTurn, CommandInvoker commandInvoker, CastlingLogic castlingLogic, PromotionLogic promotionLogic) {
+    public ChessGameLogic(ChessGameTurn chessGameTurn,
+                          CommandInvoker commandInvoker,
+                          CastlingLogic castlingLogic,
+                          PromotionLogic promotionLogic,
+                            PlayerManager playerManager
+    ) {
         this.chessGameTurn = chessGameTurn;
         this.commandInvoker = commandInvoker;
         this.castlingLogic = castlingLogic;
@@ -49,7 +54,7 @@ public class ChessGameLogic implements GameLogicActions {
         this.drawCondition = new DrawCondition();
         this.chessObserver.addObserver(new GameUIObserver());
         this.chessRuleHandler = new ChessRuleHandler();
-        this.playerManagerActions = new PlayerManager();
+        this.playerManager = playerManager;
     }
 
     public void setGameEventListener(GameEventListener gameEventListener, GameStatusListener gameStatusListener) {
@@ -67,7 +72,7 @@ public class ChessGameLogic implements GameLogicActions {
         Position clickedPosition = new Position(x, y);
         ChessPiece targetPiece = GameUtils.findPieceAtPosition(gameStatusListener, clickedPosition).orElse(null);
         if (targetPiece != null && gameStatusListener.getSelectedPiece() == null) {
-            handlePieceSelection(targetPiece, clickedPosition);
+            handlePieceSelection(targetPiece, clickedPosition, playerManager);
         } else if (gameStatusListener.getSelectedPiece() != null) {
             handlePieceMove(clickedPosition);
         } else {
@@ -75,8 +80,8 @@ public class ChessGameLogic implements GameLogicActions {
         }
     }
 
-    private void handlePieceSelection(ChessPiece piece, Position clickedPosition) {
-        if (isSelectable(piece)) {
+    private void handlePieceSelection(ChessPiece piece, Position clickedPosition, PlayerManager playerManager) {
+        if (isSelectable(piece, playerManager)) {
             gameStatusListener.setSelectedPiece(piece);
             gameEventListener.highlightPossibleMoves(piece);
             castlingLogic.castlingJudgeLogic(piece, clickedPosition);
@@ -84,7 +89,6 @@ public class ChessGameLogic implements GameLogicActions {
             notifyInvalidMoveAttempted("Invalid move: Piece not selectable.");
         }
     }
-
     private boolean canMoveBreakCheck(ChessPiece piece, Position targetPosition) {
         Position originalPosition = piece.getPosition();
         piece.setPosition(targetPosition);
@@ -204,14 +208,14 @@ public class ChessGameLogic implements GameLogicActions {
         return isKingInCheck(piece.getColor());
     }
 
-
-    boolean isFriendlyPieceAtPosition(Position position, ChessPiece selectedPiece) {
+    @Override
+    public boolean isFriendlyPieceAtPosition(Position position, ChessPiece selectedPiece) {
         Optional<ChessPiece> pieceAtPosition = GameUtils.findPieceAtPosition(gameStatusListener, position);
         return pieceAtPosition.isPresent() && pieceAtPosition.get().getColor() == selectedPiece.getColor();
     }
 
-    private boolean isSelectable(ChessPiece piece) {
-        return PlayerManager.getCurrentPlayerColor() == piece.getColor();
+    private boolean isSelectable(ChessPiece piece, PlayerManager playerManager) {
+        return playerManager.getCurrentPlayerColor() == piece.getColor();
     }
 
 

@@ -1,7 +1,7 @@
 
 †
-java:S11177"CRename "collapsiblePane" which hides the field declared at line 22.(Ù€¡É8Œí²Äÿ1J$a6e752a1-ed4e-46ae-94d1-b1d7b1612406
+java:S1117:"CRename "collapsiblePane" which hides the field declared at line 24.(Ù€¡É8ğ·äˆ€2J$7c2afc60-5c26-45a1-a27c-1263fa72875b
 „
-java:S1117:"ARename "mainSplitPane" which hides the field declared at line 24.(àœ¯£8Œí²Äÿ1J$19a083d3-e624-4158-8822-77f0e9bfbe86
+java:S1117="ARename "mainSplitPane" which hides the field declared at line 26.(àœ¯£8ğ·äˆ€2J$0844cc42-49f7-41d0-9655-81ba68fdded3
 
-java:S3252Ÿ"IUse static access with "javax.swing.WindowConstants" for "EXIT_ON_CLOSE".(úßçš8‘í²Äÿ1J$a0f31eb7-1fc0-41f8-bffd-29179d9c79d0
+java:S3252¢"IUse static access with "javax.swing.WindowConstants" for "EXIT_ON_CLOSE".(úßçš8ö·äˆ€2J$a44cb205-364f-4c3e-b613-27fa7bcdcfcd

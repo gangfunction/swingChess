@@ -13,4 +13,6 @@ public interface GameLogicActions {
     void updateGameStateAfterMove(ChessPiece king, Position kingTargetPosition);
     boolean isKingInCheckAfterMove(ChessPiece piece, Position clickedPosition);
     void setAfterCastling(boolean b);
+
+    boolean isFriendlyPieceAtPosition(Position position, ChessPiece thisPiece);
 }

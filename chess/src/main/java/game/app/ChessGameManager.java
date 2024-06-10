@@ -3,6 +3,7 @@ package game.app;
 import game.Position;
 import game.command.CommandInvoker;
 import game.core.ChessGameTurn;
+import game.core.PlayerManager;
 import game.core.factory.ChessPiece;
 import game.ui.ChessBoardUI;
 import game.model.ChessGameLogic;
@@ -23,7 +24,7 @@ public class ChessGameManager {
     private static VictoryCondition victoryCondition;
     private static ChessGameLogic chessGameLogic;
 
-    static void initializeGameComponents() {
+    static void initializeGameComponents(PlayerManager playerManager) {
         chessGameState = new ChessGameState();
         commandInvoker = new CommandInvoker();
         commandInvoker.addUndoRedoListener(ChessGameManager::updateUI);
@@ -32,7 +33,7 @@ public class ChessGameManager {
         chessGameTurn = new ChessGameTurn(drawCondition, victoryCondition);
 
         chessBoardUI = createChessBoardUI(chessGameState);
-        chessGameLogic = createChessGameLogic(chessGameTurn, commandInvoker, chessBoardUI, chessGameState);
+        chessGameLogic = createChessGameLogic(chessGameTurn, commandInvoker, chessBoardUI, chessGameState, playerManager);
 
         setupGameLogic(chessGameLogic, chessBoardUI, chessGameState, chessGameTurn, drawCondition, victoryCondition);
 
@@ -46,10 +47,17 @@ public class ChessGameManager {
     private static ChessGameLogic createChessGameLogic(ChessGameTurn chessGameTurn,
                                                        CommandInvoker commandInvoker,
                                                        ChessBoardUI chessBoardUI,
-                                                       ChessGameState chessGameState) {
+                                                       ChessGameState chessGameState,
+                                                       PlayerManager playerManager
+    ) {
         CastlingLogic castlingLogic = new CastlingLogic(chessBoardUI);
         PromotionLogic promotionLogic = new PromotionLogic(chessGameState, chessBoardUI);
-        ChessGameLogic chessGameLogic = new ChessGameLogic(chessGameTurn, commandInvoker, castlingLogic, promotionLogic);
+        ChessGameLogic chessGameLogic = new ChessGameLogic(chessGameTurn,
+                commandInvoker,
+                castlingLogic,
+                promotionLogic,
+                playerManager
+        );
         chessGameLogic.setGameEventListener(chessBoardUI, chessGameState);
         castlingLogic.setCastlingLogic(chessGameState, chessGameLogic);
         return chessGameLogic;

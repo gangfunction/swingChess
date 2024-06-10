@@ -8,7 +8,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class PlayerManager {
-    private static List<Player> players = new ArrayList<>();
+    private  List<Player> players;
     @Getter
     @Setter
     private static int currentPlayerIndex;
@@ -18,9 +18,9 @@ public class PlayerManager {
         currentPlayerIndex = 0;
     }
 
-    public static void setPlayers(List<Player> players) {
-        PlayerManager.players.clear();
-        PlayerManager.players = players;
+    public  void setPlayers(List<Player> players) {
+        this.players.clear();
+        this.players = players;
     }
 
     private List<Player> initializePlayers() {
@@ -37,7 +37,7 @@ public class PlayerManager {
         return players.get(currentPlayerIndex);
     }
 
-    public static Color getCurrentPlayerColor() {
+    public  Color getCurrentPlayerColor() {
         return players.get(currentPlayerIndex).getColor();
     }
 

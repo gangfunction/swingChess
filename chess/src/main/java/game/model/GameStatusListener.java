@@ -34,7 +34,7 @@ public interface GameStatusListener {
 
     int getMoveWithoutPawnOrCaptureCount();
 
-    boolean isAvailableMoveTarget(Position position, ChessGameLogic chessGameLogic);
+    boolean isAvailableMoveTarget(Position position, GameLogicActions gameLogicActions);
 
     ChessPiece getKing(Color color);
 

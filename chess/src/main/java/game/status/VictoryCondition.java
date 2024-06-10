@@ -31,9 +31,9 @@ public class VictoryCondition {
         }
     }
 
-    public boolean isCheckMate() {
+    public boolean isCheckMate(PlayerManager playerManager) {
         ensureInitialized();
-        ChessPiece king = chessGameState.getKing(PlayerManager.getCurrentPlayerColor());
+        ChessPiece king = chessGameState.getKing(playerManager.getCurrentPlayerColor());
         if (king == null) {
             throw new IllegalStateException("King not found for current player");
         }

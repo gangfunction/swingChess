@@ -98,7 +98,7 @@ public class ChessGameTurn implements GameTurnListener, Serializable {
                 endGame();
                 break;
             case ONGOING:
-                if (victoryCondition.isKingInCheck(chessGameState.getKing(PlayerManager.getCurrentPlayerColor()))) {
+                if (victoryCondition.isKingInCheck(chessGameState.getKing(playerManager.getCurrentPlayerColor()))) {
                     notifyObservers("체크 " + player.getName() + "님!");
                 }
                 break;
@@ -106,8 +106,8 @@ public class ChessGameTurn implements GameTurnListener, Serializable {
     }
 
     private GameStatus determineGameStatus() {
-        Color currentPlayerColor = PlayerManager.getCurrentPlayerColor();
-        if (victoryCondition.isCheckMate()) {
+        Color currentPlayerColor = playerManager.getCurrentPlayerColor();
+        if (victoryCondition.isCheckMate(playerManager)) {
             return GameStatus.CHECKMATE;
         } else if (drawCondition.isStalemate(currentPlayerColor)) {
             return GameStatus.STALEMATE;
@@ -143,7 +143,7 @@ public class ChessGameTurn implements GameTurnListener, Serializable {
                     .append(";")
                     .append("\n");
         }
-        builder.append("TURN:").append(PlayerManager.getCurrentPlayerColor()).append(";").append("\n");
+        builder.append("TURN:").append(playerManager.getCurrentPlayerColor()).append(";").append("\n");
         builder.append("CASTLING:").append(chessGameState.getCastlingRights()).append(";").append("\n");
         Optional.ofNullable(chessGameState.getEnPassantTarget())
                 .ifPresent(target -> builder.append("EnPassant:").append(target).append(";").append("\n"));

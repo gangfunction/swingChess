@@ -1,11 +1,11 @@
 
 š
-java:S1104"XMake chessBoardUI a static final constant or non-public and provide accessors if needed.(ò§]8¹¼ï¶ÿ1J$1f3dd76e-e9bb-4ace-adb1-85ef6578c062
+java:S1104"XMake chessBoardUI a static final constant or non-public and provide accessors if needed.(ò§]8¹¼ï¶ÿ1J$4aded508-24b5-4839-ab77-6ab2ba151734
 t
-java:S1444"2Make this "public static chessBoardUI" field final(ò§]8¹¼ï¶ÿ1J$9513e172-18e0-40df-9744-8daaaadab446
+java:S1444"2Make this "public static chessBoardUI" field final(ò§]8¹¼ï¶ÿ1J$5b5d3d39-212f-4c67-ba38-ac52cea35c41
  
-java:S1450"]Remove the "chessGameLogic" field and declare it as a local variable in the relevant methods.(¦ÃÊó8º¼ï¶ÿ1J$f9a9001b-9896-4184-ad4e-2da0a02007b1
+java:S1450"]Remove the "chessGameLogic" field and declare it as a local variable in the relevant methods.(¦ÃÊó8º¼ï¶ÿ1J$392b3813-1ea7-4fc3-a9a0-679d9dad79d6
 ¢
-java:S1450"_Remove the "victoryCondition" field and declare it as a local variable in the relevant methods.(ôÒÚú8º¼ï¶ÿ1J$1e13ef8b-ec6a-4d9e-8cda-c888bff11651
+java:S1450"_Remove the "victoryCondition" field and declare it as a local variable in the relevant methods.(ôÒÚú8º¼ï¶ÿ1J$aa7b3c73-9d3f-43ec-b0a7-2a639a2214be
 ‚
-java:S1118":Add a private constructor to hide the implicit public one.(•“ÒÊıÿÿÿÿ8»¼ï¶ÿ1J$df6b6674-3a94-4127-8d99-a9af68719044
+java:S1118":Add a private constructor to hide the implicit public one.(•“ÒÊıÿÿÿÿ8»¼ï¶ÿ1J$3785835e-fe4c-4f80-8c38-124cba102e5f

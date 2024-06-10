@@ -10,11 +10,13 @@ import java.awt.*;
 import java.util.List;
 
 public class OfflineFrame extends JFrame {
+    private final PlayerManager playerManager;
     ChessGameTurn chessGameTurn;
     JTextField userTextField;
     JTextField opponentTextField;
     JButton startButton;
-    public OfflineFrame() {
+    public OfflineFrame(PlayerManager playerManager) {
+        this.playerManager = playerManager;
         setLayout( new FlowLayout(FlowLayout.CENTER));
         setLocationRelativeTo(null);
         add(new JLabel("Offline Mode"));
@@ -40,8 +42,7 @@ public class OfflineFrame extends JFrame {
                 JOptionPane.showMessageDialog(null, "Starting game...");
             }
             this.dispose();
-
-            PlayerManager.setPlayers(List.of(new Player(user, Color.WHITE), new Player(opponent,Color.BLACK)));
+            playerManager.setPlayers(List.of(new Player(user, Color.WHITE), new Player(opponent,Color.BLACK)));
 
 
         });

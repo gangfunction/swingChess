@@ -99,7 +99,7 @@ public class ChessGameState implements GameStatusListener {
     }
 
     @Override
-    public boolean isAvailableMoveTarget(Position position, ChessGameLogic chessGameLogic) {
+    public boolean isAvailableMoveTarget(Position position, GameLogicActions gameLogicActions) {
         ChessPiece thisPiece = getSelectedPiece();
         if (thisPiece == null) {
             return false;
@@ -109,8 +109,8 @@ public class ChessGameState implements GameStatusListener {
             gameLogicActions.setAfterCastling(true);
             return true;
         }
-        Set<Position> validMoves = chessGameLogic.calculateMovesForPiece(thisPiece);
-        return validMoves.contains(position) && !chessGameLogic.isFriendlyPieceAtPosition(position, thisPiece);
+        Set<Position> validMoves = gameLogicActions.calculateMovesForPiece(thisPiece);
+        return validMoves.contains(position) && !gameLogicActions.isFriendlyPieceAtPosition(position, thisPiece);
     }
 
     private final Map<Color, ChessPiece> kingCache = new ConcurrentHashMap<>();

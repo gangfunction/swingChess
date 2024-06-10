@@ -2,6 +2,7 @@ package game.app;
 
 import com.formdev.flatlaf.FlatDarkLaf;
 import game.GameLog;
+import game.core.PlayerManager;
 import game.ui.ChessBoardUI;
 import org.jdesktop.swingx.JXCollapsiblePane;
 import game.core.ChessGameTurn;
@@ -15,6 +16,7 @@ import java.awt.event.WindowEvent;
 
 public class Main {
     private static final GameStateManager gameStateManager;
+
     static {
         gameStateManager = new GameStateManager();
     }
@@ -28,15 +30,16 @@ public class Main {
         FlatDarkLaf.setup();
         SwingUtilities.invokeLater(() -> {
             Main main = new Main();
-            main.initializeUI();
-            new LoginFrame();
+            PlayerManager playerManager = new PlayerManager();
+            main.initializeUI(playerManager);
+            new LoginFrame(playerManager);
         });
     }
 
-    private  void initializeUI() {
+    private  void initializeUI(PlayerManager playerManager) {
         try {
             primaryFrame = createPrimaryFrame();
-            ChessGameManager.initializeGameComponents();
+            ChessGameManager.initializeGameComponents(playerManager);
             setupPrimaryFrame(primaryFrame, ChessGameManager.chessBoardUI, ChessGameManager.chessGameTurn);
             ServerCommunicator.connectToServer();
             ServerCommunicator.sendLogToServer();
