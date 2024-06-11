@@ -4,6 +4,7 @@ import game.Position;
 import game.command.CommandInvoker;
 import game.core.ChessGameTurn;
 import game.core.factory.ChessPiece;
+import game.model.CapturedPieceManager;
 import game.ui.GameEventListener;
 import game.model.GameStatusListener;
 
@@ -12,12 +13,19 @@ public class CastlingHandler {
     private final GameEventListener gameEventListener;
     private final ChessGameTurn gameTurnListener;
     private final CommandInvoker commandInvoker;
+    private final CapturedPieceManager capturedPieceManager;
 
-    public CastlingHandler(GameStatusListener gameStatusListener, GameEventListener gameEventListener, ChessGameTurn gameTurnListener, CommandInvoker commandInvoker) {
+    public CastlingHandler(GameStatusListener gameStatusListener,
+                           GameEventListener gameEventListener,
+                           ChessGameTurn gameTurnListener,
+                           CommandInvoker commandInvoker,
+                           CapturedPieceManager capturedPieceManager
+    ) {
         this.gameStatusListener = gameStatusListener;
         this.gameEventListener = gameEventListener;
         this.gameTurnListener = gameTurnListener;
         this.commandInvoker = commandInvoker;
+        this.capturedPieceManager = capturedPieceManager;
     }
 
     public void handleCastlingMove(ChessPiece king, boolean isQueenSide) {
@@ -32,7 +40,7 @@ public class CastlingHandler {
        ChessPiece rook = gameStatusListener.getChessPieceAt(from);
         if (rook != null) {
             gameEventListener.onPieceMoved(to, rook);
-            commandInvoker.executeCommand(rook, from, to, gameStatusListener, gameTurnListener);
+            commandInvoker.executeCommand(rook, from, to, gameStatusListener, gameTurnListener, capturedPieceManager);
         }
     }
 }

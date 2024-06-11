@@ -10,7 +10,7 @@ import lombok.Setter;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
-public class ChessGameState implements GameStatusListener {
+public class ChessGameState implements GameStatusListener, CapturedPieceManager, ChessPieceManager, SpecialMoveManager, MoveManager {
 
     private final Map<Position, ChessPiece> chessPieces = new ConcurrentHashMap<>();
     @Getter

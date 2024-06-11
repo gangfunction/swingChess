@@ -26,7 +26,7 @@ import static game.app.ChessGameManager.chessBoardUI;
 import static game.app.ChessGameManager.updateUI;
 
 @Slf4j
-public class ChessGameTurn implements GameTurnListener, Serializable {
+public class ChessGameTurn implements GameTurnListener, Serializable ,ObserverListener{
     @Serial
     private static final long serialVersionUID = 1L;
     @Setter

@@ -58,7 +58,7 @@ public class ChessGameManager {
                 promotionLogic,
                 playerManager
         );
-        chessGameLogic.setGameEventListener(chessBoardUI, chessGameState);
+        chessGameLogic.setGameEventListener(chessBoardUI, chessGameState, chessGameState);
         castlingLogic.setCastlingLogic(chessGameState, chessGameLogic);
         return chessGameLogic;
     }

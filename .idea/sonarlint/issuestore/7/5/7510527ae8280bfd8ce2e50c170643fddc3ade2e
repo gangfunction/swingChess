@@ -1,26 +1,20 @@
 
 x
-java:S1948!"0Make "chessGameState" transient or serializable.(ù¶×öýÿÿÿÿ8Âó´Õÿ1J$56d17f57-578b-4037-9169-6b82902c2df0
+java:S1948!"0Make "chessGameState" transient or serializable.(ù¶×öýÿÿÿÿ8‰÷‡±€2J$75b46654-6bbb-4a84-92fb-7f4091762f79
 r
-java:S1948#"/Make "playerManager" transient or serializable.(ˆ›õ„8Âó´Õÿ1J$e2665dfc-87d8-41a3-9476-d3a9dab0cf72
+java:S1948#"/Make "playerManager" transient or serializable.(ˆ›õ„8‰÷‡±€2J$7cdcc091-a104-4416-bdd2-442743c9fcff
 s
-java:S1948$"+Make "observers" transient or serializable.(ÂèæÌÿÿÿÿÿ8Âó´Õÿ1J$23a2da96-1e6a-48af-a98f-dbfb0ef0278b
+java:S1948$"+Make "observers" transient or serializable.(ÂèæÌÿÿÿÿÿ8‰÷‡±€2J$ee16211d-1333-4534-b639-cc348a40f02b
 r
-java:S1948("/Make "drawCondition" transient or serializable.(Ëžý…8Âó´Õÿ1J$1a49ec54-2afd-4ac0-badf-912908e969a1
+java:S1948("/Make "drawCondition" transient or serializable.(Ëžý…8‰÷‡±€2J$aa4414b4-e448-41b9-a25d-a5d27cfafb77
 u
-java:S1948)"2Make "victoryCondition" transient or serializable.(š‰Ÿ»8Âó´Õÿ1J$f2566fc1-f86c-4e86-b6a7-6b1d14a07c85
+java:S1948)"2Make "victoryCondition" transient or serializable.(š‰Ÿ»8‰÷‡±€2J$16a41ccf-c62a-4971-a292-b4eac6e55b64
 q
-java:S1948*"/Make "chessObserver" transient or serializable.(ýÝæa8Âó´Õÿ1J$73015cbb-3843-4890-8a5e-aaf2f44c3785
-}
-java:S2209e"5Change this instance-reference to a static reference.(å Ð‡øÿÿÿÿ8÷ôåˆ€2J$6b4797e0-c0ba-450c-aae6-e2183e249b92
-x
-java:S2209m"5Change this instance-reference to a static reference.(¨¯ë²8çŽæˆ€2J$e598c5ba-80f5-43f4-95be-c93064b6af74
-y
-java:S2209’"5Change this instance-reference to a static reference.(Ã‰–¶8ÑÏæˆ€2J$365b91d9-6993-4ad1-bf72-a30b3a2af497
+java:S1948*"/Make "chessObserver" transient or serializable.(ýÝæa8‰÷‡±€2J$f19c00d2-0f57-4afa-8808-9c01dcc090c7
 †
-java:S1117¢"=Rename "gameEnded" which hides the field declared at line 39.(˜¬È‹ûÿÿÿÿ8Êó´Õÿ1J$4baa0073-8983-47d3-9ba4-465448fea6c2
-l	java:S108§")Either remove or fill this block of code.(ØÕÞÚ8Ëó´Õÿ1J$dd611fbe-b329-4b53-a067-aa4ac90b58ea
-q	java:S108ª")Either remove or fill this block of code.(‡Âº˜üÿÿÿÿ8Ëó´Õÿ1J$2afe943f-e81b-4eef-ba59-bbb084ac93a7
-s	java:S106³"+Replace this use of System.out by a logger.(ÆÃ¨âÿÿÿÿÿ8Ìó´Õÿ1J$a4aee268-c7d8-43a6-a7b8-2e646e552d30
+java:S1117¢"=Rename "gameEnded" which hides the field declared at line 39.(˜¬È‹ûÿÿÿÿ8‘÷‡±€2J$527dfa00-5dcb-43bc-af3f-4c1da2f5596d
+l	java:S108§")Either remove or fill this block of code.(ØÕÞÚ8‘÷‡±€2J$e8e717ac-a103-4b70-9125-02644277b2cb
+q	java:S108ª")Either remove or fill this block of code.(‡Âº˜üÿÿÿÿ8’÷‡±€2J$c987b546-cc31-4d80-8a4f-ba3c3b1eac7b
+s	java:S106³"+Replace this use of System.out by a logger.(ÆÃ¨âÿÿÿÿÿ8“÷‡±€2J$49c4cb4a-4319-4741-8c36-39f529dadd77
 š
-java:S2159º"VRemove this call to "equals"; comparisons between unrelated types always return false.(ÖÞºå8Îó´Õÿ1J$33579956-1f65-48a1-826e-a9b53110183c
+java:S2159º"VRemove this call to "equals"; comparisons between unrelated types always return false.(ÖÞºå8”÷‡±€2J$5ab5d37d-0876-4428-a02e-7713f79778ac

@@ -3,6 +3,7 @@ package game.command;
 import game.Position;
 import game.core.ChessGameTurn;
 import game.core.factory.ChessPiece;
+import game.model.CapturedPieceManager;
 import game.model.GameStatusListener;
 
 import java.util.ArrayDeque;
@@ -21,8 +22,14 @@ public class CommandInvoker {
      * Clears the redo stack as new command execution invalidates the redo history.
      *
      */
-    public synchronized MoveCommand executeCommand(ChessPiece piece, Position start, Position end, GameStatusListener state, ChessGameTurn turn) {
-        MoveCommand command = commandPool.getCommand(piece, start, end, state, turn);
+    public synchronized MoveCommand executeCommand(ChessPiece piece,
+                                                   Position start,
+                                                   Position end,
+                                                   GameStatusListener state,
+                                                   ChessGameTurn turn,
+                                                    CapturedPieceManager capturedPieceManager
+    ) {
+        MoveCommand command = commandPool.getCommand(piece, start, end, state, turn,capturedPieceManager);
         command.execute();
         undoStack.push(command);
         int MAX_STACK_SIZE = 100;

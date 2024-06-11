@@ -36,7 +36,8 @@ public class ChessGameLogic implements GameLogicActions {
 
     @Setter
     private boolean afterCastling = false;
-    private PlayerManager playerManager;
+    private final PlayerManager playerManager;
+    private CapturedPieceManager capturedPieceManager;
 
 
     public ChessGameLogic(ChessGameTurn chessGameTurn,
@@ -57,13 +58,14 @@ public class ChessGameLogic implements GameLogicActions {
         this.playerManager = playerManager;
     }
 
-    public void setGameEventListener(GameEventListener gameEventListener, GameStatusListener gameStatusListener) {
+    public void setGameEventListener(GameEventListener gameEventListener, GameStatusListener gameStatusListener, CapturedPieceManager capturedPieceManager) {
         this.gameEventListener = gameEventListener;
         this.gameStatusListener = gameStatusListener;
+        this.capturedPieceManager = capturedPieceManager;
         this.victoryCondition.setVictoryCondition(gameStatusListener, chessGameTurn);
         this.drawCondition.setDrawCondition(gameStatusListener, this, chessGameTurn);
         this.castlingLogic.setCastlingLogic(gameStatusListener, this);
-        this.castlingHandler = new CastlingHandler(gameStatusListener, gameEventListener, chessGameTurn, commandInvoker);
+        this.castlingHandler = new CastlingHandler(gameStatusListener, gameEventListener, chessGameTurn, commandInvoker,capturedPieceManager);
 
     }
 
@@ -193,7 +195,13 @@ public class ChessGameLogic implements GameLogicActions {
     }
     private void updatePiecePosition(ChessPiece selectedPiece, Position clickedPosition) {
         gameEventListener.onPieceMoved(clickedPosition, selectedPiece);
-        MoveCommand moveCommand = commandInvoker.executeCommand(selectedPiece, selectedPiece.getPosition(), clickedPosition, gameStatusListener, chessGameTurn);
+        MoveCommand moveCommand = commandInvoker.executeCommand(selectedPiece,
+                selectedPiece.getPosition(),
+                clickedPosition,
+                gameStatusListener,
+                chessGameTurn,
+                capturedPieceManager
+        );
         commandInvoker.returnCommand(moveCommand);
     }
 

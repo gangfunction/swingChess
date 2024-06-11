@@ -2,6 +2,7 @@ package game.command;
 
 import game.Position;
 import game.core.ChessGameTurn;
+import game.model.CapturedPieceManager;
 import game.util.PieceType;
 import game.core.factory.ChessPiece;
 import game.model.GameStatusListener;
@@ -17,6 +18,7 @@ public class MoveCommand implements Command {
     private Position endPosition;
     private GameStatusListener chessGameState;
     private ChessGameTurn chessGameTurn;
+    private CapturedPieceManager capturedPieceManager;
 
     /**
      * Constructor for MoveCommand.
@@ -26,19 +28,21 @@ public class MoveCommand implements Command {
      * @param endPosition     the ending position of the piece
      * @param chessGameState  the current state of the chess game
      */
-    public MoveCommand(ChessPiece piece, Position startPosition, Position endPosition, GameStatusListener chessGameState, ChessGameTurn chessGameTurn) {
+    public MoveCommand(ChessPiece piece, Position startPosition, Position endPosition, GameStatusListener chessGameState, ChessGameTurn chessGameTurn, CapturedPieceManager capturedPieceManager) {
         this.piece = piece;
         this.startPosition = startPosition;
         this.endPosition = endPosition;
         this.chessGameState = chessGameState;
         this.chessGameTurn = chessGameTurn;
+        this.capturedPieceManager = capturedPieceManager;
     }
-    public void reset(ChessPiece piece, Position startPosition, Position endPosition, GameStatusListener chessGameState, ChessGameTurn chessGameTurn) {
+    public void reset(ChessPiece piece, Position startPosition, Position endPosition, GameStatusListener chessGameState, ChessGameTurn chessGameTurn,CapturedPieceManager capturedPieceManager) {
         this.piece = piece;
         this.startPosition = startPosition;
         this.endPosition = endPosition;
         this.chessGameState = chessGameState;
         this.chessGameTurn = chessGameTurn;
+        this.capturedPieceManager = capturedPieceManager;
     }
 
     /**
@@ -53,7 +57,7 @@ public class MoveCommand implements Command {
         piece.setPosition(endPosition);
         ChessPiece capturedPiece = chessGameState.getChessPieces().put(endPosition, piece);
         if (capturedPiece != null) {
-            chessGameState.getCapturedPieces().push(capturedPiece);
+            capturedPieceManager.getCapturedPieces().push(capturedPiece);
         }
 
 
