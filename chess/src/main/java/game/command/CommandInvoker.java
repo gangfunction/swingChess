@@ -3,8 +3,10 @@ package game.command;
 import game.Position;
 import game.core.ChessGameTurn;
 import game.core.factory.ChessPiece;
-import game.model.CapturedPieceManager;
-import game.model.GameStatusListener;
+import game.model.state.CapturedPieceManager;
+import game.model.state.ChessPieceManager;
+import game.model.state.SpecialMoveManager;
+import game.model.state.MoveManager;
 
 import java.util.ArrayDeque;
 import java.util.ArrayList;
@@ -25,11 +27,16 @@ public class CommandInvoker {
     public synchronized MoveCommand executeCommand(ChessPiece piece,
                                                    Position start,
                                                    Position end,
-                                                   GameStatusListener state,
+                                                   SpecialMoveManager state,
                                                    ChessGameTurn turn,
-                                                    CapturedPieceManager capturedPieceManager
+                                                   CapturedPieceManager capturedPieceManager,
+                                                   ChessPieceManager chessPieceManager,
+                                                   MoveManager moveManager
     ) {
-        MoveCommand command = commandPool.getCommand(piece, start, end, state, turn,capturedPieceManager);
+        MoveCommand command = commandPool.getCommand(piece, start, end, state, turn,
+                capturedPieceManager,
+                chessPieceManager,
+                moveManager);
         command.execute();
         undoStack.push(command);
         int MAX_STACK_SIZE = 100;

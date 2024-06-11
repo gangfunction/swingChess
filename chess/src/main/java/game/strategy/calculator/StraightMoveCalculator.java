@@ -3,7 +3,8 @@ package game.strategy.calculator;
 import game.GameUtils;
 import game.Position;
 import game.core.factory.ChessPiece;
-import game.model.GameStatusListener;
+import game.model.state.ChessPieceManager;
+import game.model.state.MoveManager;
 import game.strategy.MoveStrategy;
 
 import java.util.HashSet;
@@ -11,7 +12,7 @@ import java.util.Set;
 
 public class StraightMoveCalculator implements MoveStrategy {
     @Override
-    public Set<Position> calculateMoves(GameStatusListener chessGameState, ChessPiece chessPiece) {
+    public Set<Position> calculateMoves(ChessPieceManager chessGameState, MoveManager moveManager, ChessPiece chessPiece) {
         Set<Position> validMoves = new HashSet<>();
         Position position = chessPiece.getPosition();
         int[][] directions = {{1, 0}, {-1, 0}, {0, 1}, {0, -1}}; // 상, 하, 좌, 우 이동
@@ -29,14 +30,14 @@ public class StraightMoveCalculator implements MoveStrategy {
         return validMoves;
     }
 
-    public static boolean calculateValidMoves(GameStatusListener chessGameState, ChessPiece chessPiece, Set<Position> validMoves, int nextX, int nextY) {
+    public static boolean calculateValidMoves(ChessPieceManager chessPieceManger, ChessPiece chessPiece, Set<Position> validMoves, int nextX, int nextY) {
         Position nextPosition = new Position(nextX, nextY);
 
         if (!GameUtils.isValidPosition(nextPosition)) return true;
 
-        if (GameUtils.isPositionEmpty(nextPosition, chessGameState) || GameUtils.isPositionOccupiedByOpponent(nextPosition, chessPiece.getColor(), chessGameState)) {
+        if (GameUtils.isPositionEmpty(nextPosition, chessPieceManger) || GameUtils.isPositionOccupiedByOpponent(nextPosition, chessPiece.getColor(), chessPieceManger)) {
             validMoves.add(nextPosition);
-            return GameUtils.isPositionOccupiedByOpponent(nextPosition, chessPiece.getColor(), chessGameState);
+            return GameUtils.isPositionOccupiedByOpponent(nextPosition, chessPiece.getColor(), chessPieceManger);
         } else {
             return true;
         }

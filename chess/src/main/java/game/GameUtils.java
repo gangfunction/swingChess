@@ -1,13 +1,14 @@
 package game;
 
+import game.model.state.ChessPieceManager;
 import game.util.Color;
 import game.core.factory.ChessPiece;
-import game.model.GameStatusListener;
 
 import java.util.Optional;
 
 public class GameUtils {
     private static final int BOARD_SIZE = 8;
+
     private GameUtils() {
         throw new UnsupportedOperationException("Utility class");
     }
@@ -19,18 +20,18 @@ public class GameUtils {
         return x >= 0 && x < BOARD_SIZE && y >= 0 && y < BOARD_SIZE;
     }
 
-    public static boolean isPositionEmpty(Position position, GameStatusListener gameStatusListener) {
-        return gameStatusListener.getChessPieces().values().stream()
+    public static boolean isPositionEmpty(Position position, ChessPieceManager chessPieceManager) {
+        return chessPieceManager.getChessPieces().values().stream()
                 .noneMatch(piece -> piece.getPosition().equals(position));
     }
 
-    public static boolean isPositionOccupiedByOpponent(Position position, Color currentPlayerColor, GameStatusListener gameStatusListener) {
-        return gameStatusListener.getChessPieces().values().stream()
+    public static boolean isPositionOccupiedByOpponent(Position position, Color currentPlayerColor, ChessPieceManager chessPieceManager) {
+        return chessPieceManager.getChessPieces().values().stream()
                 .anyMatch(piece -> piece.getPosition().equals(position) && !piece.getColor().equals(currentPlayerColor));
     }
 
-    public static Optional<ChessPiece> findPieceAtPosition(GameStatusListener gameStatusListener, Position position) {
-        return gameStatusListener.getChessPieces().values().stream()
+    public static Optional<ChessPiece> findPieceAtPosition(ChessPieceManager chessPiceManager, Position position) {
+        return chessPiceManager.getChessPieces().values().stream()
                 .filter(piece -> piece.getPosition().equals(position))
                 .findFirst();
     }

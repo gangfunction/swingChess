@@ -7,7 +7,7 @@ import game.core.PlayerManager;
 import game.core.factory.ChessPiece;
 import game.ui.ChessBoardUI;
 import game.model.ChessGameLogic;
-import game.model.ChessGameState;
+import game.model.state.ChessGameState;
 import game.model.PromotionLogic;
 import game.model.castling.CastlingLogic;
 import game.status.DrawCondition;
@@ -30,7 +30,7 @@ public class ChessGameManager {
         commandInvoker.addUndoRedoListener(ChessGameManager::updateUI);
         DrawCondition drawCondition = new DrawCondition();
         victoryCondition = new VictoryCondition();
-        chessGameTurn = new ChessGameTurn(drawCondition, victoryCondition);
+        chessGameTurn = new ChessGameTurn(drawCondition, victoryCondition, chessGameState);
 
         chessBoardUI = createChessBoardUI(chessGameState);
         chessGameLogic = createChessGameLogic(chessGameTurn, commandInvoker, chessBoardUI, chessGameState, playerManager);
@@ -41,7 +41,7 @@ public class ChessGameManager {
     }
 
     private static ChessBoardUI createChessBoardUI(ChessGameState chessGameState) {
-        return new ChessBoardUI(chessGameState);
+        return new ChessBoardUI(chessGameState, chessGameState);
     }
 
     private static ChessGameLogic createChessGameLogic(ChessGameTurn chessGameTurn,
@@ -50,25 +50,33 @@ public class ChessGameManager {
                                                        ChessGameState chessGameState,
                                                        PlayerManager playerManager
     ) {
-        CastlingLogic castlingLogic = new CastlingLogic(chessBoardUI);
-        PromotionLogic promotionLogic = new PromotionLogic(chessGameState, chessBoardUI);
+        CastlingLogic castlingLogic = new CastlingLogic(chessBoardUI, chessGameState);
+        PromotionLogic promotionLogic = new PromotionLogic(chessGameState, chessBoardUI, chessGameState);
         ChessGameLogic chessGameLogic = new ChessGameLogic(chessGameTurn,
                 commandInvoker,
                 castlingLogic,
                 promotionLogic,
-                playerManager
+                playerManager,
+                chessGameState,
+                chessGameState
         );
-        chessGameLogic.setGameEventListener(chessBoardUI, chessGameState, chessGameState);
+        chessGameLogic.setGameEventListener(chessBoardUI, chessGameState, chessGameState, chessGameState);
         castlingLogic.setCastlingLogic(chessGameState, chessGameLogic);
         return chessGameLogic;
     }
 
-    private static void setupGameLogic(ChessGameLogic chessGameLogic, ChessBoardUI chessBoardUI, ChessGameState chessGameState, ChessGameTurn chessGameTurn, DrawCondition drawCondition, VictoryCondition victoryCondition) {
+    private static void setupGameLogic(ChessGameLogic chessGameLogic,
+                                       ChessBoardUI chessBoardUI,
+                                       ChessGameState chessGameState,
+                                       ChessGameTurn chessGameTurn,
+                                       DrawCondition drawCondition,
+                                       VictoryCondition victoryCondition
+    ) {
         chessBoardUI.setGameLogicActions(chessGameLogic);
-        chessGameTurn.setChessGameState(chessGameState);
+        chessGameTurn.setSpecialMoveManager(chessGameState);
         chessGameState.setGameLogicActions(chessGameLogic);
-        victoryCondition.setVictoryCondition(chessGameState, chessGameTurn);
-        drawCondition.setDrawCondition(chessGameState, chessGameLogic, chessGameTurn);
+        victoryCondition.setVictoryCondition(chessGameState, chessGameTurn, chessGameState, chessGameState);
+        drawCondition.setDrawCondition(chessGameState, chessGameLogic, chessGameTurn,chessGameState, chessGameState);
     }
 
     public static void updateUI() {

@@ -1,12 +1,14 @@
 package game.status;
 
 import game.Position;
+import game.model.state.ChessPieceManager;
+import game.model.state.MoveManager;
 import game.util.Color;
 import game.core.GameTurnListener;
 import game.core.factory.ChessPiece;
 import game.util.PieceType;
 import game.model.GameLogicActions;
-import game.model.GameStatusListener;
+import game.model.state.SpecialMoveManager;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -15,15 +17,24 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 
 public class DrawCondition {
-    private GameStatusListener gameStatusListener;
+    private SpecialMoveManager specialMoveManager;
     private GameLogicActions gameLogicActions;
     private GameTurnListener gameTurnListener;
     private final Map<String, Integer> gameStateOccurrences = new HashMap<>();
+    private ChessPieceManager chessPieceManager;
+    private MoveManager moveManager;
 
-    public void setDrawCondition(GameStatusListener chessGameState, GameLogicActions chessGameLogic, GameTurnListener chessGameTurn) {
-        this.gameStatusListener = chessGameState;
+    public void setDrawCondition(SpecialMoveManager chessGameState,
+                                 GameLogicActions chessGameLogic,
+                                 GameTurnListener chessGameTurn,
+                                 ChessPieceManager chessPieceManager,
+                                 MoveManager moveManager
+    ) {
+        this.specialMoveManager = chessGameState;
         this.gameLogicActions = chessGameLogic;
         this.gameTurnListener = chessGameTurn;
+        this.chessPieceManager= chessPieceManager;
+        this.moveManager = moveManager;
     }
 
     public boolean isDraw() {
@@ -48,7 +59,7 @@ public class DrawCondition {
     }
 
     private Map<Position, ChessPiece> getCurrentPlayerPieces(Color color) {
-        return gameStatusListener.getChessPieces().values().stream()
+        return chessPieceManager.getChessPieces().values().stream()
                 .filter(piece -> piece.getColor() == color)
                 .collect(Collectors.toMap(
                         ChessPiece::getPosition,
@@ -69,7 +80,7 @@ public class DrawCondition {
 
     private boolean tryMoveAndCheck(ChessPiece piece, Position move, Color currentPlayerColor) {
         Position originalPosition = piece.getPosition();
-        ChessPiece capturedPiece = gameStatusListener.getChessPieceAt(move);
+        ChessPiece capturedPiece = chessPieceManager.getChessPieceAt(move);
 
         movePiece(piece, move, capturedPiece);
         boolean isInCheck = gameLogicActions.isKingInCheck(currentPlayerColor);
@@ -80,7 +91,7 @@ public class DrawCondition {
 
     private void movePiece(ChessPiece piece, Position move, ChessPiece capturedPiece) {
         if (capturedPiece != null) {
-            gameStatusListener.removeChessPiece(capturedPiece);
+            chessPieceManager.removeChessPiece(capturedPiece);
         }
         piece.setPosition(move);
         piece.setMoved(true);
@@ -90,12 +101,12 @@ public class DrawCondition {
         piece.setPosition(originalPosition);
         piece.setMoved(false);
         if (capturedPiece != null) {
-            gameStatusListener.addChessPiece(originalPosition, capturedPiece);
+            chessPieceManager.addChessPiece(originalPosition, capturedPiece);
         }
     }
 
     private boolean isInsufficientMaterial() {
-        Map<Position, ChessPiece> pieces = gameStatusListener.getChessPieces();
+        Map<Position, ChessPiece> pieces = chessPieceManager.getChessPieces();
         long nonKingCount = pieces.values().stream().filter(piece -> piece.getType() != PieceType.KING).count();
         if (nonKingCount == 0) {
             return true;
@@ -131,7 +142,7 @@ public class DrawCondition {
     }
 
     private boolean isFiftyMoveRule() {
-        int moveWithoutPawnOrCapture = gameStatusListener.getMoveWithoutPawnOrCaptureCount();
+        int moveWithoutPawnOrCapture = moveManager.getMoveWithoutPawnOrCaptureCount();
         return moveWithoutPawnOrCapture >= 50;
     }
 }

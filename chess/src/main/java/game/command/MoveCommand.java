@@ -2,10 +2,12 @@ package game.command;
 
 import game.Position;
 import game.core.ChessGameTurn;
-import game.model.CapturedPieceManager;
+import game.model.state.CapturedPieceManager;
+import game.model.state.ChessPieceManager;
+import game.model.state.MoveManager;
 import game.util.PieceType;
 import game.core.factory.ChessPiece;
-import game.model.GameStatusListener;
+import game.model.state.SpecialMoveManager;
 
 import javax.swing.*;
 
@@ -16,33 +18,56 @@ public class MoveCommand implements Command {
     private ChessPiece piece;
     private Position startPosition;
     private Position endPosition;
-    private GameStatusListener chessGameState;
+    private SpecialMoveManager specialMoveManager;
     private ChessGameTurn chessGameTurn;
     private CapturedPieceManager capturedPieceManager;
+    private MoveManager moveManager;
+    private ChessPieceManager chessPieceManager;
 
     /**
      * Constructor for MoveCommand.
      *
-     * @param piece           the chess piece to move
-     * @param startPosition   the starting position of the piece
-     * @param endPosition     the ending position of the piece
-     * @param chessGameState  the current state of the chess game
+     * @param piece          the chess piece to move
+     * @param startPosition  the starting position of the piece
+     * @param endPosition    the ending position of the piece
+     * @param chessGameState the current state of the chess game
      */
-    public MoveCommand(ChessPiece piece, Position startPosition, Position endPosition, GameStatusListener chessGameState, ChessGameTurn chessGameTurn, CapturedPieceManager capturedPieceManager) {
+    public MoveCommand(ChessPiece piece,
+                       Position startPosition,
+                       Position endPosition,
+                       SpecialMoveManager chessGameState,
+                       ChessGameTurn chessGameTurn,
+                       CapturedPieceManager capturedPieceManager,
+                       ChessPieceManager chessPieceManager,
+                       MoveManager moveManager
+    ) {
         this.piece = piece;
         this.startPosition = startPosition;
         this.endPosition = endPosition;
-        this.chessGameState = chessGameState;
+        this.specialMoveManager = chessGameState;
         this.chessGameTurn = chessGameTurn;
         this.capturedPieceManager = capturedPieceManager;
+        this.chessPieceManager = chessPieceManager;
+        this.moveManager = moveManager;
     }
-    public void reset(ChessPiece piece, Position startPosition, Position endPosition, GameStatusListener chessGameState, ChessGameTurn chessGameTurn,CapturedPieceManager capturedPieceManager) {
+
+    public void reset(ChessPiece piece,
+                      Position startPosition,
+                      Position endPosition,
+                      SpecialMoveManager chessGameState,
+                      ChessGameTurn chessGameTurn,
+                      CapturedPieceManager capturedPieceManager,
+                      ChessPieceManager chessPieceManager,
+                      MoveManager moveManager
+    ) {
         this.piece = piece;
         this.startPosition = startPosition;
         this.endPosition = endPosition;
-        this.chessGameState = chessGameState;
+        this.specialMoveManager = chessGameState;
         this.chessGameTurn = chessGameTurn;
         this.capturedPieceManager = capturedPieceManager;
+        this.chessPieceManager = chessPieceManager;
+        this.moveManager = moveManager;
     }
 
     /**
@@ -51,11 +76,11 @@ public class MoveCommand implements Command {
     @Override
     public void execute() {
         // 시작 위치에서 기물 제거
-        chessGameState.getChessPieces().remove(startPosition);
+        chessPieceManager.getChessPieces().remove(startPosition);
 
         // 기물의 위치를 새로운 위치로 업데이트
         piece.setPosition(endPosition);
-        ChessPiece capturedPiece = chessGameState.getChessPieces().put(endPosition, piece);
+        ChessPiece capturedPiece = chessPieceManager.getChessPieces().put(endPosition, piece);
         if (capturedPiece != null) {
             capturedPieceManager.getCapturedPieces().push(capturedPiece);
         }
@@ -63,7 +88,7 @@ public class MoveCommand implements Command {
 
         // 폰의 더블 무브 처리
         if (piece.getType() == PieceType.PAWN && Math.abs(startPosition.y() - endPosition.y()) == 2) {
-            chessGameState.updateLastMovedPawn(piece, startPosition, endPosition);
+            moveManager.updateLastMovedPawn(piece, startPosition, endPosition);
         }
 
         // UI 업데이트
@@ -76,15 +101,15 @@ public class MoveCommand implements Command {
     @Override
     public void undo() {
         // 기물의 위치를 원래 위치로 되돌림
-        chessGameState.getChessPieces().remove(endPosition);
-        chessGameState.getChessPieces().put(startPosition, piece);
+        chessPieceManager.getChessPieces().remove(endPosition);
+        chessPieceManager.getChessPieces().put(startPosition, piece);
         piece.setPosition(startPosition);
 
         // 잡힌 기물이 있을 경우, 해당 기물을 원래 위치에 복원
-        if(!chessGameState.getCapturedPieces().isEmpty()){
-            ChessPiece chessPiece = chessGameState.getCapturedPieces().pop();
+        if (!capturedPieceManager.getCapturedPieces().isEmpty()) {
+            ChessPiece chessPiece = capturedPieceManager.getCapturedPieces().pop();
             if (chessPiece != null) {
-                chessGameState.getChessPieces().put(endPosition, chessPiece);
+                chessPieceManager.getChessPieces().put(endPosition, chessPiece);
             }
         }
 

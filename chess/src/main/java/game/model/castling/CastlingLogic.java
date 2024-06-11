@@ -2,10 +2,11 @@ package game.model.castling;
 
 import game.Position;
 import game.core.factory.ChessPiece;
+import game.model.state.ChessPieceManager;
 import game.util.PieceType;
 import game.ui.GameEventListener;
 import game.model.GameLogicActions;
-import game.model.GameStatusListener;
+import game.model.state.SpecialMoveManager;
 import lombok.Getter;
 
 import java.util.List;
@@ -14,17 +15,19 @@ import java.util.stream.Collectors;
 
 public class CastlingLogic {
     private GameLogicActions gameLogicActions;
-    private GameStatusListener gameStatusListener;
+    private SpecialMoveManager specialMoveManager;
     private final GameEventListener gameEventListener;
     @Getter
     private boolean isQueenSide;
+    private final ChessPieceManager chessPieceManger;
 
-    public CastlingLogic(GameEventListener gameEventListener) {
+    public CastlingLogic(GameEventListener gameEventListener, ChessPieceManager chessPieceManger) {
         this.gameEventListener = gameEventListener;
+        this.chessPieceManger = chessPieceManger;
     }
 
-    public void setCastlingLogic(GameStatusListener chessGameState, GameLogicActions gameLogicActions) {
-        this.gameStatusListener = chessGameState;
+    public void setCastlingLogic(SpecialMoveManager chessGameState, GameLogicActions gameLogicActions) {
+        this.specialMoveManager = chessGameState;
         this.gameLogicActions = gameLogicActions;
     }
 
@@ -42,21 +45,21 @@ public class CastlingLogic {
 
     private boolean isCastlingAttempt(ChessPiece piece, Position clickedPosition) {
         return piece.getType() == PieceType.KING && !piece.isMoved()
-                && gameStatusListener.isRookUnmovedForCastling(piece.getColor(), clickedPosition)
+                && specialMoveManager.isRookUnmovedForCastling(piece.getColor(), clickedPosition)
                 && !gameLogicActions.isKingInCheck(piece.getColor())
                 && !gameLogicActions.isKingInCheckAfterMove(piece, clickedPosition)
                 && isCastlingPathClear(piece, isQueenSide); // 추가 조건
     }
 
     private List<ChessPiece> getOpponentPieces(ChessPiece piece) {
-        return gameStatusListener.getChessPieces().values().stream()
+        return chessPieceManger.getChessPieces().values().stream()
                 .filter(opponentPiece -> opponentPiece.getColor() != piece.getColor())
                 .collect(Collectors.toList());
     }
 
     private boolean isPathClearAndSafe(List<Position> path, List<ChessPiece> opponentPieces) {
         for (Position position : path) {
-            if (gameStatusListener.getChessPieceAt(position) != null || isPositionUnderAttack(position, opponentPieces)) {
+            if (chessPieceManger.getChessPieceAt(position) != null || isPositionUnderAttack(position, opponentPieces)) {
                 return false;
             }
         }
@@ -80,7 +83,7 @@ public class CastlingLogic {
             rookTargetPosition = new Position(5, king.getPosition().y());
         }
         gameEventListener.highlightMoves(Set.of(kingTargetPosition, rookTargetPosition));
-        gameStatusListener.setCanCastle(true);
+        specialMoveManager.setCanCastle(true);
 
     }
     private boolean isCastlingPathClear(ChessPiece king, boolean isQueenSide) {

@@ -2,8 +2,9 @@ package game.core;
 
 import game.Position;
 import game.core.factory.ChessPiece;
+import game.model.state.ChessPieceManager;
 import game.util.PieceType;
-import game.model.GameStatusListener;
+import game.model.state.SpecialMoveManager;
 import game.observer.ChessObserver;
 import game.observer.Observer;
 import game.status.DrawCondition;
@@ -30,7 +31,7 @@ public class ChessGameTurn implements GameTurnListener, Serializable ,ObserverLi
     @Serial
     private static final long serialVersionUID = 1L;
     @Setter
-    private GameStatusListener chessGameState;
+    private SpecialMoveManager specialMoveManager;
 
     private final PlayerManager playerManager;
     private final List<Observer> observers;
@@ -40,6 +41,7 @@ public class ChessGameTurn implements GameTurnListener, Serializable ,ObserverLi
     private final DrawCondition drawCondition;
     private final VictoryCondition victoryCondition;
     private final ChessObserver chessObserver;
+    private final ChessPieceManager chessPieceManager;
 
     /**
      * Constructor for ChessGameTurn.
@@ -47,9 +49,10 @@ public class ChessGameTurn implements GameTurnListener, Serializable ,ObserverLi
      * @param drawCondition    the condition for a draw
      * @param victoryCondition the condition for victory
      */
-    public ChessGameTurn(DrawCondition drawCondition, VictoryCondition victoryCondition) {
+    public ChessGameTurn(DrawCondition drawCondition, VictoryCondition victoryCondition, ChessPieceManager chessPieceManager) {
         this.drawCondition = drawCondition;
         this.victoryCondition = victoryCondition;
+        this.chessPieceManager = chessPieceManager;
         this.playerManager = new PlayerManager();
         this.currentPlayerIndex = 0;
         this.gameEnded = false;
@@ -98,7 +101,7 @@ public class ChessGameTurn implements GameTurnListener, Serializable ,ObserverLi
                 endGame();
                 break;
             case ONGOING:
-                if (victoryCondition.isKingInCheck(chessGameState.getKing(playerManager.getCurrentPlayerColor()))) {
+                if (victoryCondition.isKingInCheck(chessPieceManager.getKing(playerManager.getCurrentPlayerColor()))) {
                     notifyObservers("체크 " + player.getName() + "님!");
                 }
                 break;
@@ -131,7 +134,7 @@ public class ChessGameTurn implements GameTurnListener, Serializable ,ObserverLi
     @Override
     public String serializeGameState() {
         StringBuilder builder = new StringBuilder();
-        List<ChessPiece> pieces = new ArrayList<>(chessGameState.getChessPieces().values());
+        List<ChessPiece> pieces = new ArrayList<>(chessPieceManager.getChessPieces().values());
         for (ChessPiece piece : pieces) {
             builder.append(piece.getType())
                     .append("_")
@@ -144,8 +147,8 @@ public class ChessGameTurn implements GameTurnListener, Serializable ,ObserverLi
                     .append("\n");
         }
         builder.append("TURN:").append(playerManager.getCurrentPlayerColor()).append(";").append("\n");
-        builder.append("CASTLING:").append(chessGameState.getCastlingRights()).append(";").append("\n");
-        Optional.ofNullable(chessGameState.getEnPassantTarget())
+        builder.append("CASTLING:").append(specialMoveManager.getCastlingRights()).append(";").append("\n");
+        Optional.ofNullable(specialMoveManager.getEnPassantTarget())
                 .ifPresent(target -> builder.append("EnPassant:").append(target).append(";").append("\n"));
         builder.append("GameEnded:").append(isGameEnded() ? "Yes" : "No").append(";").append("\n");
         String gameState = builder.toString();
@@ -154,7 +157,7 @@ public class ChessGameTurn implements GameTurnListener, Serializable ,ObserverLi
     }
     @Override
     public void deserializeGameState(String gameState) {
-            chessGameState.clearBoard();
+            specialMoveManager.clearBoard();
             chessBoardUI.clearHighlights();
 
             String[] parts = gameState.split("\n");
@@ -177,7 +180,7 @@ public class ChessGameTurn implements GameTurnListener, Serializable ,ObserverLi
                     int x = Integer.parseInt(pieceBody[0]);
                     int y = Integer.parseInt(pieceBody[1].replace(";", ""));
                     System.out.println("Piece: " + type + " " + color + " at " + x + " " + y);
-                    chessGameState.getChessPieces().put(new Position(x, y), new ChessPiece(type, new Position(x, y),color));
+                    chessPieceManager.getChessPieces().put(new Position(x, y), new ChessPiece(type, new Position(x, y),color));
                 }
             }
             this.gameEnded = gameEnded;
@@ -188,8 +191,8 @@ public class ChessGameTurn implements GameTurnListener, Serializable ,ObserverLi
                     break;
                 }
             }
-            for(Map.Entry<Position, ChessPiece> entry : chessGameState.getChessPieces().entrySet()){
-                chessGameState.getChessPieces().put(entry.getKey(), entry.getValue());
+            for(Map.Entry<Position, ChessPiece> entry : chessPieceManager.getChessPieces().entrySet()){
+                chessPieceManager.getChessPieces().put(entry.getKey(), entry.getValue());
                 JPanel panel = chessBoardUI.getPanelAtPosition(entry.getKey());
                 chessBoardUI.addPieceToPanel(panel, new JLabel(IconLoader.loadIcon(entry.getValue().getType(), entry.getValue().getColor())));
             }

@@ -1,6 +1,8 @@
 package game.model;
 
 import game.Position;
+import game.model.state.ChessPieceManager;
+import game.model.state.SpecialMoveManager;
 import game.ui.GameEventListener;
 import game.util.Color;
 import game.core.factory.ChessPiece;
@@ -23,18 +25,23 @@ public class PromotionLogic implements ActionListener {
     JButton knightButton;
     PieceType promotionPieceType = null;
     private static final Logger logger = Logger.getLogger(PromotionLogic.class.getName());
-    private final GameStatusListener gameStatusListener;
+    private final SpecialMoveManager specialMoveManager;
     private final GameEventListener gameEventListener;
 
     private final Set<ChessPiece> promotedPawns = new HashSet<>();
+    private final ChessPieceManager chessPieceManager;
 
-    public PromotionLogic(GameStatusListener gameStatusListener, GameEventListener gameEventListener) {
-        this.gameStatusListener = gameStatusListener;
+    public PromotionLogic(SpecialMoveManager specialMoveManager,
+                          GameEventListener gameEventListener,
+                          ChessPieceManager chessPieceManager
+    ) {
+        this.specialMoveManager = specialMoveManager;
+        this.chessPieceManager = chessPieceManager;
         this.gameEventListener = gameEventListener;
     }
 
     public void promotePawn(ChessPiece pawn, Position promotionPosition) {
-        if (gameStatusListener == null || gameEventListener == null) {
+        if (specialMoveManager == null || gameEventListener == null) {
             logger.info("Listeners must not be null");
         }
         if (canPromote(pawn, promotionPosition) && !promotedPawns.contains(pawn)) {
@@ -70,11 +77,11 @@ public class PromotionLogic implements ActionListener {
     private void handlePromotion(ChessPiece pawn, Position promotionPosition) {
         Color color = pawn.getColor();
         gameEventListener.onPieceMoved(promotionPosition, pawn);
-        ChessPiece chessPiece = gameStatusListener.getChessPieces().get(promotionPosition);
-        gameStatusListener.removeChessPiece(chessPiece);
+        ChessPiece chessPiece = chessPieceManager.getChessPieces().get(promotionPosition);
+        chessPieceManager.removeChessPiece(chessPiece);
         ChessPiece newPiece = createNewPiece(color, promotionPosition, promotionPieceType);
         gameEventListener.onPieceMoved(promotionPosition, newPiece);
-        gameStatusListener.addChessPiece(promotionPosition, newPiece);
+        chessPieceManager.addChessPiece(promotionPosition, newPiece);
     }
 
     private static void setupDialog(JDialog dialog) {

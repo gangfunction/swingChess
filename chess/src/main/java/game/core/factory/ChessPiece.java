@@ -1,8 +1,9 @@
 package game.core.factory;
 
 import game.Position;
+import game.model.state.ChessPieceManager;
+import game.model.state.MoveManager;
 import game.util.Color;
-import game.model.GameStatusListener;
 import game.strategy.*;
 import game.util.MoveStrategyFactory;
 import game.util.PieceType;
@@ -32,8 +33,8 @@ public class ChessPiece {
         this.moveStrategy = MoveStrategyFactory.createMoveStrategy(pieceType);
     }
 
-    public Set<Position> calculateMoves(GameStatusListener chessGameState) {
-        return moveStrategy.calculateMoves(chessGameState, this);
+    public Set<Position> calculateMoves(ChessPieceManager chessPieceManager, MoveManager moveManager) {
+        return moveStrategy.calculateMoves(chessPieceManager, moveManager,this);
     }
 
     public void setMoved(boolean moved) {

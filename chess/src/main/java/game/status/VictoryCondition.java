@@ -1,11 +1,13 @@
 package game.status;
 
 import game.Position;
+import game.model.state.ChessPieceManager;
+import game.model.state.MoveManager;
 import game.util.Color;
 import game.core.GameTurnListener;
 import game.core.PlayerManager;
 import game.core.factory.ChessPiece;
-import game.model.GameStatusListener;
+import game.model.state.SpecialMoveManager;
 import game.strategy.*;
 
 import java.util.HashSet;
@@ -13,16 +15,25 @@ import java.util.Set;
 
 public class VictoryCondition {
 
-    private GameStatusListener chessGameState;
+    private SpecialMoveManager chessGameState;
     private GameTurnListener chessGameTurn;
     private Boolean isKingInCheckCache = null;
+    private ChessPieceManager chessPieceManager;
+    private MoveManager moveManager;
 
-    public void setVictoryCondition(GameStatusListener chessGameState,GameTurnListener chessGameTurn) {
+
+    public void setVictoryCondition(SpecialMoveManager chessGameState,
+                                    GameTurnListener chessGameTurn,
+                                    ChessPieceManager chessPieceManager,
+                                    MoveManager moveManager
+    ) {
         if (chessGameState == null ||  chessGameTurn == null) {
             throw new IllegalArgumentException("Arguments cannot be null");
         }
         this.chessGameState = chessGameState;
         this.chessGameTurn = chessGameTurn;
+        this.chessPieceManager = chessPieceManager;
+        this.moveManager = moveManager;
     }
 
     private void ensureInitialized() {
@@ -33,7 +44,7 @@ public class VictoryCondition {
 
     public boolean isCheckMate(PlayerManager playerManager) {
         ensureInitialized();
-        ChessPiece king = chessGameState.getKing(playerManager.getCurrentPlayerColor());
+        ChessPiece king = chessPieceManager.getKing(playerManager.getCurrentPlayerColor());
         if (king == null) {
             throw new IllegalStateException("King not found for current player");
         }
@@ -42,13 +53,13 @@ public class VictoryCondition {
 
 
     private boolean canMoveToSafety(ChessPiece king) {
-        return new KingStrategy().calculateMoves(chessGameState, king).stream()
+        return new KingStrategy().calculateMoves(chessPieceManager,moveManager, king).stream()
                 .anyMatch(move -> !isPositionUnderThreat(move, king.getColor()));
     }
 
 
     private boolean canOtherPiecesProtectKing(ChessPiece king) {
-        return chessGameState.getChessPieces().values().stream()
+        return chessPieceManager.getChessPieces().values().stream()
                 .filter(piece -> piece.getColor() == king.getColor() && !piece.equals(king))
                 .anyMatch(piece -> {
                     Set<Position> moves = calculateMovesForPiece(piece);
@@ -77,7 +88,7 @@ public class VictoryCondition {
 
     public boolean isPositionUnderThreat(Position position, Color color) {
         ensureInitialized();
-        return chessGameState.getChessPieces().values().parallelStream()
+        return chessPieceManager.getChessPieces().values().parallelStream()
                 .filter(piece -> piece.getColor() != color)
                 .flatMap(piece -> calculateMovesForPiece(piece).stream())
                 .anyMatch(move -> move.equals(position));
@@ -85,7 +96,7 @@ public class VictoryCondition {
 
     private Set<Position> calculateMovesForPiece(ChessPiece piece) {
         MoveStrategy strategy = piece.getMoveStrategy();
-        return new HashSet<>(strategy.calculateMoves(chessGameState, piece));
+        return new HashSet<>(strategy.calculateMoves(chessPieceManager,moveManager, piece));
     }
 
     public void invalidateKingInCheckCache() {

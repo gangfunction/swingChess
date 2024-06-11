@@ -3,14 +3,18 @@ package game.model;
 
 import game.Position;
 import game.core.factory.ChessPiece;
+import game.model.state.SpecialMoveManager;
+import game.model.state.MoveManager;
 
 public class MoveValidator {
-    private final GameStatusListener gameStatusListener;
+    private final SpecialMoveManager specialMoveManager;
     private final GameLogicActions gameLogicActions;
+    private final MoveManager moveManager;
 
-    public MoveValidator(GameStatusListener gameStatusListener, GameLogicActions gameLogicActions) {
-        this.gameStatusListener = gameStatusListener;
+    public MoveValidator(SpecialMoveManager specialMoveManager, GameLogicActions gameLogicActions, MoveManager moveManager) {
+        this.specialMoveManager = specialMoveManager;
         this.gameLogicActions = gameLogicActions;
+        this.moveManager = moveManager;
     }
 
     public boolean isValidMove(ChessPiece piece, Position targetPosition) {
@@ -21,7 +25,7 @@ public class MoveValidator {
                 !canMoveBreakCheck(piece, targetPosition)) {
             return false;
         }
-        return gameStatusListener.isAvailableMoveTarget(targetPosition, gameLogicActions);
+        return moveManager.isAvailableMoveTarget(targetPosition, gameLogicActions);
     }
 
     private boolean canMoveBreakCheck(ChessPiece piece, Position targetPosition) {

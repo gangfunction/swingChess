@@ -1,35 +1,46 @@
 package game.model;
 
 import game.Position;
+import game.model.state.ChessPieceManager;
+import game.model.state.SpecialMoveManager;
+import game.model.state.MoveManager;
 import game.util.Color;
 import game.core.factory.ChessPiece;
 import game.util.PieceType;
 
 public class ChessRuleHandler {
-    public boolean isKingInCheck(Color color, GameStatusListener gameStatusListener) {
+    private final ChessPieceManager chessPieceManager;
+    private final MoveManager moveManager;
 
-        ChessPiece king = findKing(color, gameStatusListener);
+    public ChessRuleHandler(ChessPieceManager chessPieceManager, MoveManager moveManager) {
+        this.chessPieceManager = chessPieceManager;
+        this.moveManager = moveManager;
+    }
+
+    public boolean isKingInCheck(Color color, SpecialMoveManager specialMoveManager) {
+
+        ChessPiece king = findKing(color, specialMoveManager);
         if (king == null) {
             throw new IllegalStateException("King not found for color " + color);
         }
         Position kingPosition = king.getPosition();
-        return gameStatusListener.getChessPieces().values().stream()
+        return chessPieceManager.getChessPieces().values().stream()
                 .filter(piece -> piece.getColor() != color)
-                .flatMap(piece -> piece.calculateMoves(gameStatusListener).stream())
+                .flatMap(piece -> piece.calculateMoves(chessPieceManager,moveManager).stream())
                 .anyMatch(move -> move.equals(kingPosition));
     }
-    private ChessPiece findKing(Color color, GameStatusListener gameStatusListener) {
-        return gameStatusListener.getChessPieces().values().stream()
+    private ChessPiece findKing(Color color, SpecialMoveManager specialMoveManager) {
+        return chessPieceManager.getChessPieces().values().stream()
                 .filter(piece -> piece.getType() == PieceType.KING && piece.getColor() == color)
                 .findFirst()
                 .orElse(null);
     }
 
-    boolean checkEnPassantCondition(ChessPiece selectedPiece, Position moveTo, GameStatusListener gameStatusListener) {
+    boolean checkEnPassantCondition(ChessPiece selectedPiece, Position moveTo, SpecialMoveManager specialMoveManager) {
         if (selectedPiece.getType() != PieceType.PAWN) return false;
         int direction = selectedPiece.getColor() == Color.WHITE ? 1 : -1;
         Position adjacentPawnPosition = new Position(moveTo.x(), moveTo.y() + direction);
-        ChessPiece adjacentPawn = gameStatusListener.getChessPieceAt(adjacentPawnPosition);
+        ChessPiece adjacentPawn = chessPieceManager.getChessPieceAt(adjacentPawnPosition);
         if (adjacentPawn ==null) return false;
         return adjacentPawn.getType() == PieceType.PAWN;
     }

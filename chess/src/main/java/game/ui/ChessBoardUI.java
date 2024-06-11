@@ -3,8 +3,9 @@ package game.ui;
 import game.Position;
 import game.core.factory.ChessPiece;
 import game.core.factory.ChessPieceFactoryImpl;
-import game.model.ChessGameState;
+import game.model.state.ChessGameState;
 import game.model.GameLogicActions;
+import game.model.state.ChessPieceManager;
 import game.util.PieceType;
 import lombok.Getter;
 import lombok.Setter;
@@ -31,10 +32,12 @@ public class ChessBoardUI extends JFrame implements GameEventListener {
     private static final Set<Position> highlightedPositions = new HashSet<>();
     private static final Color LIGHT_SQUARE_COLOR = Color.WHITE;
     private static final Color DARK_SQUARE_COLOR = Color.GRAY;
+    private final ChessPieceManager chessPieceManager;
 
 
-    public ChessBoardUI(ChessGameState chessGameState) {
+    public ChessBoardUI(ChessGameState chessGameState, ChessPieceManager chessPieceManager) {
         this.chessGameState = chessGameState;
+        this.chessPieceManager = chessPieceManager;
         initializeBoard();
         initializeStatusBar();
         initializeCapturedPiecesPanel();
@@ -86,7 +89,7 @@ public class ChessBoardUI extends JFrame implements GameEventListener {
     public void highlightPossibleMoves(ChessPiece piece) {
         clearHighlights();
         getHighlightedPositions().clear();
-        Set<Position> moves = piece.calculateMoves(chessGameState);// 이동 가능한 위치 계산
+        Set<Position> moves = piece.calculateMoves(chessGameState,chessGameState);// 이동 가능한 위치 계산
         moves.removeIf(this::isOutOfBounds);
         highlightMoves(moves);
         highlightedPositions.addAll(moves);
@@ -187,7 +190,7 @@ public class ChessBoardUI extends JFrame implements GameEventListener {
     public void placePieceOnboard(Position move, ChessPiece chessPiece) {
         SwingUtilities.invokeLater(() -> {
             try {
-                chessGameState.addChessPiece(move, chessPiece);
+                chessPieceManager.addChessPiece(move, chessPiece);
                 Icon icon = IconLoader.loadIcon(chessPiece.getType(), chessPiece.getColor());
                 JLabel pieceLabel = new JLabel(icon, SwingConstants.CENTER);
                 JPanel panel = getPanelAtPosition(chessPiece.getPosition());

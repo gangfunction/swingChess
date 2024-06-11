@@ -2,9 +2,10 @@ package game.strategy;
 
 import game.GameUtils;
 import game.Position;
+import game.model.state.ChessPieceManager;
+import game.model.state.MoveManager;
 import game.util.Color;
 import game.core.factory.ChessPiece;
-import game.model.GameStatusListener;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -20,30 +21,30 @@ public class PawnStrategy implements MoveStrategy {
         return (color == Color.WHITE) ? -MOVE_ONE_STEP : MOVE_ONE_STEP;
     }
     @Override
-    public Set<Position> calculateMoves(GameStatusListener chessBoard, ChessPiece piece) {
+    public Set<Position> calculateMoves(ChessPieceManager chessPieceManager, MoveManager moveManager,ChessPiece piece) {
         Set<Position> validMoves = new HashSet<>();
         Position position = piece.getPosition();
         Color color = piece.getColor();
 
-        calculateStandardMoves(chessBoard, validMoves, position, color);
-        calculateAttackMoves(chessBoard, validMoves, position, color);
-        calculateEnPassantMoves(chessBoard, validMoves, position, color);
+        calculateStandardMoves(chessPieceManager, validMoves, position, color);
+        calculateAttackMoves(validMoves, position, color,chessPieceManager);
+        calculateEnPassantMoves(moveManager,chessPieceManager, validMoves, position, color);
         return validMoves;
     }
 
-    private void calculateStandardMoves(GameStatusListener chessBoard, final Set<Position> validMoves, Position position, Color color) {
+    private void calculateStandardMoves(ChessPieceManager chessPieceManager, final Set<Position> validMoves, Position position, Color color) {
         int direction = getMoveDirection(color);
         int startY = position.y();
 
-        tryToAddMove(chessBoard, validMoves, position, direction, MOVE_ONE_STEP);
+        tryToAddMove(chessPieceManager, validMoves, position, direction, MOVE_ONE_STEP);
 
         if (isOnStartRow(color, startY)) {
-            tryToAddMove(chessBoard, validMoves, position, direction, MOVE_TWO_STEPS);
+            tryToAddMove(chessPieceManager, validMoves, position, direction, MOVE_TWO_STEPS);
         }
     }
 
 
-    private void calculateEnPassantMoves(GameStatusListener chessBoard, final Set<Position> validMoves, Position position, Color color) {
+    private void calculateEnPassantMoves(MoveManager moveManager, ChessPieceManager chessPieceManager, final Set<Position> validMoves, Position position, Color color) {
         int direction = (color == Color.WHITE) ? -MOVE_ONE_STEP : +MOVE_ONE_STEP;
         int enPassantY = position.y() + direction;
         int[] enPassantXs = {position.x() - 1, position.x() + 1};
@@ -52,16 +53,16 @@ public class PawnStrategy implements MoveStrategy {
             if (enPassantX < 0 || enPassantX >= 8) continue; // 보드를 벗어나는 위치는 제외
 
             Position targetPawnPosition = new Position(enPassantX, position.y());
-            if (GameUtils.isPositionOccupiedByOpponent(targetPawnPosition, color, chessBoard) &&
-                    wasPawnMovedTwoSteps(position, chessBoard)) {
+            if (GameUtils.isPositionOccupiedByOpponent(targetPawnPosition, color, chessPieceManager) &&
+                    wasPawnMovedTwoSteps(position,moveManager)) {
                 Position enPassantPos = new Position(enPassantX, enPassantY); // 앙파썽 수행 후 폰이 도착할 위치
                 validMoves.add(enPassantPos);
             }
         }
     }
-    private boolean wasPawnMovedTwoSteps(Position targetPawnPosition, GameStatusListener chessBoard) {
-        ChessPiece lastMovedPawn = chessBoard.getLastMovedPiece();
-        boolean lastMoveWasDoubleStep = chessBoard.getLastMoveWasDoubleStep();
+    private boolean wasPawnMovedTwoSteps(Position targetPawnPosition, MoveManager moveManager) {
+        ChessPiece lastMovedPawn = moveManager.getLastMovedPiece();
+        boolean lastMoveWasDoubleStep = moveManager.getLastMoveWasDoubleStep();
         if (lastMovedPawn == null || !lastMoveWasDoubleStep) {
             return false;
         }
@@ -71,7 +72,9 @@ public class PawnStrategy implements MoveStrategy {
         return (lastMovedPosition.y() == currentY) && (Math.abs(lastMovedPosition.x() - currentX) == 1);
     }
 
-    private void calculateAttackMoves(GameStatusListener chessBoard, final Set<Position> validMoves, Position position, Color color) {
+    private void calculateAttackMoves(final Set<Position> validMoves,
+                                      Position position, Color color, ChessPieceManager chessPieceManager
+    ) {
         int direction = getMoveDirection(color);
         int startX = position.x();
         int startY = position.y();
@@ -79,15 +82,15 @@ public class PawnStrategy implements MoveStrategy {
         int[] attackOffsets = {-1, 1}; // Attack left and right
         for (int xOffset : attackOffsets) {
             Position attackPos = new Position(startX + xOffset, startY + direction);
-            if (GameUtils.isPositionOccupiedByOpponent(attackPos, color, chessBoard)){
+            if (GameUtils.isPositionOccupiedByOpponent(attackPos, color, chessPieceManager)){
                 validMoves.add(attackPos);
             }
         }
     }
 
-    private void tryToAddMove(GameStatusListener chessBoard, final Set<Position> validMoves, Position position, int directionY, int steps) {
+    private void tryToAddMove(ChessPieceManager chessPieceManager, final Set<Position> validMoves, Position position, int directionY, int steps) {
         Position potentialPosition = new Position(position.x(), position.y() + (directionY * steps));
-        if (GameUtils.isPositionEmpty(potentialPosition, chessBoard)) {
+        if (GameUtils.isPositionEmpty(potentialPosition, chessPieceManager)) {
             validMoves.add(potentialPosition);
         }
     }
