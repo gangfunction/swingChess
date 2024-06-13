@@ -114,7 +114,7 @@ public class MoveCommand implements Command {
         }
 
         updateUI(endPosition, startPosition);
-        chessGameTurn.previousTurn(); // 턴을 이전으로 되돌림
+//        chessGameTurn.previousTurn(); // 턴을 이전으로 되돌림
     }
 
     private void updateUI(Position oldPos, Position newPos) {

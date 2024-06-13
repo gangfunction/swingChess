@@ -1,3 +1,7 @@
 
-‘
-java:S1149"PReplace the synchronized class "Stack" by an unsynchronized one such as "Deque".(ÇëåŞøÿÿÿÿJ$0fec9e5b-ebb0-4b7c-8314-defe7f55f287
+}
+java:S1450”"_Remove the "gameLogicActions" field and declare it as a local variable in the relevant methods.(‘ÑåÇ8ñ û€2
+˜
+java:S1149"PReplace the synchronized class "Stack" by an unsynchronized one such as "Deque".(ÇëåŞøÿÿÿÿ8Š“Ÿû€2J$7cba33b6-37f4-49a6-8ee8-a7faf6efbd22
+R
+java:S1068”"4Remove this unused "gameLogicActions" private field.(‘ÑåÇ8ü û€2

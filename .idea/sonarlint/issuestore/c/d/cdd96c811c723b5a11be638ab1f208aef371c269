@@ -1,5 +1,7 @@
 
-ˆ	java:S107#"AConstructor has 8 parameters, which is greater than 7 authorized.(ˆú¯Îþÿÿÿÿ8´ùå²€2J$c9fe3aba-9157-40f9-ae9c-ca3b02a43930
-~	java:S1076"<Method has 8 parameters, which is greater than 7 authorized.(ü‰ÄÆ8¹âæ²€2J$20075e01-fd43-42a6-9fd1-c1a0d8e505ec
-X
-java:S1068"6Remove this unused "gameStatusListener" private field.(‘£ƒ‹üÿÿÿÿ8¬˜î²€2
+ˆ	java:S107#"AConstructor has 8 parameters, which is greater than 7 authorized.(ˆú¯Îþÿÿÿÿ8´ùå²€2J$bc38447d-323b-4dc7-a747-38905e0e2034
+~	java:S1076"<Method has 8 parameters, which is greater than 7 authorized.(ü‰ÄÆ8¹âæ²€2J$13907e75-cba5-41be-9888-4ba4496e0e6f
+~
+java:S1068"6Remove this unused "specialMoveManager" private field.(ÁÂ†þùÿÿÿÿ8öì¦û€2J$9b0d0e70-daba-43d5-a555-ac1720cd09df
+N
+java:S1068"1Remove this unused "chessGameTurn" private field.(Ë®¶½8Ç¤¬û€2

@@ -20,8 +20,6 @@ public class ChessGameState implements SpecialMoveManager, CapturedPieceManager,
     private ChessPiece lastMovedPiece = null;
     private boolean lastMoveWasDoubleStep = false;
     private boolean canCastle = false;
-    @Setter
-    private GameLogicActions gameLogicActions;
     private int moveWithoutPawnOrCaptureCount = 0;
 
     @Override
@@ -147,4 +145,8 @@ public class ChessGameState implements SpecialMoveManager, CapturedPieceManager,
     }
 
 
+    private GameLogicActions gameLogicActions;
+    public void setGameLogicActions(ChessGameLogic chessGameLogic) {
+        this.gameLogicActions = chessGameLogic;
+    }
 }
