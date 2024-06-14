@@ -1,3 +1,10 @@
-.idea/sonarlint
+.idea/sonarlint/*
 chess/build/*
 chess/.idea/
+
+# SonarLint plugin
+.idea/**/sonarlint/
+.vscode/**/sonarlint/
+
+# SonarQube Plugin
+.idea/**/sonarIssues.xml
