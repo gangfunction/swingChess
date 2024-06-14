@@ -4,6 +4,7 @@ import game.GameUtils;
 import game.Position;
 import game.command.CommandInvoker;
 import game.command.MoveCommand;
+import game.computer.ComputerPlayer;
 import game.core.ChessGameTurn;
 import game.model.state.CapturedPieceManager;
 import game.model.state.ChessPieceManager;
@@ -37,13 +38,14 @@ public class ChessGameLogic implements GameLogicActions {
     private final ChessObserver chessObserver;
     private CastlingHandler castlingHandler;
     private final ChessRuleHandler chessRuleHandler;
-
+    private Position enPassantTarget = null;
     @Setter
     private boolean afterCastling = false;
     private final PlayerManager playerManager;
     private CapturedPieceManager capturedPieceManager;
     private final ChessPieceManager chessPieceManager;
     private final MoveManager moveManager;
+    private final ComputerPlayer computerPlayer;
 
 
     public ChessGameLogic(ChessGameTurn chessGameTurn,
@@ -51,7 +53,9 @@ public class ChessGameLogic implements GameLogicActions {
                           CastlingLogic castlingLogic,
                           PromotionLogic promotionLogic,
                           PlayerManager playerManager,
-                          ChessPieceManager chessPieceManager, MoveManager moveManager
+                          ChessPieceManager chessPieceManager,
+                          MoveManager moveManager,
+                          ComputerPlayer computerPlayer
     ) {
         this.chessGameTurn = chessGameTurn;
         this.commandInvoker = commandInvoker;
@@ -65,6 +69,7 @@ public class ChessGameLogic implements GameLogicActions {
         this.chessObserver.addObserver(new GameUIObserver());
         this.chessRuleHandler = new ChessRuleHandler(chessPieceManager, moveManager);
         this.playerManager = playerManager;
+        this.computerPlayer = computerPlayer;
     }
 
     public void setGameEventListener(GameEventListener gameEventListener,
@@ -92,11 +97,15 @@ public class ChessGameLogic implements GameLogicActions {
 
     public void handleSquareClick(int x, int y) {
         Position clickedPosition = new Position(x, y);
+        System.out.println("Clicked position: " + clickedPosition);
+        System.out.println("Selected piece: " + chessPieceManager.getSelectedPiece());
+        System.out.println("Current player: " + playerManager.getCurrentPlayerColor());
         ChessPiece targetPiece = GameUtils.findPieceAtPosition(chessPieceManager, clickedPosition).orElse(null);
         if (targetPiece != null && chessPieceManager.getSelectedPiece() == null) {
             handlePieceSelection(targetPiece, clickedPosition, playerManager);
         } else if (chessPieceManager.getSelectedPiece() != null) {
             handlePieceMove(clickedPosition);
+
         } else {
             notifyInvalidMoveAttempted("No piece selected and no target piece at clicked position");
         }
@@ -160,6 +169,10 @@ public class ChessGameLogic implements GameLogicActions {
         }
         chessGameTurn.nextTurn();
         chessPieceManager.setSelectedPiece(null);
+        if(playerManager.getCurrentPlayerColor().isComputer() && computerPlayer.isActive()){
+            computerPlayer.play();
+            chessGameTurn.nextTurn();
+        }
         chessObserver.setGameState("Piece moved to " + clickedPosition);
     }
     
@@ -171,7 +184,8 @@ public class ChessGameLogic implements GameLogicActions {
         }
     }
 
-    void executeMove(ChessPiece selectedPiece, Position clickedPosition) {
+    @Override
+    public void executeMove(ChessPiece selectedPiece, Position clickedPosition) {
         removeCapturedPieceIfExists(clickedPosition);
         updatePiecePosition(selectedPiece, clickedPosition);
         handleCastlingMove(selectedPiece);
@@ -253,7 +267,7 @@ public class ChessGameLogic implements GameLogicActions {
         return piece.calculateMoves(chessPieceManager,moveManager);
     }
     public boolean isKingInCheck(Color color){
-        return chessRuleHandler.isKingInCheck(color, specialMoveManager);
+        return chessRuleHandler.isKingInCheck(color);
     }
 
 

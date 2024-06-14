@@ -7,16 +7,25 @@ public class Stockfish {
     private BufferedReader processReader;
     private PrintWriter processWriter;
 
-    public boolean startEngine(String path) {
+    private static final String PATH = "/opt/homebrew/bin/stockfish";
+    public void startEngine() {
         try {
-            engineProcess = Runtime.getRuntime().exec(path);
+            engineProcess = Runtime.getRuntime().exec(PATH);
             processReader = new BufferedReader(new InputStreamReader(engineProcess.getInputStream()));
             processWriter = new PrintWriter(new OutputStreamWriter(engineProcess.getOutputStream()), true);
+
+            checkEngine();
         } catch (Exception e) {
             e.printStackTrace();
-            return false;
         }
-        return true;
+    }
+
+    private void checkEngine() {
+        sendCommand("uci");
+        String output = getOutput(1000);
+        if (output.contains("uciok")) {
+            System.out.println("Stockfish engine has started successfully");
+        }
     }
 
     public void sendCommand(String command) {
@@ -48,20 +57,7 @@ public class Stockfish {
     }
 
 
-    public static void main(String[] args) {
-        Stockfish stockfish = new Stockfish();
-        if (stockfish.startEngine("/opt/homebrew/bin/stockfish")) {
-            stockfish.sendCommand("uci");
-            System.out.println(stockfish.getOutput(1000)); // 1초 대기 후 출력 읽기
 
-            stockfish.sendCommand("isready");
-            System.out.println(stockfish.getOutput(1000)); // 1초 대기 후 출력 읽기
 
-            stockfish.sendCommand("position startpos moves e2e4 e7e5");
-            stockfish.sendCommand("go movetime 1000");
-            System.out.println(stockfish.getOutput(2000)); // 2초 대기 후 출력 읽기
 
-            stockfish.stopEngine();
-        }
-    }
 }

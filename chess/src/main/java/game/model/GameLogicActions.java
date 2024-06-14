@@ -15,4 +15,5 @@ public interface GameLogicActions {
     void setAfterCastling(boolean b);
 
     boolean isFriendlyPieceAtPosition(Position position, ChessPiece thisPiece);
+    void executeMove(ChessPiece selectedPiece, Position clickedPosition);
 }

@@ -6,13 +6,12 @@ import game.util.Color;
 import game.core.factory.ChessPiece;
 import game.util.PieceType;
 import lombok.Getter;
-import lombok.Setter;
 
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
 public class ChessGameState implements SpecialMoveManager, CapturedPieceManager, ChessPieceManager, MoveManager {
-
+    private Position enPassantTarget = null;
     private final Map<Position, ChessPiece> chessPieces = new ConcurrentHashMap<>();
     @Getter
     private final Stack<ChessPiece> capturedPieces = new Stack<>();
@@ -21,6 +20,8 @@ public class ChessGameState implements SpecialMoveManager, CapturedPieceManager,
     private boolean lastMoveWasDoubleStep = false;
     private boolean canCastle = false;
     private int moveWithoutPawnOrCaptureCount = 0;
+    private boolean isQueenSideCastlingAllowed = false;
+    private boolean isKingSideCastlingAllowed = false;
 
     @Override
     public void addChessPiece(Position move, ChessPiece chessPiece) {
@@ -70,6 +71,60 @@ public class ChessGameState implements SpecialMoveManager, CapturedPieceManager,
     }
 
     @Override
+    public void setCastlingRights(String part) {
+        isKingSideCastlingAllowed = false;
+        isQueenSideCastlingAllowed = false;
+
+        for (char c : part.toCharArray()) {
+            switch (c) {
+                case 'K', 'k' -> isKingSideCastlingAllowed = true;
+                case 'Q', 'q' -> isQueenSideCastlingAllowed = true;
+            }
+        }
+    }
+    @Override
+    public void setEnPassantTarget(Position position) {
+        if (position == null) {
+            enPassantTarget = null;
+            return;
+        }
+
+        ChessPiece lastMovedPawn = getLastMovedPiece();
+        if (lastMovedPawn == null || !lastMovedPawn.getType().equals(PieceType.PAWN)) {
+            enPassantTarget = null;
+            return;
+        }
+
+        boolean lastMoveWasDoubleStep = getLastMoveWasDoubleStep();
+        if (!lastMoveWasDoubleStep) {
+            enPassantTarget = null;
+            return;
+        }
+
+        Position lastMovedPosition = lastMovedPawn.getPosition();
+        Color color = lastMovedPawn.getColor();
+        int direction = getMoveDirection(color);
+
+        // 앙파상 타겟 위치 계산
+        int targetX = lastMovedPosition.x();
+        int targetY = lastMovedPosition.y() + (-direction);
+
+        if (targetX == position.x() && targetY == position.y()) {
+            enPassantTarget = position;
+        } else {
+            enPassantTarget = null;
+        }
+    }
+
+    private int getMoveDirection(Color color) {
+        return color == Color.WHITE ? -1 : 1;
+    }
+    @Override
+    public void setHalfMoveClock(int halfMoveClock) {
+        this.moveWithoutPawnOrCaptureCount = halfMoveClock;
+    }
+
+    @Override
     public void removeChessPiece(ChessPiece targetPawn) {
         chessPieces.remove(targetPawn.getPosition());
         capturedPieces.push(targetPawn);
@@ -93,8 +148,18 @@ public class ChessGameState implements SpecialMoveManager, CapturedPieceManager,
     }
 
     @Override
-    public int getMoveWithoutPawnOrCaptureCount() {
+    public int getHalfMoveClock() {
         return moveWithoutPawnOrCaptureCount;
+    }
+
+    @Override
+    public boolean isKingSideCastlingAllowed(Color color) {
+        return isKingSideCastlingAllowed;
+    }
+
+    @Override
+    public boolean isQueenSideCastlingAllowed(Color color) {
+        return isQueenSideCastlingAllowed;
     }
 
     @Override
@@ -103,13 +168,24 @@ public class ChessGameState implements SpecialMoveManager, CapturedPieceManager,
         if (thisPiece == null) {
             return false;
         }
-        if (canCastle && (position.equals(new Position(2, thisPiece.getPosition().y())) ||
-                position.equals(new Position(6, thisPiece.getPosition().y())))) {
+        if(canCastle && position.equals(new Position(2, thisPiece.getPosition().y()))){
             gameLogicActions.setAfterCastling(true);
+            isQueenSideCastlingAllowed = true;
+
+            return true;
+        }
+        if (canCastle && position.equals(new Position(6, thisPiece.getPosition().y()))) {
+            gameLogicActions.setAfterCastling(true);
+            isKingSideCastlingAllowed = true;
             return true;
         }
         Set<Position> validMoves = gameLogicActions.calculateMovesForPiece(thisPiece);
         return validMoves.contains(position) && !gameLogicActions.isFriendlyPieceAtPosition(position, thisPiece);
+    }
+
+    @Override
+    public Position getEnPassantTarget() {
+        return enPassantTarget;
     }
 
     private final Map<Color, ChessPiece> kingCache = new ConcurrentHashMap<>();
@@ -122,16 +198,20 @@ public class ChessGameState implements SpecialMoveManager, CapturedPieceManager,
                 .orElse(null));
     }
 
-    @Override
-    public Position getEnPassantTarget() {
-        return null;
-    }
 
     @Override
     public char[] getCastlingRights() {
-        return new char[0];
-    }
+        StringBuilder rights = new StringBuilder();
 
+        if (isKingSideCastlingAllowed) {
+            rights.append('K');
+        }
+        if (isQueenSideCastlingAllowed) {
+            rights.append('Q');
+        }
+
+        return rights.toString().toCharArray();
+    }
 
     @Override
     public void setCanCastle(boolean canCastle) {
@@ -145,8 +225,4 @@ public class ChessGameState implements SpecialMoveManager, CapturedPieceManager,
     }
 
 
-    private GameLogicActions gameLogicActions;
-    public void setGameLogicActions(ChessGameLogic chessGameLogic) {
-        this.gameLogicActions = chessGameLogic;
-    }
 }

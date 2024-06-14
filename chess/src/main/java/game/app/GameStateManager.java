@@ -34,27 +34,28 @@ public class GameStateManager {
 
         if (userSelection == JFileChooser.APPROVE_OPTION) {
             File file = fileChooser.getSelectedFile();
-            try (BufferedReader bufferedReader = new BufferedReader(new FileReader(file))) {
-                StringBuilder gameStateBuilder = new StringBuilder();
-                String line;
-                while ((line = bufferedReader.readLine()) != null) {
-                    gameStateBuilder.append(line).append("\n");
-                }
-                String gameState = gameStateBuilder.toString();
-                log.info("Loaded game state: " + gameState);
-                chessGameTurn.deserializeGameState(gameState);
-                ChessGameManager.updateUI();
-                log.info("Game state loaded successfully from " + file.getAbsolutePath());
-            } catch (IOException e) {
-                log.error("Failed to load game state", e);
-                JOptionPane.showMessageDialog(null, "Failed to load game state: " + e.getMessage());
-            }
+            loadProcess(file);
         } else {
             log.info("File selection cancelled by user.");
         }
     }
 
-     void saveLogic() {
+    private static void loadProcess(File file) {
+        try (BufferedReader bufferedReader = new BufferedReader(new FileReader(file))) {
+            StringBuilder gameStateBuilder = new StringBuilder();
+            String line;
+            while ((line = bufferedReader.readLine()) != null) {
+                gameStateBuilder.append(line).append("\n");
+            }
+            String gameState = gameStateBuilder.toString();
+            chessGameTurn.deserializeGameState(gameState);
+        } catch (IOException e) {
+            log.error("Failed to load game state", e);
+            JOptionPane.showMessageDialog(null, "Failed to load game state: " + e.getMessage());
+        }
+    }
+
+    void saveLogic() {
         String gameState = chessGameTurn.serializeGameState();
         String directoryPath = "chess/game/saves";
         Path path = Paths.get(directoryPath);

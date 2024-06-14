@@ -1,6 +1,8 @@
 package game.core;
 
+import game.GameUtils;
 import game.Position;
+import game.app.ChessGameManager;
 import game.core.factory.ChessPiece;
 import game.model.state.ChessPieceManager;
 import game.util.PieceType;
@@ -10,7 +12,6 @@ import game.observer.Observer;
 import game.status.DrawCondition;
 import game.status.GameStatus;
 import game.status.VictoryCondition;
-import game.ui.IconLoader;
 import game.util.Color;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
@@ -19,9 +20,8 @@ import javax.swing.*;
 import java.io.Serial;
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
-import java.util.Map;
-import java.util.Optional;
 
 import static game.app.ChessGameManager.chessBoardUI;
 import static game.app.ChessGameManager.updateUI;
@@ -43,17 +43,16 @@ public class ChessGameTurn implements GameTurnListener, Serializable ,ObserverLi
     private final ChessObserver chessObserver;
     private final ChessPieceManager chessPieceManager;
 
-    /**
-     * Constructor for ChessGameTurn.
-     *
-     * @param drawCondition    the condition for a draw
-     * @param victoryCondition the condition for victory
-     */
-    public ChessGameTurn(DrawCondition drawCondition, VictoryCondition victoryCondition, ChessPieceManager chessPieceManager) {
+
+    public ChessGameTurn(DrawCondition drawCondition,
+                         VictoryCondition victoryCondition,
+                         ChessPieceManager chessPieceManager,
+                            PlayerManager playerManager
+                         ) {
         this.drawCondition = drawCondition;
         this.victoryCondition = victoryCondition;
         this.chessPieceManager = chessPieceManager;
-        this.playerManager = new PlayerManager();
+        this.playerManager = playerManager;
         this.currentPlayerIndex = 0;
         this.gameEnded = false;
         this.observers = new ArrayList<>();
@@ -77,9 +76,8 @@ public class ChessGameTurn implements GameTurnListener, Serializable ,ObserverLi
 
     @Override
     public void nextTurn() {
-        currentPlayerIndex = (currentPlayerIndex + 1) % NUMBER_OF_PLAYERS;
-        Player player = playerManager.getCurrentPlayer();
         playerManager.nextPlayer();
+        Player player = playerManager.getCurrentPlayer();
         notifyObservers(player.getName() + "님의 차례입니다.");
         checkGameStatusAndConditions(player);
         victoryCondition.invalidateKingInCheckCache();
@@ -133,77 +131,191 @@ public class ChessGameTurn implements GameTurnListener, Serializable ,ObserverLi
 
     @Override
     public String serializeGameState() {
-        StringBuilder builder = new StringBuilder();
-        List<ChessPiece> pieces = new ArrayList<>(chessPieceManager.getChessPieces().values());
-        for (ChessPiece piece : pieces) {
-            builder.append(piece.getType())
-                    .append("_")
-                    .append(piece.getColor())
-                    .append(":")
-                    .append(piece.getPosition().x())
-                    .append(" ")
-                    .append(piece.getPosition().y())
-                    .append(";")
-                    .append("\n");
-        }
-        builder.append("TURN:").append(playerManager.getCurrentPlayerColor()).append(";").append("\n");
-        builder.append("CASTLING:").append(specialMoveManager.getCastlingRights()).append(";").append("\n");
-        Optional.ofNullable(specialMoveManager.getEnPassantTarget())
-                .ifPresent(target -> builder.append("EnPassant:").append(target).append(";").append("\n"));
-        builder.append("GameEnded:").append(isGameEnded() ? "Yes" : "No").append(";").append("\n");
-        String gameState = builder.toString();
-        chessObserver.setGameState(gameState);
-        return gameState;
+        return getFEN();
     }
+
+    @Override
+    public String computerSerializeGameState() {
+        return getComputerFEN();
+    }
+
+    private String getComputerFEN() {
+        Color currentPlayerColor = playerManager.getCurrentPlayerColor();
+        return getComputerPiecePlacement() + " " +
+                (currentPlayerColor == Color.WHITE ? "w" : "b") + " " + // 현재 플레이어 색상에 따라 'w' 또는 'b' 설정
+                getCastlingRights() + " " +
+                getEnPassantTarget() + " " +
+                specialMoveManager.getHalfMoveClock() + " " +
+                getTotalMoves();
+    }
+
+    private String getComputerPiecePlacement() {
+        StringBuilder placement = new StringBuilder();
+        for (int rank = 0; rank < 8; rank++) {
+            int emptySquares = 0;
+            for (int file = 0; file <8 ; file++) { // 파일 순서를 반대로
+                Position position = new Position(file, rank);
+                ChessPiece piece = GameUtils.findPieceAtPosition(chessPieceManager, position).orElse(null);
+                if (piece == null) {
+                    emptySquares++;
+                } else {
+                    if (emptySquares > 0) {
+                        placement.append(emptySquares);
+                        emptySquares = 0;
+                    }
+                    placement.append(piece.getType().getFenSymbol(piece.getColor()));
+                }
+            }
+            if (emptySquares > 0) {
+                placement.append(emptySquares);
+            }
+            if (rank < 7) {
+                placement.append("/"); // 마지막 행에서는 "/" 추가 안함
+            }
+        }
+        return placement.toString();
+    }
+    public String getFEN() {
+        Color currentPlayerColor = playerManager.getCurrentPlayerColor();
+        return getPiecePlacement() + " " +
+                (currentPlayerColor == Color.WHITE ? "w" : "b") + " " + // 현재 플레이어 색상에 따라 'w' 또는 'b' 설정
+                getCastlingRights() + " " +
+                getEnPassantTarget() + " " +
+                specialMoveManager.getHalfMoveClock() + " " +
+                getTotalMoves();
+    }
+
+    private String getPiecePlacement() {
+        StringBuilder placement = new StringBuilder();
+        for (int rank = 7; rank >= 0; rank--) {
+            int emptySquares = 0;
+            for (int file = 0; file < 8; file++) {
+                Position position = new Position(file, rank);
+                ChessPiece piece = GameUtils.findPieceAtPosition(chessPieceManager, position).orElse(null);
+                if (piece == null) {
+                    emptySquares++;
+                } else {
+                    if (emptySquares > 0) {
+                        placement.append(emptySquares);
+                        emptySquares = 0;
+                    }
+                    placement.append(piece.getType().getFenSymbol(piece.getColor()));
+                }
+            }
+            if (emptySquares > 0) {
+                placement.append(emptySquares);
+            }
+            if (rank > 0) {
+                placement.append("/");
+            }
+        }
+        return placement.toString();
+    }
+    private String getCastlingRights() {
+        StringBuilder rights = new StringBuilder();
+        if (specialMoveManager.isKingSideCastlingAllowed(Color.WHITE)) {
+            rights.append("K");
+        }
+        if (specialMoveManager.isQueenSideCastlingAllowed(Color.WHITE)) {
+            rights.append("Q");
+        }
+        if (specialMoveManager.isKingSideCastlingAllowed(Color.BLACK)) {
+            rights.append("k");
+        }
+        if (specialMoveManager.isQueenSideCastlingAllowed(Color.BLACK)) {
+            rights.append("q");
+        }
+        return rights.isEmpty() ? "-" : rights.toString();
+    }
+
+    private String getEnPassantTarget() {
+        ChessPiece lastMovedPawn = specialMoveManager.getLastMovedPiece();
+        if (lastMovedPawn == null || !lastMovedPawn.getType().equals(PieceType.PAWN)) {
+            return "-"; // 앙파상 타겟이 없는 경우 "-" 반환
+        }
+
+        boolean lastMoveWasDoubleStep = specialMoveManager.getLastMoveWasDoubleStep();
+        if (!lastMoveWasDoubleStep) {
+            return "-"; // 마지막 이동이 2칸 이동이 아닌 경우 "-" 반환
+        }
+
+        Position lastMovedPosition = lastMovedPawn.getPosition();
+        Color color = lastMovedPawn.getColor();
+        int direction = getMoveDirection(color);
+        int targetX = lastMovedPosition.x();
+        int targetY = lastMovedPosition.y() + (-direction);
+
+        // 앙파상 타겟 위치를 FEN 표기법에 맞게 변환
+        return String.format("%c%d", (char)('a' + targetX), 8 - targetY);
+    }
+
+    private int getMoveDirection(Color color) {
+        return color == Color.WHITE ? -1 : 1;
+    }
+
+    private int getTotalMoves() {
+        return (specialMoveManager.getHalfMoveClock() + 1) / 2 + 1;
+    }
+
     @Override
     public void deserializeGameState(String gameState) {
-            specialMoveManager.clearBoard();
-            chessBoardUI.clearHighlights();
+        specialMoveManager.clearBoard();
+        chessBoardUI.clearHighlights();
+        String[] parts = gameState.split(" ");
 
-            String[] parts = gameState.split("\n");
-            Color currentPlayerColor = null;
-            boolean gameEnded = false;
-
-        for (String part : parts) {
-                if (part.startsWith("TURN:")) {
-                    currentPlayerColor = Color.valueOf(part.split(":")[1].trim().replace(";", ""));
-                } else if (part.startsWith("CASTLING:")) {
-                } else if (part.startsWith("GameEnded:")) {
-                    gameEnded = part.split(":")[1].trim().equalsIgnoreCase("YES");
-                } else if (part.startsWith("EnPassant:")) {
+        // 체스 말 배치 정보 처리
+        String piecePlacement = parts[0];
+        String[] rows = piecePlacement.split("/");
+        for (int rank = 7; rank >= 0; rank--) {
+            String row = rows[7 - rank];
+            int file = 0;
+            for (int i = 0; i < row.length(); i++) {
+                char c = row.charAt(i);
+                if (Character.isDigit(c)) {
+                    file += Character.getNumericValue(c);
                 } else {
-                    String[] pieceInfo = part.split(":");
-                    String[] pieceHeader = pieceInfo[0].split("_");
-                    String[] pieceBody = pieceInfo[1].split(" ");
-                    PieceType type = PieceType.valueOf(pieceHeader[0].trim().toUpperCase());
-                    Color color = Color.valueOf(pieceHeader[1].trim().toUpperCase().replace(";", ""));
-                    int x = Integer.parseInt(pieceBody[0]);
-                    int y = Integer.parseInt(pieceBody[1].replace(";", ""));
-                    System.out.println("Piece: " + type + " " + color + " at " + x + " " + y);
-                    chessPieceManager.getChessPieces().put(new Position(x, y), new ChessPiece(type, new Position(x, y),color));
+                    PieceType type = PieceType.fromFenSymbol(c);
+                    Color color = (Character.isUpperCase(c)) ? Color.WHITE : Color.BLACK;
+                    Position position = new Position(file, rank);
+                    ChessPiece piece = new ChessPiece(type, position, color);
+                    chessPieceManager.getChessPieces().put(position, piece);
+                    file++;
                 }
             }
-            this.gameEnded = gameEnded;
+        }
 
-            for (int i = 0; i < playerManager.getPlayers().size(); i++) {
-                if (playerManager.getPlayers().get(i).equals(currentPlayerColor)) {
-                    currentPlayerIndex = i;
-                    break;
-                }
+        Color currentPlayerColor;
+        if (parts[1].equals("w")) {
+            currentPlayerColor = Color.WHITE;
+        } else {
+            currentPlayerColor = Color.BLACK;
+        }
+        for (int i = 0; i < playerManager.getPlayers().size(); i++) {
+            if (playerManager.getPlayers().get(i).equals(currentPlayerColor)) {
+                currentPlayerIndex = i;
+                break;
             }
-            for(Map.Entry<Position, ChessPiece> entry : chessPieceManager.getChessPieces().entrySet()){
-                chessPieceManager.getChessPieces().put(entry.getKey(), entry.getValue());
-                JPanel panel = chessBoardUI.getPanelAtPosition(entry.getKey());
-                chessBoardUI.addPieceToPanel(panel, new JLabel(IconLoader.loadIcon(entry.getValue().getType(), entry.getValue().getColor())));
-            }
-            updateUI();
-            notifyObservers("Game state deserialized and UI updated.");
-            chessObserver.setGameState(gameState);
+        }
+
+        // 캐슬링 권한 처리
+        specialMoveManager.setCastlingRights(parts[2]);
+
+        // 앙파상 타겟 처리
+        if (!parts[3].equals("-")) {
+            int file = parts[3].charAt(0) - 'a';
+            int rank = 8 - Integer.parseInt(parts[3].substring(1));
+            specialMoveManager.setEnPassantTarget(new Position(file, rank));
+        }
+
+        // 50 move rule 처리
+        specialMoveManager.setHalfMoveClock(Integer.parseInt(parts[4]));
+
+
+        //getChessPieces 메소드를 사용하여 체스 말 배치 정보를 가져온 후 UI에 반영
+        updateUI();
+
+        notifyObservers("Game state deserialized and UI updated.");
+        chessObserver.setGameState(gameState);
     }
 
-    public void previousTurn() {
-        currentPlayerIndex = (currentPlayerIndex - 1 + NUMBER_OF_PLAYERS) % NUMBER_OF_PLAYERS;
-        Player player = playerManager.getCurrentPlayer();
-        notifyObservers(player.getName() + "님의 차례입니다.");
-    }
 }

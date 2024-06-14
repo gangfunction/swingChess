@@ -1,5 +1,7 @@
 
 v
-java:S1948#"3Make "chessPieceManager" transient or serializable.(èğ–ö8ë¢»³€2J$42a0c5c0-a98e-4d77-8469-1450307efd4a
+java:S1948#"3Make "chessPieceManager" transient or serializable.(èğ–ö8ë¢»³€2J$0d04e258-faa9-48f7-a5fb-5d6e9dd608bc
 ‡
-java:S6201{"FReplace this instanceof check and cast with 'instanceof JPanel jpanel'(÷ İùÿÿÿÿJ$fc1bcf67-ce02-4e70-82ec-cad2b2293d09
+java:S6201{"FReplace this instanceof check and cast with 'instanceof JPanel jpanel'(÷ İùÿÿÿÿJ$a52fc8b7-ec57-46ea-9c1f-7a6fb5ab66e0
+c
+java:S6201‹"EReplace this instanceof check and cast with 'instanceof JPanel panel'(°ßŒ8Ê¦»¥2

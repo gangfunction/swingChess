@@ -1,7 +1,8 @@
 
-}
-java:S1450”"_Remove the "gameLogicActions" field and declare it as a local variable in the relevant methods.(‘ÑåÇ8ñ û€2
 ˜
-java:S1149"PReplace the synchronized class "Stack" by an unsynchronized one such as "Deque".(ÇëåŞøÿÿÿÿ8Š“Ÿû€2J$7cba33b6-37f4-49a6-8ee8-a7faf6efbd22
-R
-java:S1068”"4Remove this unused "gameLogicActions" private field.(‘ÑåÇ8ü û€2
+java:S1149"PReplace the synchronized class "Stack" by an unsynchronized one such as "Deque".(ÇëåŞøÿÿÿÿ8ÌÈƒ2J$f9ec5aac-cdcf-4977-bb87-6e3f4d0ab653
+“
+java:S1301O"KReplace this "switch" statement by "if" statements to increase readability.(îÇËúÿÿÿÿ8û´øƒ2J$c03b3720-5f0b-4b5c-909c-b1b0b5362c61
+i	java:S131O""Add a default case to this switch.(îÇËúÿÿÿÿ8âôƒ2J$49c79a5b-95d1-42fb-a3ea-a8d2818c2136
+‘
+java:S1117b"IRename "lastMoveWasDoubleStep" which hides the field declared at line 20.(šê‚Éûÿÿÿÿ8—ô€„2J$edc47889-607b-4f64-94db-13014438a713

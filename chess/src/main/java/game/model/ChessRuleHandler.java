@@ -17,9 +17,9 @@ public class ChessRuleHandler {
         this.moveManager = moveManager;
     }
 
-    public boolean isKingInCheck(Color color, SpecialMoveManager specialMoveManager) {
+    public boolean isKingInCheck(Color color) {
 
-        ChessPiece king = findKing(color, specialMoveManager);
+        ChessPiece king = findKing(color);
         if (king == null) {
             throw new IllegalStateException("King not found for color " + color);
         }
@@ -29,7 +29,7 @@ public class ChessRuleHandler {
                 .flatMap(piece -> piece.calculateMoves(chessPieceManager,moveManager).stream())
                 .anyMatch(move -> move.equals(kingPosition));
     }
-    private ChessPiece findKing(Color color, SpecialMoveManager specialMoveManager) {
+    private ChessPiece findKing(Color color) {
         return chessPieceManager.getChessPieces().values().stream()
                 .filter(piece -> piece.getType() == PieceType.KING && piece.getColor() == color)
                 .findFirst()

@@ -14,6 +14,10 @@ public class ServerCommunicator {
     private static final int SERVER_PORT = 8080;
     private static final int LOG_SERVER_PORT = 8000;
 
+    private ServerCommunicator() {
+        throw new IllegalStateException("Utility class");
+    }
+
     static void connectToServer() {
         new SwingWorker<Void, Void>() {
             @Override

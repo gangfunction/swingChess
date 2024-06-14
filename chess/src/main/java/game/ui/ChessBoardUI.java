@@ -252,4 +252,24 @@ public class ChessBoardUI extends JFrame implements GameEventListener {
         JOptionPane.showMessageDialog(null, reason);
     }
 
+    public void setPieceIcon(Position position, Icon icon) {
+        JPanel panel = getPanelAtPosition(position);
+        panel.removeAll();
+        panel.add(new JLabel(icon));
+        panel.revalidate();
+        panel.repaint();
+    }
+
+    public void rotateBoard(boolean isBlackTurn) {
+        // 체스판 회전 로직 구현
+        // 예시: boardPanel의 모든 컴포넌트를 회전시키는 경우
+        for (Component component : boardPanel.getComponents()) {
+            if (component instanceof JPanel) {
+                JPanel panel = (JPanel) component;
+                panel.setComponentOrientation(isBlackTurn ? ComponentOrientation.RIGHT_TO_LEFT : ComponentOrientation.LEFT_TO_RIGHT);
+            }
+        }
+        boardPanel.revalidate();
+        boardPanel.repaint();
+    }
 }

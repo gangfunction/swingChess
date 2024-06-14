@@ -142,7 +142,7 @@ public class DrawCondition {
     }
 
     private boolean isFiftyMoveRule() {
-        int moveWithoutPawnOrCapture = moveManager.getMoveWithoutPawnOrCaptureCount();
+        int moveWithoutPawnOrCapture = specialMoveManager.getHalfMoveClock();
         return moveWithoutPawnOrCapture >= 50;
     }
 }

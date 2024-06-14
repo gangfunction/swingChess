@@ -1,22 +1,27 @@
 
 |
-java:S1948""4Make "specialMoveManager" transient or serializable.(ÁÂ†şùÿÿÿÿ8ˆó“û€2J$2178402f-c5d1-4f9b-8297-224885b0f6c3
+java:S1948""4Make "specialMoveManager" transient or serializable.(ÁÂ†şùÿÿÿÿ8¨æş¦2J$92475fe6-d298-46b8-89be-4ac0dc5fc382
 r
-java:S1948$"/Make "playerManager" transient or serializable.(ˆ›õ„8‰÷‡±€2J$e67dbaa2-d3e8-46d0-9b1c-4d52ecb1ebd4
+java:S1948$"/Make "playerManager" transient or serializable.(ˆ›õ„8¨æş¦2J$6e7e8c25-3383-4650-801c-eb826d35d6f3
 s
-java:S1948%"+Make "observers" transient or serializable.(ÂèæÌÿÿÿÿÿ8‰÷‡±€2J$7c7ee19f-735e-41e8-b8fa-f6845384e5c0
+java:S1948%"+Make "observers" transient or serializable.(ÂèæÌÿÿÿÿÿ8©æş¦2J$0ebe5202-6600-4245-bba9-3888fa2a56e3
 r
-java:S1948)"/Make "drawCondition" transient or serializable.(Ëı…8‰÷‡±€2J$84bbc176-0e0b-42e7-b1b4-410025544042
+java:S1948)"/Make "drawCondition" transient or serializable.(Ëı…8©æş¦2J$d1b2c4c6-eed2-4afc-b996-9ea11fef688a
 u
-java:S1948*"2Make "victoryCondition" transient or serializable.(š‰Ÿ»8‰÷‡±€2J$08d3b9db-7b0b-4542-9bb7-1259950dc22e
+java:S1948*"2Make "victoryCondition" transient or serializable.(š‰Ÿ»8©æş¦2J$d9ae6bdc-39a8-4fef-8b05-b26de21d14ec
 q
-java:S1948+"/Make "chessObserver" transient or serializable.(ıİæa8‰÷‡±€2J$f69a5351-ed70-4dab-b04b-9253c35aed8f
+java:S1948+"/Make "chessObserver" transient or serializable.(ıİæa8©æş¦2J$560ed928-75e3-4ccc-a372-cdcfb1866e79
 v
-java:S1948,"3Make "chessPieceManager" transient or serializable.(èğ–ö8¥¨ ²€2J$3d32bb9d-7154-4e06-b44a-1d270e1f13f1
-†
-java:S1117¥"=Rename "gameEnded" which hides the field declared at line 40.(˜¬È‹ûÿÿÿÿ8‘÷‡±€2J$a9675184-c6de-414a-857a-c7862b75317e
-l	java:S108ª")Either remove or fill this block of code.(ØÕŞÚ8‘÷‡±€2J$d3b038c2-f775-4fdb-ac8a-f5a6d81a4b99
-q	java:S108­")Either remove or fill this block of code.(‡Âº˜üÿÿÿÿ8’÷‡±€2J$e1c5136b-adf3-4d47-b523-e35376967739
-s	java:S106¶"+Replace this use of System.out by a logger.(ÆÃ¨âÿÿÿÿÿ8“÷‡±€2J$8391179c-e2b7-4b0f-af73-990dd962623f
+java:S1948,"3Make "chessPieceManager" transient or serializable.(èğ–ö8©æş¦2J$0844651a-f0ba-42c3-9805-99aaeb96203b
+–
+java:S3776…"RRefactor this method to reduce its Cognitive Complexity from 17 to the 15 allowed.(„“â¶8±æş¦2J$f84113fd-f86e-406c-aead-2d972c69ec9f
 š
-java:S2159½"VRemove this call to "equals"; comparisons between unrelated types always return false.(ÖŞºå8”÷‡±€2J$cc6edfae-8dce-48b6-9534-5d6c1917f916
+java:S2159¦"VRemove this call to "equals"; comparisons between unrelated types always return false.(ÖŞºå8³æş¦2J$8157e05c-bf34-45f6-b839-d100f9066c24
+~
+java:S1128"6Remove this unused import 'game.app.ChessGameManager'.(µßªÎûÿÿÿÿ8´æş¦2J$926f130f-2af7-4847-b5bd-a56ac8d4ada8
+u
+java:S1128"-Remove this unused import 'java.util.Arrays'.(î–˜Éüÿÿÿÿ8´æş¦2J$d5eea522-7e2f-4919-b2e4-fccfa4e24f14
+}
+java:S1068&"5Remove this unused "NUMBER_OF_PLAYERS" private field.(¸¡Ìùùÿÿÿÿ8´æş¦2J$9058e4f0-33cd-49ab-8e4b-c18eb4d681b0
+x
+java:S1068'"6Remove this unused "currentPlayerIndex" private field.(Ûù_8´æş¦2J$fffaf7d1-65f5-43c5-8b47-8e980610665f

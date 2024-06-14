@@ -2,6 +2,8 @@ package game.app;
 
 import com.formdev.flatlaf.FlatDarkLaf;
 import game.GameLog;
+import game.computer.ComputerPlayer;
+import game.computer.Stockfish;
 import game.core.PlayerManager;
 import game.ui.ChessBoardUI;
 import org.jdesktop.swingx.JXCollapsiblePane;
@@ -31,15 +33,17 @@ public class Main {
         SwingUtilities.invokeLater(() -> {
             Main main = new Main();
             PlayerManager playerManager = new PlayerManager();
-            main.initializeUI(playerManager);
-            new LoginFrame(playerManager);
+            Stockfish stockfish = new Stockfish();
+            ComputerPlayer computerPlayer = new ComputerPlayer(stockfish);
+            main.initializeUI(playerManager, computerPlayer);
+            new LoginFrame(playerManager,computerPlayer);
         });
     }
 
-    private  void initializeUI(PlayerManager playerManager) {
+    private  void initializeUI(PlayerManager playerManager,ComputerPlayer computerPlayer){
         try {
             primaryFrame = createPrimaryFrame();
-            ChessGameManager.initializeGameComponents(playerManager);
+            ChessGameManager.initializeGameComponents(playerManager, computerPlayer);
             setupPrimaryFrame(primaryFrame, ChessGameManager.chessBoardUI, ChessGameManager.chessGameTurn);
             ServerCommunicator.connectToServer();
             ServerCommunicator.sendLogToServer();

@@ -4,6 +4,7 @@ import game.model.state.ChessPieceManager;
 import game.util.Color;
 import game.core.factory.ChessPiece;
 
+import java.util.Map;
 import java.util.Optional;
 
 public class GameUtils {

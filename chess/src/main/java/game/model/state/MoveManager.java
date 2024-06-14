@@ -9,6 +9,7 @@ public interface MoveManager {
     ChessPiece getLastMovedPiece();
     boolean getLastMoveWasDoubleStep();
     void updateMoveWithoutPawnOrCaptureCount(boolean isPawnMove, boolean isCapture);
-    int getMoveWithoutPawnOrCaptureCount();
     boolean isAvailableMoveTarget(Position position, GameLogicActions gameLogicActions);
+
+    Position getEnPassantTarget();
 }

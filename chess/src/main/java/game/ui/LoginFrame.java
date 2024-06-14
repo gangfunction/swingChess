@@ -1,5 +1,6 @@
 package game.ui;
 
+import game.computer.ComputerPlayer;
 import game.core.PlayerManager;
 import game.login.HttpClient;
 import game.login.MessageBuilder;
@@ -15,9 +16,10 @@ public class LoginFrame extends JFrame implements ActionListener {
     private final JButton loginButton;
     private final JButton registerButton;
     private final JButton offlineButton;
-    private PlayerManager playerManager;
-
-    public LoginFrame(PlayerManager playerManager) {
+    private final PlayerManager playerManager;
+    private final ComputerPlayer computerPlayer;
+    public LoginFrame(PlayerManager playerManager, ComputerPlayer computerPlayer) {
+        this.computerPlayer = computerPlayer;
         this.playerManager = playerManager;
         setTitle("Login Form");
         setLayout(new FlowLayout(FlowLayout.CENTER));
@@ -77,7 +79,7 @@ public class LoginFrame extends JFrame implements ActionListener {
         }
         else if (e.getSource() == offlineButton) {
             // 오프라인 모드로 이동
-            new OfflineFrame(playerManager);
+            new OfflineFrame(playerManager,computerPlayer);
             JOptionPane.showMessageDialog(null, "Offline mode");
             this.dispose();
         }

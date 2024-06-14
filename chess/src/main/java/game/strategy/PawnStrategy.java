@@ -28,7 +28,7 @@ public class PawnStrategy implements MoveStrategy {
 
         calculateStandardMoves(chessPieceManager, validMoves, position, color);
         calculateAttackMoves(validMoves, position, color,chessPieceManager);
-        calculateEnPassantMoves(moveManager,chessPieceManager, validMoves, position, color);
+        calculateEnPassantMoves(moveManager, chessPieceManager,validMoves, position, color);
         return validMoves;
     }
 
@@ -48,18 +48,25 @@ public class PawnStrategy implements MoveStrategy {
         int direction = (color == Color.WHITE) ? -MOVE_ONE_STEP : +MOVE_ONE_STEP;
         int enPassantY = position.y() + direction;
         int[] enPassantXs = {position.x() - 1, position.x() + 1};
+        Position enPassantTarget = moveManager.getEnPassantTarget();
+        if(enPassantTarget == null){
+            for (int enPassantX : enPassantXs) {
+                if (enPassantX < 0 || enPassantX >= 8) continue; // 보드를 벗어나는 위치는 제외
 
-        for (int enPassantX : enPassantXs) {
-            if (enPassantX < 0 || enPassantX >= 8) continue; // 보드를 벗어나는 위치는 제외
+                Position targetPawnPosition = new Position(enPassantX, position.y());
+                if (GameUtils.isPositionOccupiedByOpponent(targetPawnPosition, color, chessPieceManager) &&
+                        wasPawnMovedTwoSteps(position,moveManager)) {
+                    Position enPassantPos = new Position(enPassantX, enPassantY); // 앙파썽 수행 후 폰이 도착할 위치
+                    validMoves.add(enPassantPos);
 
-            Position targetPawnPosition = new Position(enPassantX, position.y());
-            if (GameUtils.isPositionOccupiedByOpponent(targetPawnPosition, color, chessPieceManager) &&
-                    wasPawnMovedTwoSteps(position,moveManager)) {
-                Position enPassantPos = new Position(enPassantX, enPassantY); // 앙파썽 수행 후 폰이 도착할 위치
-                validMoves.add(enPassantPos);
+                }
+                return;
             }
         }
+        validMoves.add(enPassantTarget);
+
     }
+
     private boolean wasPawnMovedTwoSteps(Position targetPawnPosition, MoveManager moveManager) {
         ChessPiece lastMovedPawn = moveManager.getLastMovedPiece();
         boolean lastMoveWasDoubleStep = moveManager.getLastMoveWasDoubleStep();

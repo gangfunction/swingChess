@@ -46,7 +46,8 @@ The chess game, which is commonly known, has been implemented using a Swing GUI.
 
 ### 4. Computer Match Implementation
 - [x] Integration with open-source chess engine (Stockfish)
-- [ ] Improvement of serialization state and logging method (planned to use FEN (Forsyth-Edwards Notation))
+- [x] Improvement of serialization state and logging method (planned to use FEN (Forsyth-Edwards Notation))
+- [ ] Improve to update only the update panel when playing against the computer.
 - [ ] Implementation of rating setting function for computer matches
 
 ---------
@@ -96,5 +97,6 @@ The chess game, which is commonly known, has been implemented using a Swing GUI.
 
 ### 4. 컴퓨터 대전 구현
 - [x] 오픈소스 체스 엔진 연동 (Stockfish)
-- [ ] 직렬화 상태 및 로그방법의 개선 (FEN(Forsyth-Edwards Notation) 사용 예정)
+- [x] 직렬화 상태 및 로그방법의 개선 (FEN(Forsyth-Edwards Notation) 사용 예정)
+- [ ] 컴퓨터 대전시 업데이트 패널만 업데이트할수있게 개선합니다.
 - [ ] 컴퓨터 대전시 레이팅 설정 기능 구현

@@ -1,0 +1,1 @@
+RNBQKBNR/PPP1PPPP/8/8/2P5/8/pp1ppppp/rnbqkbnr b - Optional[Position[x=2, y=2]] 0 1

@@ -1,9 +1,4 @@
 
-w
-java:S3010"/Remove this assignment of "currentPlayerIndex".(®‡Òºüÿÿÿÿ8·‘Ûˆ€2J$0e78f606-668e-49e0-87ec-4df8d682b82c
-~
-java:S1117";Rename "players" which hides the field declared at line 11.(ãáÁÁ8¸‘Ûˆ€2J$8c1f480f-c6dd-465e-a354-c9195d496f6e
-y
-java:S2696-"6Make the enclosing method "static" or remove this set.(‚ÛÀÇ8»‘Ûˆ€2J$7dcb7790-2fe8-4ee0-aebf-2cdcd44bdf33
-~
-java:S26961"6Make the enclosing method "static" or remove this set.(™ª»—ÿÿÿÿÿ8»‘Ûˆ€2J$4ed4dadc-13c8-444e-8047-a2629fd7b2df
+r	java:S106""+Replace this use of System.out by a logger.(˜º½ıÿÿÿÿ8©Ş¢2J$c9a7a2bc-4244-46de-8483-ced61b8b6ed8
+m	java:S106'"+Replace this use of System.out by a logger.(ªÚ×£8©Ş¢2J$41096473-39dc-4196-a09e-1e40d1a2e977
+m	java:S106,"+Replace this use of System.out by a logger.(¢ìúÏ8¿­ë¢2J$9d4b3911-f61c-4891-bc0d-bfdd29b17d00

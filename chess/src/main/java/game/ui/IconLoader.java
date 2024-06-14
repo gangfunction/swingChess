@@ -1,5 +1,6 @@
 package game.ui;
 
+import game.core.factory.ChessPiece;
 import game.util.Color;
 import game.util.PieceType;
 
@@ -44,5 +45,9 @@ public class IconLoader {
 
         return "/icons/" + colorPrefix + "/" + pieceType.toString().toLowerCase() + ".png";
 
+    }
+
+    public static Icon getIcon(ChessPiece chessPiece) {
+        return loadIcon(chessPiece.getPieceType(), chessPiece.getColor());
     }
 }

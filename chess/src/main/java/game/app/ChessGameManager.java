@@ -2,6 +2,7 @@ package game.app;
 
 import game.Position;
 import game.command.CommandInvoker;
+import game.computer.ComputerPlayer;
 import game.core.ChessGameTurn;
 import game.core.PlayerManager;
 import game.core.factory.ChessPiece;
@@ -24,18 +25,27 @@ public class ChessGameManager {
     private static VictoryCondition victoryCondition;
     private static ChessGameLogic chessGameLogic;
 
-    static void initializeGameComponents(PlayerManager playerManager) {
+    static void initializeGameComponents(PlayerManager playerManager,ComputerPlayer computerPlayer){
         chessGameState = new ChessGameState();
         commandInvoker = new CommandInvoker();
         commandInvoker.addUndoRedoListener(ChessGameManager::updateUI);
         DrawCondition drawCondition = new DrawCondition();
         victoryCondition = new VictoryCondition();
-        chessGameTurn = new ChessGameTurn(drawCondition, victoryCondition, chessGameState);
+        chessGameTurn = new ChessGameTurn(drawCondition, victoryCondition, chessGameState,playerManager);
 
         chessBoardUI = createChessBoardUI(chessGameState);
-        chessGameLogic = createChessGameLogic(chessGameTurn, commandInvoker, chessBoardUI, chessGameState, playerManager);
+        chessGameLogic = createChessGameLogic(chessGameTurn,
+                commandInvoker,
+                chessBoardUI,
+                chessGameState,
+                playerManager,
+                computerPlayer
+        );
 
-        setupGameLogic(chessGameLogic, chessBoardUI, chessGameState, chessGameTurn, drawCondition, victoryCondition);
+        setupGameLogic(chessGameLogic,
+                chessBoardUI, chessGameState,
+                chessGameTurn, drawCondition,
+                victoryCondition, playerManager, computerPlayer);
 
         GameStateManager.setChessGameTurn(chessGameTurn);
     }
@@ -48,7 +58,8 @@ public class ChessGameManager {
                                                        CommandInvoker commandInvoker,
                                                        ChessBoardUI chessBoardUI,
                                                        ChessGameState chessGameState,
-                                                       PlayerManager playerManager
+                                                       PlayerManager playerManager,
+                                                       ComputerPlayer computerPlayer
     ) {
         CastlingLogic castlingLogic = new CastlingLogic(chessBoardUI, chessGameState);
         PromotionLogic promotionLogic = new PromotionLogic(chessGameState, chessBoardUI, chessGameState);
@@ -58,7 +69,8 @@ public class ChessGameManager {
                 promotionLogic,
                 playerManager,
                 chessGameState,
-                chessGameState
+                chessGameState,
+                computerPlayer
         );
         chessGameLogic.setGameEventListener(chessBoardUI, chessGameState, chessGameState, chessGameState);
         castlingLogic.setCastlingLogic(chessGameState, chessGameLogic);
@@ -70,13 +82,15 @@ public class ChessGameManager {
                                        ChessGameState chessGameState,
                                        ChessGameTurn chessGameTurn,
                                        DrawCondition drawCondition,
-                                       VictoryCondition victoryCondition
+                                       VictoryCondition victoryCondition,
+                                        PlayerManager playerManager,
+                                        ComputerPlayer computerPlayer
     ) {
         chessBoardUI.setGameLogicActions(chessGameLogic);
         chessGameTurn.setSpecialMoveManager(chessGameState);
-        chessGameState.setGameLogicActions(chessGameLogic);
         victoryCondition.setVictoryCondition(chessGameState, chessGameTurn, chessGameState, chessGameState);
-        drawCondition.setDrawCondition(chessGameState, chessGameLogic, chessGameTurn,chessGameState, chessGameState);
+        drawCondition.setDrawCondition(chessGameState, chessGameLogic, chessGameTurn, chessGameState, chessGameState);
+        computerPlayer.setComputer(chessGameState, chessGameLogic, chessGameTurn, playerManager);
     }
 
     public static void updateUI() {
@@ -85,6 +99,9 @@ public class ChessGameManager {
                 JPanel panel = chessBoardUI.getPanelAtPosition(new Position(x, y));
 
                 panel.removeAll();
+                panel.revalidate();
+                panel.repaint();
+
                 chessBoardUI.setDefaultTileBackground(y * 8 + x, panel);
             }
         }
@@ -93,5 +110,6 @@ public class ChessGameManager {
             chessBoardUI.placePieceOnboard(entry.getKey(), entry.getValue());
 
         }
+
     }
 }

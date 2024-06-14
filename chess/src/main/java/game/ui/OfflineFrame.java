@@ -1,6 +1,6 @@
 package game.ui;
 
-import game.core.ChessGameTurn;
+import game.computer.ComputerPlayer;
 import game.util.Color;
 import game.core.Player;
 import game.core.PlayerManager;
@@ -10,24 +10,46 @@ import java.awt.*;
 import java.util.List;
 
 public class OfflineFrame extends JFrame {
-    private final PlayerManager playerManager;
-    ChessGameTurn chessGameTurn;
     JTextField userTextField;
     JTextField opponentTextField;
+    JLabel userNameLabel;
+    JLabel opponentLabel;
+    JPanel userPanel;
+    JPanel opponentPanel;
     JButton startButton;
-    public OfflineFrame(PlayerManager playerManager) {
-        this.playerManager = playerManager;
+    JButton dualPlayerButton;
+    JButton computerButton;
+    public OfflineFrame(PlayerManager playerManager, ComputerPlayer computerPlayer) {
+        setTitle("Offline Game");
         setLayout( new FlowLayout(FlowLayout.CENTER));
-        setLocationRelativeTo(null);
-        add(new JLabel("Offline Mode"));
         setSize(300, 200);
+        setLocationRelativeTo(null);
+        userNameLabel = new JLabel();
+        userNameLabel.setText("Player 1");
+
         userTextField = new JTextField(20);
-        add(new JLabel("Username:"));
         add(userTextField);
 
+        userPanel = new JPanel();
+        userPanel.add(userNameLabel);
+        userPanel.add(userTextField);
+
+        opponentLabel = new JLabel();
+        opponentLabel.setText("Player 2");
+
         opponentTextField = new JTextField(20);
-        add(new JLabel("Opponent:"));
         add(opponentTextField);
+
+        opponentPanel = new JPanel();
+        opponentPanel.add(opponentLabel);
+        opponentPanel.add(opponentTextField);
+
+        add(userPanel);
+        add(opponentPanel);
+
+        userPanel.setVisible(false);
+        opponentPanel.setVisible(false);
+
 
         startButton = new JButton("Start");
         add(startButton);
@@ -42,10 +64,33 @@ public class OfflineFrame extends JFrame {
                 JOptionPane.showMessageDialog(null, "Starting game...");
             }
             this.dispose();
-            playerManager.setPlayers(List.of(new Player(user, Color.WHITE), new Player(opponent,Color.BLACK)));
-
-
+            playerManager.addPlayer(user, Color.WHITE);
+            playerManager.addPlayer(opponent, Color.BLACK);
+            playerManager.setCurrentPlayerIndex(0);
         });
+        computerButton = new JButton("Play against computer");
+        add(computerButton);
+        computerButton.addActionListener(e -> {
+            computerPlayer.setActive(true);
+            playerManager.addPlayer("User", Color.WHITE);
+            System.out.println(playerManager.getPlayers().size() + " " + playerManager.getCurrentPlayer().getName() + " " + playerManager.getCurrentPlayer().getColor());
+            playerManager.addPlayer("Computer", Color.BLACK);
+            playerManager.setCurrentPlayer(playerManager.getPlayers().get(0));
+            System.out.println(playerManager.getPlayers().size() + " " + playerManager.getCurrentPlayer().getName() + " " + playerManager.getCurrentPlayer().getColor());
+
+            this.dispose();
+        });
+        dualPlayerButton = new JButton("Dual Player");
+        add(dualPlayerButton);
+        dualPlayerButton.addActionListener(e -> {
+            userPanel.setVisible(true);
+            opponentPanel.setVisible(true);
+            revalidate();
+            repaint();
+        });
+
+
+
 
     }
 }
