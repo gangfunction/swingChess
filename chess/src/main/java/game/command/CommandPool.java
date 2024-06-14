@@ -1,11 +1,9 @@
 package game.command;
 
 import game.Position;
-import game.core.ChessGameTurn;
 import game.core.factory.ChessPiece;
 import game.model.state.CapturedPieceManager;
 import game.model.state.ChessPieceManager;
-import game.model.state.SpecialMoveManager;
 import game.model.state.MoveManager;
 
 import java.util.ArrayDeque;
@@ -16,20 +14,18 @@ public class CommandPool {
 
     public MoveCommand getCommand(ChessPiece piece,
                                   Position start, Position end,
-                                  SpecialMoveManager state,
-                                  ChessGameTurn turn,
                                   CapturedPieceManager capturedPieceManager,
                                   ChessPieceManager chessPieceManager,
                                   MoveManager moveManager
     ) {
         if (pool.isEmpty()) {
-            return new MoveCommand(piece, start, end, state, turn,
+            return new MoveCommand(piece, start, end,
                     capturedPieceManager,
                     chessPieceManager,
                     moveManager);
         } else {
             MoveCommand command = pool.pop();
-            command.reset(piece, start, end, state, turn,
+            command.reset(piece, start, end,
                     capturedPieceManager,
                     chessPieceManager,
                     moveManager);

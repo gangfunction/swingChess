@@ -15,6 +15,7 @@ public class ChessGameState implements SpecialMoveManager, CapturedPieceManager,
     private final Map<Position, ChessPiece> chessPieces = new ConcurrentHashMap<>();
     @Getter
     private final Stack<ChessPiece> capturedPieces = new Stack<>();
+
     private ChessPiece selectedPiece = null;
     private ChessPiece lastMovedPiece = null;
     private boolean lastMoveWasDoubleStep = false;
@@ -198,20 +199,6 @@ public class ChessGameState implements SpecialMoveManager, CapturedPieceManager,
                 .orElse(null));
     }
 
-
-    @Override
-    public char[] getCastlingRights() {
-        StringBuilder rights = new StringBuilder();
-
-        if (isKingSideCastlingAllowed) {
-            rights.append('K');
-        }
-        if (isQueenSideCastlingAllowed) {
-            rights.append('Q');
-        }
-
-        return rights.toString().toCharArray();
-    }
 
     @Override
     public void setCanCastle(boolean canCastle) {

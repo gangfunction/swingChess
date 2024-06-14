@@ -9,6 +9,8 @@ import game.model.state.ChessPieceManager;
 import game.util.PieceType;
 import lombok.Getter;
 import lombok.Setter;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.swing.*;
 import java.awt.*;
@@ -22,6 +24,7 @@ import static game.util.Color.WHITE;
 
 
 public class ChessBoardUI extends JFrame implements GameEventListener {
+    private static final Logger log = LoggerFactory.getLogger(ChessBoardUI.class);
     @Getter
     private JPanel boardPanel;
     private final transient ChessGameState chessGameState;
@@ -45,12 +48,12 @@ public class ChessBoardUI extends JFrame implements GameEventListener {
     }
 
 
-    private void initializeStatusBar(){
+    private void initializeStatusBar() {
         JLabel statusBar = new JLabel("White's turn");
         add(statusBar, BorderLayout.SOUTH);
     }
 
-    private void initializeCapturedPiecesPanel(){
+    private void initializeCapturedPiecesPanel() {
         JPanel capturedPiecesPanel = new JPanel();
         capturedPiecesPanel.setLayout(new GridLayout(2, 8));
         add(capturedPiecesPanel, BorderLayout.NORTH);
@@ -89,7 +92,7 @@ public class ChessBoardUI extends JFrame implements GameEventListener {
     public void highlightPossibleMoves(ChessPiece piece) {
         clearHighlights();
         getHighlightedPositions().clear();
-        Set<Position> moves = piece.calculateMoves(chessGameState,chessGameState);// 이동 가능한 위치 계산
+        Set<Position> moves = piece.calculateMoves(chessGameState, chessGameState);// 이동 가능한 위치 계산
         moves.removeIf(this::isOutOfBounds);
         highlightMoves(moves);
         highlightedPositions.addAll(moves);
@@ -111,6 +114,7 @@ public class ChessBoardUI extends JFrame implements GameEventListener {
             }
         }
     }
+
     private final Map<Position, JPanel> panelCache = new HashMap<>();
 
     public JPanel getPanelAtPosition(Position position) {
@@ -138,7 +142,7 @@ public class ChessBoardUI extends JFrame implements GameEventListener {
         square.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent e) {
-                if(gameLogicActions != null && SwingUtilities.isLeftMouseButton(e)){
+                if (gameLogicActions != null && SwingUtilities.isLeftMouseButton(e)) {
                     gameLogicActions.handleSquareClick(x, y);
                 }
             }
@@ -186,20 +190,17 @@ public class ChessBoardUI extends JFrame implements GameEventListener {
 
     }
 
-
     @Override
     public void placePieceOnboard(Position move, ChessPiece chessPiece) {
-        SwingUtilities.invokeLater(() -> {
-            try {
-                chessPieceManager.addChessPiece(move, chessPiece);
-                Icon icon = IconLoader.loadIcon(chessPiece.getType(), chessPiece.getColor());
-                JLabel pieceLabel = new JLabel(icon, SwingConstants.CENTER);
-                JPanel panel = getPanelAtPosition(chessPiece.getPosition());
-                addPieceToPanel(panel, pieceLabel);
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-        });
+        try {
+            chessPieceManager.addChessPiece(move, chessPiece);
+            Icon icon = IconLoader.loadIcon(chessPiece.getType(), chessPiece.getColor());
+            JLabel pieceLabel = new JLabel(icon, SwingConstants.CENTER);
+            JPanel panel = getPanelAtPosition(chessPiece.getPosition());
+            addPieceToPanel(panel, pieceLabel);
+        } catch (Exception e) {
+            log.error("Failed to place piece on board", e);
+        }
     }
 
     @Override
@@ -232,10 +233,8 @@ public class ChessBoardUI extends JFrame implements GameEventListener {
     private void updateUI(JPanel oldPanel, JPanel newPanel) {
         oldPanel.revalidate();
         newPanel.revalidate();
-        SwingUtilities.invokeLater(() -> {
-            oldPanel.repaint();
-            newPanel.repaint();
-        });
+        oldPanel.repaint();
+        newPanel.repaint();
     }
 
     private void putPieceToPanel(JPanel panel, ChessPiece piece) {
@@ -253,24 +252,4 @@ public class ChessBoardUI extends JFrame implements GameEventListener {
         JOptionPane.showMessageDialog(null, reason);
     }
 
-    public void setPieceIcon(Position position, Icon icon) {
-        JPanel panel = getPanelAtPosition(position);
-        panel.removeAll();
-        panel.add(new JLabel(icon));
-        panel.revalidate();
-        panel.repaint();
-    }
-
-    public void rotateBoard(boolean isBlackTurn) {
-        // 체스판 회전 로직 구현
-        // 예시: boardPanel의 모든 컴포넌트를 회전시키는 경우
-        for (Component component : boardPanel.getComponents()) {
-            if (component instanceof JPanel) {
-                JPanel panel = (JPanel) component;
-                panel.setComponentOrientation(isBlackTurn ? ComponentOrientation.RIGHT_TO_LEFT : ComponentOrientation.LEFT_TO_RIGHT);
-            }
-        }
-        boardPanel.revalidate();
-        boardPanel.repaint();
-    }
 }

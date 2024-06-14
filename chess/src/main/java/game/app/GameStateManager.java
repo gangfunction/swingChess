@@ -63,7 +63,7 @@ public class GameStateManager {
         if (!Files.exists(path)) {
             try {
                 Files.createDirectories(path);
-                log.info("Directory created: " + directoryPath);
+                log.info("Directory created: {}", directoryPath);
             } catch (IOException e) {
                 log.error("Failed to create directory", e);
                 return;
@@ -82,7 +82,7 @@ public class GameStateManager {
 
         try (FileWriter fileWriter = new FileWriter(filename)) {
             fileWriter.write(gameState);
-            log.info("Game state saved successfully to " + filename);
+            log.info("Game state saved successfully to {}", filename);
         } catch (IOException e) {
             log.error("Failed to save game state", e);
         }

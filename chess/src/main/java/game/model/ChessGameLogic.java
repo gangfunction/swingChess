@@ -4,7 +4,6 @@ import game.GameUtils;
 import game.Position;
 import game.command.CommandInvoker;
 import game.command.MoveCommand;
-import game.computer.ComputerPlayer;
 import game.core.ChessGameTurn;
 import game.model.state.CapturedPieceManager;
 import game.model.state.ChessPieceManager;
@@ -38,14 +37,12 @@ public class ChessGameLogic implements GameLogicActions {
     private final ChessObserver chessObserver;
     private CastlingHandler castlingHandler;
     private final ChessRuleHandler chessRuleHandler;
-    private Position enPassantTarget = null;
     @Setter
     private boolean afterCastling = false;
     private final PlayerManager playerManager;
     private CapturedPieceManager capturedPieceManager;
     private final ChessPieceManager chessPieceManager;
     private final MoveManager moveManager;
-    private final ComputerPlayer computerPlayer;
 
 
     public ChessGameLogic(ChessGameTurn chessGameTurn,
@@ -54,8 +51,7 @@ public class ChessGameLogic implements GameLogicActions {
                           PromotionLogic promotionLogic,
                           PlayerManager playerManager,
                           ChessPieceManager chessPieceManager,
-                          MoveManager moveManager,
-                          ComputerPlayer computerPlayer
+                          MoveManager moveManager
     ) {
         this.chessGameTurn = chessGameTurn;
         this.commandInvoker = commandInvoker;
@@ -69,7 +65,6 @@ public class ChessGameLogic implements GameLogicActions {
         this.chessObserver.addObserver(new GameUIObserver());
         this.chessRuleHandler = new ChessRuleHandler(chessPieceManager, moveManager);
         this.playerManager = playerManager;
-        this.computerPlayer = computerPlayer;
     }
 
     public void setGameEventListener(GameEventListener gameEventListener,
@@ -81,7 +76,7 @@ public class ChessGameLogic implements GameLogicActions {
         this.specialMoveManager = specialMoveManager;
         this.capturedPieceManager = capturedPieceManager;
         this.victoryCondition.setVictoryCondition(specialMoveManager, chessGameTurn, chessPieceManager, moveManager);
-        this.drawCondition.setDrawCondition(specialMoveManager, this, chessGameTurn, chessPieceManager, moveManager);
+        this.drawCondition.setDrawCondition(specialMoveManager, this, chessGameTurn, chessPieceManager);
         this.castlingLogic.setCastlingLogic(specialMoveManager, this);
         this.castlingHandler = new CastlingHandler(specialMoveManager,
                 gameEventListener,
@@ -208,7 +203,7 @@ public class ChessGameLogic implements GameLogicActions {
     }
 
     private void handleEnPassantCapture(ChessPiece selectedPiece, Position clickedPosition) {
-        if (chessRuleHandler.checkEnPassantCondition(selectedPiece, clickedPosition, specialMoveManager)) {
+        if (chessRuleHandler.checkEnPassantCondition(selectedPiece, clickedPosition)) {
             Position targetPawnPosition = getEnPassantTargetPosition(clickedPosition, selectedPiece.getColor());
             ChessPiece targetPawn = chessPieceManager.getChessPieceAt(targetPawnPosition);
             if (targetPawn != null && targetPawn.getType() == PieceType.PAWN) {

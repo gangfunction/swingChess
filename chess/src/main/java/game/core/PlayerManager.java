@@ -31,17 +31,14 @@ public class PlayerManager {
     }
 
     public  Color getCurrentPlayerColor() {
-        System.out.println("현재 플레이어의 색깔을 반환합니다." + players.get(currentPlayerIndex).getColor());
-        return players.get(currentPlayerIndex).getColor();
+        return players.get(currentPlayerIndex).color();
     }
 
     public void nextPlayer() {
-        System.out.println("다음 플레이어로 넘어갑니다."+ players.size());
         currentPlayerIndex = (currentPlayerIndex + 1) % 2;
     }
 
     public void setCurrentPlayer(Player player) {
-        System.out.println("현재 플레이어를 설정합니다." + player.getName() + " " + player.getColor());
         currentPlayerIndex = players.indexOf(player);
     }
 }

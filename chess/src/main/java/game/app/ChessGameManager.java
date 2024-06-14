@@ -18,24 +18,22 @@ import javax.swing.*;
 import java.util.Map;
 
 public class ChessGameManager {
-    public static ChessBoardUI chessBoardUI;
+    public static  ChessBoardUI chessBoardUI;
     private static ChessGameState chessGameState;
     static ChessGameTurn chessGameTurn;
     static CommandInvoker commandInvoker;
-    private static VictoryCondition victoryCondition;
-    private static ChessGameLogic chessGameLogic;
 
     static void initializeGameComponents(PlayerManager playerManager,ComputerPlayer computerPlayer){
         chessGameState = new ChessGameState();
         commandInvoker = new CommandInvoker();
         commandInvoker.addUndoRedoListener(ChessGameManager::updateUI);
         DrawCondition drawCondition = new DrawCondition();
-        victoryCondition = new VictoryCondition();
+        VictoryCondition victoryCondition = new VictoryCondition();
         chessGameTurn = new ChessGameTurn(drawCondition, victoryCondition, chessGameState,playerManager,computerPlayer);
 
         chessBoardUI = createChessBoardUI(chessGameState);
 
-        chessGameLogic = createChessGameLogic(chessGameTurn,
+        ChessGameLogic chessGameLogic = createChessGameLogic(chessGameTurn,
                 commandInvoker,
                 chessBoardUI,
                 chessGameState,
@@ -70,8 +68,7 @@ public class ChessGameManager {
                 promotionLogic,
                 playerManager,
                 chessGameState,
-                chessGameState,
-                computerPlayer
+                chessGameState
         );
         chessGameLogic.setGameEventListener(chessBoardUI, chessGameState, chessGameState, chessGameState);
         castlingLogic.setCastlingLogic(chessGameState, chessGameLogic);
@@ -90,7 +87,7 @@ public class ChessGameManager {
         chessBoardUI.setGameLogicActions(chessGameLogic);
         chessGameTurn.setSpecialMoveManager(chessGameState);
         victoryCondition.setVictoryCondition(chessGameState, chessGameTurn, chessGameState, chessGameState);
-        drawCondition.setDrawCondition(chessGameState, chessGameLogic, chessGameTurn, chessGameState, chessGameState);
+        drawCondition.setDrawCondition(chessGameState, chessGameLogic, chessGameTurn, chessGameState);
         computerPlayer.setComputer(chessGameState, chessGameLogic, chessGameTurn, playerManager);
     }
 

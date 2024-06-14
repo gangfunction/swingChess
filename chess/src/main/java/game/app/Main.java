@@ -59,10 +59,10 @@ public class Main {
         splitPane.setBottomComponent(createLogPanel(chessGameTurn));
         splitPane.setResizeWeight(0.8);
 
-        JXCollapsiblePane collapsiblePane = createCollapsibleButtonPanel();
+        collapsiblePane = createCollapsibleButtonPanel();
         JPanel rightPanel = new JPanel(new BorderLayout());
         rightPanel.add(collapsiblePane, BorderLayout.CENTER);
-        JSplitPane mainSplitPane = getjSplitPane(splitPane, rightPanel);
+        mainSplitPane = getjSplitPane(splitPane, rightPanel);
 
         primaryFrame.setContentPane(mainSplitPane);
         primaryFrame.pack();
@@ -163,7 +163,7 @@ public class Main {
     private  JFrame createPrimaryFrame() {
         if (primaryFrame == null) {
             primaryFrame = new JFrame("Chess Game");
-            primaryFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+            primaryFrame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
             primaryFrame.setSize(800, 600);
         }
         return primaryFrame;

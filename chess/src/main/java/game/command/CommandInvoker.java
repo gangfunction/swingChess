@@ -19,11 +19,6 @@ public class CommandInvoker {
     private final List<Runnable> listeners = new ArrayList<>();
     private final CommandPool commandPool = new CommandPool();
 
-    /**
-     * Executes a command and stores it in the undo stack.
-     * Clears the redo stack as new command execution invalidates the redo history.
-     *
-     */
     public synchronized MoveCommand executeCommand(ChessPiece piece,
                                                    Position start,
                                                    Position end,
@@ -33,7 +28,7 @@ public class CommandInvoker {
                                                    ChessPieceManager chessPieceManager,
                                                    MoveManager moveManager
     ) {
-        MoveCommand command = commandPool.getCommand(piece, start, end, state, turn,
+        MoveCommand command = commandPool.getCommand(piece, start, end,
                 capturedPieceManager,
                 chessPieceManager,
                 moveManager);

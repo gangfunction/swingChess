@@ -2,7 +2,6 @@ package game.core;
 
 import game.GameUtils;
 import game.Position;
-import game.app.ChessGameManager;
 import game.computer.ComputerPlayer;
 import game.core.factory.ChessPiece;
 import game.model.state.ChessPieceManager;
@@ -18,27 +17,18 @@ import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 
 import javax.swing.*;
-import java.io.Serial;
-import java.io.Serializable;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 import static game.app.ChessGameManager.chessBoardUI;
 import static game.app.ChessGameManager.updateUI;
 
 @Slf4j
-public class ChessGameTurn implements GameTurnListener, Serializable ,ObserverListener{
-    @Serial
-    private static final long serialVersionUID = 1L;
+public class ChessGameTurn implements GameTurnListener ,ObserverListener{
     @Setter
     private SpecialMoveManager specialMoveManager;
-
     private final PlayerManager playerManager;
     private final List<Observer> observers;
-    private static final int NUMBER_OF_PLAYERS = 2;
-    private int currentPlayerIndex;
-    private boolean gameEnded;
     private final DrawCondition drawCondition;
     private final VictoryCondition victoryCondition;
     private final ChessObserver chessObserver;
@@ -56,8 +46,6 @@ public class ChessGameTurn implements GameTurnListener, Serializable ,ObserverLi
         this.chessPieceManager = chessPieceManager;
         this.playerManager = playerManager;
         this.computerPlayer = computerPlayer;
-        this.currentPlayerIndex = 0;
-        this.gameEnded = false;
         this.observers = new ArrayList<>();
         this.chessObserver = new ChessObserver();
     }
@@ -81,20 +69,22 @@ public class ChessGameTurn implements GameTurnListener, Serializable ,ObserverLi
     public void nextTurn() {
         playerManager.nextPlayer();
         Player player = playerManager.getCurrentPlayer();
-        notifyObservers(player.getName() + "님의 차례입니다.");
+        notifyObservers(player.name() + "님의 차례입니다.");
         checkGameStatusAndConditions(player);
         victoryCondition.invalidateKingInCheckCache();
+
         if (playerManager.getCurrentPlayerColor() == Color.BLACK &&
                 computerPlayer.isActive()) {
             computerPlayer.play();
         }
     }
 
+
     private void checkGameStatusAndConditions(Player player) {
         GameStatus gameStatus = determineGameStatus();
         switch (gameStatus) {
             case CHECKMATE:
-                JOptionPane.showMessageDialog(null, "체크메이트! " + player.getName() + "님의 승리입니다.");
+                JOptionPane.showMessageDialog(null, "체크메이트! " + player.name() + "님의 승리입니다.");
                 endGame();
                 break;
             case STALEMATE:
@@ -107,7 +97,7 @@ public class ChessGameTurn implements GameTurnListener, Serializable ,ObserverLi
                 break;
             case ONGOING:
                 if (victoryCondition.isKingInCheck(chessPieceManager.getKing(playerManager.getCurrentPlayerColor()))) {
-                    notifyObservers("체크 " + player.getName() + "님!");
+                    notifyObservers("체크 " + player.name() + "님!");
                 }
                 break;
         }
@@ -127,13 +117,8 @@ public class ChessGameTurn implements GameTurnListener, Serializable ,ObserverLi
     }
 
     @Override
-    public boolean isGameEnded() {
-        return gameEnded;
-    }
-
-    @Override
     public void endGame() {
-        this.gameEnded = true;
+        // TODO document why this method is empty
     }
 
     @Override
@@ -156,32 +141,48 @@ public class ChessGameTurn implements GameTurnListener, Serializable ,ObserverLi
                 getTotalMoves();
     }
 
+    private String getPiecePlacement() {
+        StringBuilder placement = new StringBuilder();
+        for (int rank = 7; rank >= 0; rank--) {
+            piecePlacement(placement, rank);
+            if (rank > 0) {
+                placement.append("/");
+            }
+        }
+        return placement.toString();
+    }
+
     private String getComputerPiecePlacement() {
         StringBuilder placement = new StringBuilder();
         for (int rank = 0; rank < 8; rank++) {
-            int emptySquares = 0;
-            for (int file = 0; file <8 ; file++) { // 파일 순서를 반대로
-                Position position = new Position(file, rank);
-                ChessPiece piece = GameUtils.findPieceAtPosition(chessPieceManager, position).orElse(null);
-                if (piece == null) {
-                    emptySquares++;
-                } else {
-                    if (emptySquares > 0) {
-                        placement.append(emptySquares);
-                        emptySquares = 0;
-                    }
-                    placement.append(piece.getType().getFenSymbol(piece.getColor()));
-                }
-            }
-            if (emptySquares > 0) {
-                placement.append(emptySquares);
-            }
+            piecePlacement(placement, rank);
             if (rank < 7) {
                 placement.append("/"); // 마지막 행에서는 "/" 추가 안함
             }
         }
         return placement.toString();
     }
+
+    private void piecePlacement(StringBuilder placement, int rank) {
+        int emptySquares = 0;
+        for (int file = 0; file <8 ; file++) { // 파일 순서를 반대로
+            Position position = new Position(file, rank);
+            ChessPiece piece = GameUtils.findPieceAtPosition(chessPieceManager, position).orElse(null);
+            if (piece == null) {
+                emptySquares++;
+            } else {
+                if (emptySquares > 0) {
+                    placement.append(emptySquares);
+                    emptySquares = 0;
+                }
+                placement.append(piece.getType().getFenSymbol(piece.getColor()));
+            }
+        }
+        if (emptySquares > 0) {
+            placement.append(emptySquares);
+        }
+    }
+
     public String getFEN() {
         Color currentPlayerColor = playerManager.getCurrentPlayerColor();
         return getPiecePlacement() + " " +
@@ -190,33 +191,6 @@ public class ChessGameTurn implements GameTurnListener, Serializable ,ObserverLi
                 getEnPassantTarget() + " " +
                 specialMoveManager.getHalfMoveClock() + " " +
                 getTotalMoves();
-    }
-
-    private String getPiecePlacement() {
-        StringBuilder placement = new StringBuilder();
-        for (int rank = 7; rank >= 0; rank--) {
-            int emptySquares = 0;
-            for (int file = 0; file < 8; file++) {
-                Position position = new Position(file, rank);
-                ChessPiece piece = GameUtils.findPieceAtPosition(chessPieceManager, position).orElse(null);
-                if (piece == null) {
-                    emptySquares++;
-                } else {
-                    if (emptySquares > 0) {
-                        placement.append(emptySquares);
-                        emptySquares = 0;
-                    }
-                    placement.append(piece.getType().getFenSymbol(piece.getColor()));
-                }
-            }
-            if (emptySquares > 0) {
-                placement.append(emptySquares);
-            }
-            if (rank > 0) {
-                placement.append("/");
-            }
-        }
-        return placement.toString();
     }
     private String getCastlingRights() {
         StringBuilder rights = new StringBuilder();
@@ -291,34 +265,17 @@ public class ChessGameTurn implements GameTurnListener, Serializable ,ObserverLi
             }
         }
 
-        Color currentPlayerColor;
-        if (parts[1].equals("w")) {
-            currentPlayerColor = Color.WHITE;
-        } else {
-            currentPlayerColor = Color.BLACK;
-        }
-        for (int i = 0; i < playerManager.getPlayers().size(); i++) {
-            if (playerManager.getPlayers().get(i).equals(currentPlayerColor)) {
-                currentPlayerIndex = i;
-                break;
-            }
-        }
-
-        // 캐슬링 권한 처리
         specialMoveManager.setCastlingRights(parts[2]);
 
-        // 앙파상 타겟 처리
         if (!parts[3].equals("-")) {
             int file = parts[3].charAt(0) - 'a';
             int rank = 8 - Integer.parseInt(parts[3].substring(1));
             specialMoveManager.setEnPassantTarget(new Position(file, rank));
         }
 
-        // 50 move rule 처리
         specialMoveManager.setHalfMoveClock(Integer.parseInt(parts[4]));
 
 
-        //getChessPieces 메소드를 사용하여 체스 말 배치 정보를 가져온 후 UI에 반영
         updateUI();
 
         notifyObservers("Game state deserialized and UI updated.");

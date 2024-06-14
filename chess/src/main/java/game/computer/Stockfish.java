@@ -1,8 +1,12 @@
 package game.computer;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.io.*;
 
 public class Stockfish {
+    private static final Logger log = LoggerFactory.getLogger(Stockfish.class);
     private Process engineProcess;
     private BufferedReader processReader;
     private PrintWriter processWriter;
@@ -16,7 +20,7 @@ public class Stockfish {
 
             checkEngine();
         } catch (Exception e) {
-            e.printStackTrace();
+            log.error("Stockfish engine has failed to start");
         }
     }
 
@@ -24,7 +28,9 @@ public class Stockfish {
         sendCommand("uci");
         String output = getOutput(1000);
         if (output.contains("uciok")) {
-            System.out.println("Stockfish engine has started successfully");
+            log.info("Stockfish engine has started successfully");
+        } else {
+            log.error("Stockfish engine has failed to start");
         }
     }
 
@@ -40,7 +46,7 @@ public class Stockfish {
                 output.append(processReader.readLine()).append("\n");
             }
         } catch (Exception e) {
-            e.printStackTrace();
+            log.error("Failed to get output from Stockfish engine");
         }
         return output.toString();
     }
@@ -52,7 +58,7 @@ public class Stockfish {
             processWriter.close();
             engineProcess.destroy();
         } catch (Exception e) {
-            e.printStackTrace();
+            log.error("Failed to stop Stockfish engine");
         }
     }
 

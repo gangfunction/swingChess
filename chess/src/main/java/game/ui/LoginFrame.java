@@ -24,7 +24,7 @@ public class LoginFrame extends JFrame implements ActionListener {
         setTitle("Login Form");
         setLayout(new FlowLayout(FlowLayout.CENTER));
         setSize(350, 200);
-        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
         setLocationRelativeTo(null);
 
 
@@ -73,12 +73,10 @@ public class LoginFrame extends JFrame implements ActionListener {
             HttpClient.sendLoginRequest(message);
             this.dispose();
         } else if (e.getSource() == registerButton) {
-            // 회원가입 창으로 이동
             new RegisterFrame();
             this.dispose();
         }
         else if (e.getSource() == offlineButton) {
-            // 오프라인 모드로 이동
             new OfflineFrame(playerManager,computerPlayer);
             JOptionPane.showMessageDialog(null, "Offline mode");
             this.dispose();

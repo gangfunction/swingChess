@@ -6,11 +6,7 @@ import game.util.Color;
 
 public interface SpecialMoveManager {
 
-
     boolean isRookUnmovedForCastling(Color color, Position kingPosition);
-
-
-    char[] getCastlingRights();
 
     void setCanCastle(boolean b);
 

@@ -22,8 +22,7 @@ public class HttpClient extends SimpleChannelInboundHandler<HttpObject> {
     @Getter
     private static String sessionId;
 
-    public HttpClient(ResponseHandler responseHandler) {
-        HttpClient.responseHandler = responseHandler;
+    public HttpClient() {
     }
 
     public static void sendJoinRoomRequest(String selectedRoom) {
@@ -110,7 +109,7 @@ public class HttpClient extends SimpleChannelInboundHandler<HttpObject> {
                     protected void initChannel(Channel ch) {
                         ch.pipeline().addLast(new HttpClientCodec());
                         ch.pipeline().addLast(new HttpObjectAggregator(1048576));
-                        ch.pipeline().addLast(new HttpClient(responseHandler));
+                        ch.pipeline().addLast(new HttpClient());
                     }
                 });
     }
@@ -156,7 +155,4 @@ public class HttpClient extends SimpleChannelInboundHandler<HttpObject> {
         return sessionIdPair.length > 1 ? sessionIdPair[1] : null;
     }
 
-    public static void shutdown() {
-        workerGroup.shutdownGracefully();
-    }
 }

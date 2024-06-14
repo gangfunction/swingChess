@@ -1,8 +1,9 @@
 package game.ui;
 
-import game.core.factory.ChessPiece;
 import game.util.Color;
 import game.util.PieceType;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.imageio.ImageIO;
 import javax.swing.*;
@@ -14,6 +15,7 @@ import java.net.URL;
 public class IconLoader {
     private static final int ICON_WIDTH = 50;
     private static final int ICON_HEIGHT = 50;
+    private static final Logger log = LoggerFactory.getLogger(IconLoader.class);
 
 
     public static Icon loadIcon(PieceType pieceType, Color color) {
@@ -22,7 +24,7 @@ public class IconLoader {
         if (iconURL != null) {
             return createIconFromURL(iconURL);
         } else {
-            System.err.println("Icon not found: " + iconName);
+            log.error("Failed to load icon: {}", iconName);
             return null;
         }
     }
@@ -35,7 +37,7 @@ public class IconLoader {
                 return new ImageIcon(resizedImage);
             }
         } catch (IOException e) {
-            e.printStackTrace();
+            log.error("Failed to load icon from URL: {}", iconURL, e);
         }
         return null;
     }
@@ -47,7 +49,4 @@ public class IconLoader {
 
     }
 
-    public static Icon getIcon(ChessPiece chessPiece) {
-        return loadIcon(chessPiece.getPieceType(), chessPiece.getColor());
-    }
 }

@@ -4,8 +4,6 @@ public interface GameTurnListener {
 
     void nextTurn();
 
-    boolean isGameEnded();
-
     void endGame();
 
     String serializeGameState();
@@ -13,4 +11,5 @@ public interface GameTurnListener {
     String computerSerializeGameState();
 
     void deserializeGameState(String gameState);
+
 }

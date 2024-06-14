@@ -2,12 +2,10 @@ package game.ui;
 
 import game.computer.ComputerPlayer;
 import game.util.Color;
-import game.core.Player;
 import game.core.PlayerManager;
 
 import javax.swing.*;
 import java.awt.*;
-import java.util.List;
 
 public class OfflineFrame extends JFrame {
     JTextField userTextField;
@@ -73,10 +71,8 @@ public class OfflineFrame extends JFrame {
         computerButton.addActionListener(e -> {
             computerPlayer.setActive(true);
             playerManager.addPlayer("User", Color.WHITE);
-            System.out.println(playerManager.getPlayers().size() + " " + playerManager.getCurrentPlayer().getName() + " " + playerManager.getCurrentPlayer().getColor());
             playerManager.addPlayer("Computer", Color.BLACK);
             playerManager.setCurrentPlayer(playerManager.getPlayers().get(0));
-            System.out.println(playerManager.getPlayers().size() + " " + playerManager.getCurrentPlayer().getName() + " " + playerManager.getCurrentPlayer().getColor());
 
             this.dispose();
         });

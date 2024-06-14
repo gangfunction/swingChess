@@ -13,17 +13,13 @@ import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+@Getter
 public class ChessPiece {
     private static final Logger LOGGER = Logger.getLogger(ChessPiece.class.getName());
-    @Getter
-    private PieceType pieceType;
-    @Getter
+    private final PieceType pieceType;
     private Position position;
-    @Getter
-    private Color color;
-    @Getter
+    private final Color color;
     private boolean moved = false;
-    @Getter
     private final MoveStrategy moveStrategy;
 
     public ChessPiece(PieceType pieceType, Position position, Color color) {

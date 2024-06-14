@@ -2,7 +2,6 @@ package game.model;
 
 import game.Position;
 import game.model.state.ChessPieceManager;
-import game.model.state.SpecialMoveManager;
 import game.model.state.MoveManager;
 import game.util.Color;
 import game.core.factory.ChessPiece;
@@ -36,7 +35,7 @@ public class ChessRuleHandler {
                 .orElse(null);
     }
 
-    boolean checkEnPassantCondition(ChessPiece selectedPiece, Position moveTo, SpecialMoveManager specialMoveManager) {
+    boolean checkEnPassantCondition(ChessPiece selectedPiece, Position moveTo) {
         if (selectedPiece.getType() != PieceType.PAWN) return false;
         int direction = selectedPiece.getColor() == Color.WHITE ? 1 : -1;
         Position adjacentPawnPosition = new Position(moveTo.x(), moveTo.y() + direction);

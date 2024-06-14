@@ -2,7 +2,6 @@ package game.status;
 
 import game.Position;
 import game.model.state.ChessPieceManager;
-import game.model.state.MoveManager;
 import game.util.Color;
 import game.core.GameTurnListener;
 import game.core.factory.ChessPiece;
@@ -22,19 +21,16 @@ public class DrawCondition {
     private GameTurnListener gameTurnListener;
     private final Map<String, Integer> gameStateOccurrences = new HashMap<>();
     private ChessPieceManager chessPieceManager;
-    private MoveManager moveManager;
 
     public void setDrawCondition(SpecialMoveManager chessGameState,
                                  GameLogicActions chessGameLogic,
                                  GameTurnListener chessGameTurn,
-                                 ChessPieceManager chessPieceManager,
-                                 MoveManager moveManager
+                                 ChessPieceManager chessPieceManager
     ) {
         this.specialMoveManager = chessGameState;
         this.gameLogicActions = chessGameLogic;
         this.gameTurnListener = chessGameTurn;
         this.chessPieceManager= chessPieceManager;
-        this.moveManager = moveManager;
     }
 
     public boolean isDraw() {

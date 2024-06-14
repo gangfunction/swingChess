@@ -19,12 +19,12 @@ public class ServerFrame extends JFrame implements ActionListener {
 
     @Getter
     @Setter
-    private boolean MaxRoom = false;
+    private boolean maxRoom = false;
     
     public ServerFrame() {
         setTitle("Game Room List");
         setSize(400, 300);
-        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
         setLocationRelativeTo(null);
         setLayout(new BorderLayout());
 
