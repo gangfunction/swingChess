@@ -8,3 +8,13 @@ chess/.idea/
 
 # SonarQube Plugin
 .idea/**/sonarIssues.xml
+
+
+
+# Build directories
+target/
+build/
+
+# IDE files
+.idea/
+*.iml
