@@ -3,6 +3,7 @@ package game.core;
 import game.GameUtils;
 import game.Position;
 import game.app.ChessGameManager;
+import game.computer.ComputerPlayer;
 import game.core.factory.ChessPiece;
 import game.model.state.ChessPieceManager;
 import game.util.PieceType;
@@ -42,17 +43,19 @@ public class ChessGameTurn implements GameTurnListener, Serializable ,ObserverLi
     private final VictoryCondition victoryCondition;
     private final ChessObserver chessObserver;
     private final ChessPieceManager chessPieceManager;
+    private final ComputerPlayer computerPlayer;
 
 
     public ChessGameTurn(DrawCondition drawCondition,
                          VictoryCondition victoryCondition,
                          ChessPieceManager chessPieceManager,
-                            PlayerManager playerManager
-                         ) {
+                         PlayerManager playerManager, ComputerPlayer computerPlayer
+    ) {
         this.drawCondition = drawCondition;
         this.victoryCondition = victoryCondition;
         this.chessPieceManager = chessPieceManager;
         this.playerManager = playerManager;
+        this.computerPlayer = computerPlayer;
         this.currentPlayerIndex = 0;
         this.gameEnded = false;
         this.observers = new ArrayList<>();
@@ -81,6 +84,10 @@ public class ChessGameTurn implements GameTurnListener, Serializable ,ObserverLi
         notifyObservers(player.getName() + "님의 차례입니다.");
         checkGameStatusAndConditions(player);
         victoryCondition.invalidateKingInCheckCache();
+        if (playerManager.getCurrentPlayerColor() == Color.BLACK &&
+                computerPlayer.isActive()) {
+            computerPlayer.play();
+        }
     }
 
     private void checkGameStatusAndConditions(Player player) {

@@ -23,7 +23,7 @@ public class ComputerPlayer implements Computer {
     @Getter
     @Setter
     private boolean active = false;
-    private static final int MAX_RETRIES = 5;
+    private static final int MAX_RETRIES = 10;
     private static final long RETRY_DELAY_MS = 1000; // 1초
 
     public ComputerPlayer(Stockfish stockfish) {
@@ -68,11 +68,9 @@ public class ComputerPlayer implements Computer {
         while (retries < MAX_RETRIES) {
             try {
                 String output = stockfish.getOutput(80);
-                System.out.println(output);
                 String move = output.split("bestmove ")[1].split(" ")[0];
-                System.out.println(move);
                 differentWithCurrentStatus(move);
-                return; // 성공적으로 실행되었으므로 메서드 종료
+                return;
             } catch (Exception e ){
                 retries++;
                 if (retries == MAX_RETRIES) {
@@ -128,7 +126,7 @@ public class ComputerPlayer implements Computer {
                 () -> new IllegalArgumentException("No piece found at position: " + fromPosition)
         );
 
-        gameLogicActions.executeMove(pieceAtPosition, toPosition);
+        gameLogicActions.moveActions(pieceAtPosition, toPosition);
 
     }
 

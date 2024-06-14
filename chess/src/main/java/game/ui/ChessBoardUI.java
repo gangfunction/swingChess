@@ -153,6 +153,7 @@ public class ChessBoardUI extends JFrame implements GameEventListener {
         createSquares();
         placeChessPieces();
 
+
     }
 
     private void createSquares() {

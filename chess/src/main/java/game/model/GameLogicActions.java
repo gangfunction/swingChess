@@ -16,4 +16,6 @@ public interface GameLogicActions {
 
     boolean isFriendlyPieceAtPosition(Position position, ChessPiece thisPiece);
     void executeMove(ChessPiece selectedPiece, Position clickedPosition);
+
+    void moveActions(ChessPiece pieceAtPosition, Position toPosition);
 }

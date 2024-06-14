@@ -2,6 +2,9 @@
 chess/build/*
 chess/.idea/
 chess/.gradle/**
+.idea/sonarlint/issuestore
+.idea/sonarlint/**
+
 # SonarLint plugin
 .idea/**/sonarlint/
 .vscode/**/sonarlint/

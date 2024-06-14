@@ -97,15 +97,12 @@ public class ChessGameLogic implements GameLogicActions {
 
     public void handleSquareClick(int x, int y) {
         Position clickedPosition = new Position(x, y);
-        System.out.println("Clicked position: " + clickedPosition);
-        System.out.println("Selected piece: " + chessPieceManager.getSelectedPiece());
-        System.out.println("Current player: " + playerManager.getCurrentPlayerColor());
         ChessPiece targetPiece = GameUtils.findPieceAtPosition(chessPieceManager, clickedPosition).orElse(null);
+
         if (targetPiece != null && chessPieceManager.getSelectedPiece() == null) {
             handlePieceSelection(targetPiece, clickedPosition, playerManager);
         } else if (chessPieceManager.getSelectedPiece() != null) {
             handlePieceMove(clickedPosition);
-
         } else {
             notifyInvalidMoveAttempted("No piece selected and no target piece at clicked position");
         }
@@ -120,6 +117,7 @@ public class ChessGameLogic implements GameLogicActions {
             notifyInvalidMoveAttempted("Invalid move: Piece not selectable.");
         }
     }
+
     private boolean canMoveBreakCheck(ChessPiece piece, Position targetPosition) {
         Position originalPosition = piece.getPosition();
         piece.setPosition(targetPosition);
@@ -131,15 +129,21 @@ public class ChessGameLogic implements GameLogicActions {
     private void handlePieceMove(Position clickedPosition) {
         ChessPiece selectedPiece = chessPieceManager.getSelectedPiece();
         if (!canMoveSelectedPiece(selectedPiece, clickedPosition)) {
+            gameEventListener.clearHighlights();
+            chessPieceManager.setSelectedPiece(null);
             return;
         }
-
         if (moveManager.isAvailableMoveTarget(clickedPosition, this)) {
-            executeMove(selectedPiece, clickedPosition);
-            postMoveActions(selectedPiece, clickedPosition);
+            moveActions(selectedPiece, clickedPosition);
         } else {
             notifyInvalidMove("Target position not available.");
         }
+    }
+
+    @Override
+    public void moveActions(ChessPiece selectedPiece, Position clickedPosition) {
+        executeMove(selectedPiece, clickedPosition);
+        postMoveActions(selectedPiece, clickedPosition);
     }
 
     private boolean canMoveSelectedPiece(ChessPiece selectedPiece, Position clickedPosition) {
@@ -169,14 +173,10 @@ public class ChessGameLogic implements GameLogicActions {
         }
         chessGameTurn.nextTurn();
         chessPieceManager.setSelectedPiece(null);
-        if(playerManager.getCurrentPlayerColor().isComputer() && computerPlayer.isActive()){
-            computerPlayer.play();
-            chessGameTurn.nextTurn();
-        }
+
         chessObserver.setGameState("Piece moved to " + clickedPosition);
     }
-    
-    
+
 
     private void notifyInvalidMoveAttempted(String reason) {
         if (gameEventListener != null) {
@@ -192,6 +192,7 @@ public class ChessGameLogic implements GameLogicActions {
         handleEnPassantCapture(selectedPiece, clickedPosition);
         updateGameStateAfterMove(selectedPiece, clickedPosition);
     }
+
     private void removeCapturedPieceIfExists(Position clickedPosition) {
         ChessPiece piece = chessPieceManager.getChessPieceAt(clickedPosition);
         if (piece != null) {
@@ -221,12 +222,14 @@ public class ChessGameLogic implements GameLogicActions {
         int direction = color == Color.WHITE ? 1 : -1;
         return new Position(clickedPosition.x(), clickedPosition.y() + direction);
     }
+
     private void handleCastlingMove(ChessPiece selectedPiece) {
         if (afterCastling) {
             castlingHandler.handleCastlingMove(selectedPiece, castlingLogic.isQueenSide());
             setAfterCastling(false);
         }
     }
+
     private void updatePiecePosition(ChessPiece selectedPiece, Position clickedPosition) {
         gameEventListener.onPieceMoved(clickedPosition, selectedPiece);
         MoveCommand moveCommand = commandInvoker.executeCommand(selectedPiece,
@@ -264,9 +267,10 @@ public class ChessGameLogic implements GameLogicActions {
 
 
     public Set<Position> calculateMovesForPiece(ChessPiece piece) {
-        return piece.calculateMoves(chessPieceManager,moveManager);
+        return piece.calculateMoves(chessPieceManager, moveManager);
     }
-    public boolean isKingInCheck(Color color){
+
+    public boolean isKingInCheck(Color color) {
         return chessRuleHandler.isKingInCheck(color);
     }
 

@@ -1,7 +1,0 @@
-
-ƒ	java:S1073"AConstructor has 8 parameters, which is greater than 7 authorized.(ø—Ë¬8İ•¡2J$7ba6ff02-ccb2-4a66-9d55-1c5753de7f93
-r	java:S106d"+Replace this use of System.out by a logger.(Éš†Ÿùÿÿÿÿ8ã¸¢2J$084cf77d-333b-4043-abb8-71638fa6af26
-r	java:S106e"+Replace this use of System.out by a logger.(«¬ëûÿÿÿÿ8ã¸¢2J$740a1626-453e-439c-a03c-b2e82e89a845
-m	java:S106f"+Replace this use of System.out by a logger.(Îˆ¹·8ã¸¢2J$aee62c7b-cc34-48b9-a250-7bed157172e2
-{
-java:S1068)"3Remove this unused "enPassantTarget" private field.(«ƒ×óÿÿÿÿÿ8å•¡2J$06f9e21b-5c41-4a24-aca5-273c5d86c982

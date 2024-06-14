@@ -31,9 +31,10 @@ public class ChessGameManager {
         commandInvoker.addUndoRedoListener(ChessGameManager::updateUI);
         DrawCondition drawCondition = new DrawCondition();
         victoryCondition = new VictoryCondition();
-        chessGameTurn = new ChessGameTurn(drawCondition, victoryCondition, chessGameState,playerManager);
+        chessGameTurn = new ChessGameTurn(drawCondition, victoryCondition, chessGameState,playerManager,computerPlayer);
 
         chessBoardUI = createChessBoardUI(chessGameState);
+
         chessGameLogic = createChessGameLogic(chessGameTurn,
                 commandInvoker,
                 chessBoardUI,
