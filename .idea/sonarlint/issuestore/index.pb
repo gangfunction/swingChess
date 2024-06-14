@@ -134,3 +134,5 @@ X
 :
 
 .gitignore,a/5/a5cc2925ca8258af241be7e5b0381edf30266302
+=
+chess/gradlew,f/3/f34f3492f6a7df95a6871ca4a3a49b714bb1a6c4

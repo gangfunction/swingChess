@@ -1,7 +1,7 @@
 .idea/sonarlint/*
 chess/build/*
 chess/.idea/
-
+chess/.gradle/**
 # SonarLint plugin
 .idea/**/sonarlint/
 .vscode/**/sonarlint/

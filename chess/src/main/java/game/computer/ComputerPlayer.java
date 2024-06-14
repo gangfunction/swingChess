@@ -23,6 +23,8 @@ public class ComputerPlayer implements Computer {
     @Getter
     @Setter
     private boolean active = false;
+    private static final int MAX_RETRIES = 5;
+    private static final long RETRY_DELAY_MS = 1000; // 1초
 
     public ComputerPlayer(Stockfish stockfish) {
         this.stockfish = stockfish;
@@ -56,17 +58,35 @@ public class ComputerPlayer implements Computer {
             throw new IllegalArgumentException("Board state cannot be null or empty");
         }
         stockfish.sendCommand("position fen " + boardState);
-        stockfish.sendCommand("go movetime 500");
+        stockfish.sendCommand("go movetime 80");
         getResult();
 
     }
 
     private void getResult() {
-        String output = stockfish.getOutput(500);
-        System.out.println(output);
-        String move = output.split("bestmove ")[1].split(" ")[0];
-        System.out.println(move);
-        differentWithCurrentStatus(move);
+        int retries = 0;
+        while (retries < MAX_RETRIES) {
+            try {
+                String output = stockfish.getOutput(80);
+                System.out.println(output);
+                String move = output.split("bestmove ")[1].split(" ")[0];
+                System.out.println(move);
+                differentWithCurrentStatus(move);
+                return; // 성공적으로 실행되었으므로 메서드 종료
+            } catch (Exception e ){
+                retries++;
+                if (retries == MAX_RETRIES) {
+                    System.err.println("최대 재시도 횟수 초과: " + e.getMessage());
+                    return; // 최대 재시도 횟수 초과 시 메서드 종료
+                }
+                System.err.println("재시도 " + retries + "/" + MAX_RETRIES);
+                try {
+                    Thread.sleep(RETRY_DELAY_MS); // 재시도 전 일정 시간 대기
+                } catch (InterruptedException ex) {
+                    ex.printStackTrace();
+                }
+            }
+        }
     }
 
     private void differentWithCurrentStatus(String move) {
